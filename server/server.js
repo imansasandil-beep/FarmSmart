@@ -3,11 +3,17 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 
+// IMPORT ROUTES
+const authRoute = require('./routes/auth');
+
 const app = express();
 
 // Middleware
 app.use(express.json()); // Allows us to parse JSON data
 app.use(cors()); // Allows frontend to communicate with backend
+
+// Route Middlewares
+app.use('/api/user', authRoute); // <--- ADD THIS
 
 // 1. Database Connection
 mongoose.connect(process.env.MONGO_URI)
