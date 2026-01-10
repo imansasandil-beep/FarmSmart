@@ -41,7 +41,7 @@ export default function RegisterScreen() {
       Alert.alert("Success", "Account created successfully!");
       router.replace('/'); // Go back to Login Screen
 
-    } catch (error: any) { // <--- FIXED: Added ": any" to solve TypeScript error
+    } catch (error) { 
       setLoading(false);
       
       if (error.response) {
