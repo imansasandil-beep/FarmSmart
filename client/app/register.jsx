@@ -36,10 +36,9 @@ export default function RegisterScreen() {
         role: role // Sending the selected role
       });
 
-      // 3. Success!
-      setLoading(false);
-      Alert.alert("Success", "Account created successfully!");
-      router.replace('/'); // Go back to Login Screen
+      // 3. Show success screen
+      setLoading(false)
+      router.replace('/success');
 
     } catch (error) { 
       setLoading(false);
