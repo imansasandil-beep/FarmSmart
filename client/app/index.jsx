@@ -1,12 +1,55 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Image, Alert, ActivityIndicator} from 'react-native';
 import { Ionicons } from '@expo/vector-icons'; // Built-in icons in Expo
 import { useRouter } from 'expo-router';
+import axios from 'axios';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
+
+  const API_URL = 'http://192.168.8.119:5000/api/user/login';
+
+  // 1. Add Loading State
+const [loading, setLoading] = useState(false);
+
+// 2. The Login Function
+const handleLogin = async () => {
+  // Basic Validation
+  if (!email || !password) {
+    Alert.alert("Error", "Please enter both email and password");
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    // Send Data to Backend
+    const response = await axios.post(API_URL, {
+      email: email,
+      password: password
+    });
+
+    // Success!
+    setLoading(false);
+    // Navigate to Home
+    router.replace('/home');
+
+  } catch (error) {
+    setLoading(false);
+
+    if (error.response) {
+      // Server error (e.g., "Invalid credentials")
+      Alert.alert("Login Failed", error.response.data.message);
+    } else if (error.request) {
+      // Network error
+      Alert.alert("Network Error", "Could not connect to server. Check your IP.");
+    } else {
+      Alert.alert("Error", "Something went wrong.");
+    }
+  }
+};
 
   return (
     // Replaces the cloud background image. 
@@ -52,8 +95,16 @@ export default function LoginScreen() {
         </View>
 
         {/* Login Button */}
-        <TouchableOpacity style={styles.loginButton}>
-          <Text style={styles.loginButtonText}>Log in</Text>
+       <TouchableOpacity 
+          style={styles.loginButton} 
+          onPress={handleLogin}   // <--- Connects the click
+          disabled={loading}      // <--- Stops double-clicks
+        >
+        {loading ? (
+        <ActivityIndicator color="white" /> // <--- Shows spinner
+        ) : (
+        <Text style={styles.loginButtonText}>Log in</Text>
+        )}
         </TouchableOpacity>
 
         <Text style={styles.forgotText}>Forgot Password?</Text>

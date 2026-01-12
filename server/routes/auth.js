@@ -37,4 +37,33 @@ router.post('/register', async (req, res) => {
   }
 });
 
+router.post('/login', async (req, res) => {
+  try {
+    // 1. Get email and password from the app
+    const { email, password } = req.body;
+
+    // 2. Check if the user exists in the database
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // 3. Check if the password matches the scrambled one in DB
+    const validPassword = await bcrypt.compare(password, user.password);
+    if (!validPassword) {
+      return res.status(400).json({ message: 'Invalid password' });
+    }
+
+    // 4. Success! Remove the password from the data we send back
+    const { password: _, ...others } = user._doc;
+    
+    res.status(200).json({ message: 'Login successful', user: others });
+
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+module.exports = router;
+
 module.exports = router;
