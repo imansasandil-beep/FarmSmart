@@ -9,7 +9,8 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const router = useRouter();
 
-  const API_URL = 'http://192.168.8.119:5000/api/user/login';
+ // REPLACE THE OLD IP WITH 192.168.1.20
+const API_URL = 'http://192.168.1.139:5000/api/user/login';
 
   // 1. Add Loading State
 const [loading, setLoading] = useState(false);
