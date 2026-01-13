@@ -4,8 +4,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import * as Notifications from 'expo-notifications';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Fix 1: Persistence
 
-// 1. Configure how notifications appear when the app is OPEN
+// 1. Configure Notification Handler
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
@@ -14,6 +15,17 @@ Notifications.setNotificationHandler({
   }),
 });
 
+// 2. CRITICAL FOR ANDROID: Create Channel
+// (This fixes the "Failed to schedule" error on Android)
+if (Platform.OS === 'android') {
+  Notifications.setNotificationChannelAsync('default', {
+    name: 'default',
+    importance: Notifications.AndroidImportance.MAX,
+    vibrationPattern: [0, 250, 250, 250],
+    lightColor: '#FF231F7C',
+  });
+}
+
 export default function TaskScreen() {
   const router = useRouter();
   const [taskTitle, setTaskTitle] = useState('');
@@ -21,32 +33,36 @@ export default function TaskScreen() {
   const [showPicker, setShowPicker] = useState(false);
   const [reminders, setReminders] = useState([]);
 
+  // Fix 1: Load saved reminders when screen opens
   useEffect(() => {
-    // 2. Ask for permission on load
-    async function requestPermissions() {
-      const { status } = await Notifications.requestPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert('Permission needed', 'Please enable notifications to set reminders!');
+    const loadReminders = async () => {
+      try {
+        const stored = await AsyncStorage.getItem('farmReminders');
+        if (stored) {
+          setReminders(JSON.parse(stored));
+        }
+      } catch (error) {
+        console.log('Error loading reminders:', error);
       }
-    }
-    requestPermissions();
+    };
+    loadReminders();
   }, []);
 
-const handleScheduleNotification = async () => {
-    // 1. VALIDATION: Check for empty name
+  const handleScheduleNotification = async () => {
+    // Validation
     if (!taskTitle.trim()) {
       Alert.alert("Error", "Please enter an activity name!");
       return;
     }
-
-    // 2. VALIDATION: Check if date is in the past
+    
+    // Check for past dates
     const now = new Date();
     if (date <= now) {
       Alert.alert("Error", "Please select a future date and time!");
       return;
     }
 
-    // 3. PERMISSION: Check again right before scheduling
+    // Permission Check
     const settings = await Notifications.getPermissionsAsync();
     if (settings.status !== 'granted') {
       const { status } = await Notifications.requestPermissionsAsync();
@@ -56,9 +72,8 @@ const handleScheduleNotification = async () => {
       }
     }
 
-    // 4. SCHEDULE: Use "seconds from now" to be safe
     try {
-      // Calculate how many seconds from NOW until the selected date
+      // Calculate seconds from now
       const triggerSeconds = Math.floor((date.getTime() - now.getTime()) / 1000);
 
       const id = await Notifications.scheduleNotificationAsync({
@@ -68,25 +83,52 @@ const handleScheduleNotification = async () => {
           sound: 'default',
         },
         trigger: {
-          seconds: triggerSeconds, // Logic: "Ring in X seconds"
+          seconds: triggerSeconds,
+          channelId: 'default', // Important for Android
         },
       });
 
+      // Update State
       const newReminder = { id, title: taskTitle, time: date.toLocaleString() };
-      setReminders([...reminders, newReminder]);
+      const updatedReminders = [...reminders, newReminder];
+      setReminders(updatedReminders);
+      
+      // Fix 1: Save to Storage
+      await AsyncStorage.setItem('farmReminders', JSON.stringify(updatedReminders));
       
       setTaskTitle('');
       Alert.alert("Success", "Reminder set successfully!");
     } catch (error) {
-      console.log(error);
-      Alert.alert("Error", "Failed to schedule notification. Please try again.");
+      console.log("NOTIFICATION ERROR:", error);
+      Alert.alert("Error Details", error.message || "Failed to schedule.");
     }
   };
-  // Date Picker Handler
+
+  // Fix 3: Delete Functionality
+  const handleDeleteReminder = async (reminderId) => {
+    try {
+      // Cancel the system notification
+      await Notifications.cancelScheduledNotificationAsync(reminderId);
+      
+      // Remove from list
+      const updatedReminders = reminders.filter(r => r.id !== reminderId);
+      setReminders(updatedReminders);
+      
+      // Update Storage
+      await AsyncStorage.setItem('farmReminders', JSON.stringify(updatedReminders));
+      
+    } catch (error) {
+      Alert.alert("Error", "Failed to delete reminder");
+    }
+  };
+
+  // Fix 2: Better Date Picker for Android
   const onDateChange = (event, selectedDate) => {
     const currentDate = selectedDate || date;
-    setShowPicker(Platform.OS === 'ios'); // Keep open on iOS, close on Android
     setDate(currentDate);
+    if (Platform.OS === 'android') {
+      setShowPicker(false);
+    }
   };
 
   return (
@@ -99,7 +141,6 @@ const handleScheduleNotification = async () => {
         <View style={{ width: 28 }} />
       </View>
 
-      {/* INPUT SECTION */}
       <View style={styles.inputCard}>
         <Text style={styles.label}>Activity Name:</Text>
         <TextInput 
@@ -111,8 +152,6 @@ const handleScheduleNotification = async () => {
         />
 
         <Text style={styles.label}>When?</Text>
-        
-        {/* Date Picker Button */}
         <TouchableOpacity style={styles.dateButton} onPress={() => setShowPicker(true)}>
           <Ionicons name="calendar" size={20} color="white" />
           <Text style={styles.dateText}>{date.toLocaleString()}</Text>
@@ -124,7 +163,7 @@ const handleScheduleNotification = async () => {
             mode="datetime"
             display="default"
             onChange={onDateChange}
-            minimumDate={new Date()} // Can't pick the past
+            minimumDate={new Date()}
           />
         )}
 
@@ -133,18 +172,24 @@ const handleScheduleNotification = async () => {
         </TouchableOpacity>
       </View>
 
-      {/* LIST OF UPCOMING TASKS */}
       <Text style={styles.subTitle}>Upcoming Reminders</Text>
+      
       <FlatList
         data={reminders}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View style={styles.taskItem}>
-            <View>
+            <View style={{flex: 1}}>
               <Text style={styles.taskTitle}>{item.title}</Text>
               <Text style={styles.taskTime}>{item.time}</Text>
             </View>
-            <Ionicons name="alarm" size={24} color="#f9a825" />
+            
+            {/* Fix 3: Trash Icon */}
+            <TouchableOpacity onPress={() => handleDeleteReminder(item.id)}>
+              <Ionicons name="trash-outline" size={24} color="#ff4444" />
+            </TouchableOpacity>
+            
+            <Ionicons name="alarm" size={24} color="#f9a825" style={{marginLeft: 15}} />
           </View>
         )}
       />
