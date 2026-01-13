@@ -4,14 +4,14 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function HomeScreen() {
+export default function HomeScreen() {1
   const router = useRouter();
   const [userName, setUserName] = useState('');
   const [loading, setLoading] = useState(true);
 
   // List of Menu Options matching your screenshot
   const menuItems = [
-    { title: 'Crop calendar', route: 'crop-calendar' },
+    { title: 'Crop calendar', route: 'tasks' },
     { title: 'Crop-specific recommendations', route: 'recommendations' },
     { title: 'Personal insights', route: 'insights' },
     { title: 'Chat platform', route: 'chat' },
@@ -38,9 +38,9 @@ export default function HomeScreen() {
     getUser();
   }, []);
 
-  const handleMenuPress = async (item) => {
+const handleMenuPress = async (item) => {
+    // 1. Check for Settings (Logout)
     if (item.title === 'Settings') {
-      // Temporary Logout Logic for the "Settings" button
       Alert.alert(
         "Log Out",
         "Do you want to log out?",
@@ -56,8 +56,13 @@ export default function HomeScreen() {
           }
         ]
       );
-    } else {
-      // Placeholder for other buttons
+    } 
+    // 2. Check for Crop Calendar (which now goes to Tasks)
+    else if (item.route === 'tasks') {
+      router.push('/tasks'); 
+    } 
+    // 3. Everything else
+    else {
       Alert.alert(item.title, "This feature is coming soon!");
     }
   };
