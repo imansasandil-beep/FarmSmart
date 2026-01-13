@@ -32,26 +32,46 @@ export default function TaskScreen() {
     requestPermissions();
   }, []);
 
-  const handleScheduleNotification = async () => {
-    if (!taskTitle) {
+const handleScheduleNotification = async () => {
+    // 1. VALIDATION: Check for empty name
+    if (!taskTitle.trim()) {
       Alert.alert("Error", "Please enter an activity name!");
       return;
     }
 
-    // 3. Schedule the Notification
+    // 2. VALIDATION: Check if date is in the past
+    const now = new Date();
+    if (date <= now) {
+      Alert.alert("Error", "Please select a future date and time!");
+      return;
+    }
+
+    // 3. PERMISSION: Check again right before scheduling
+    const settings = await Notifications.getPermissionsAsync();
+    if (settings.status !== 'granted') {
+      const { status } = await Notifications.requestPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert("Permission Error", "We need permission to send you reminders!");
+        return;
+      }
+    }
+
+    // 4. SCHEDULE: Use "seconds from now" to be safe
     try {
-      const trigger = date; // The date user selected
-      
+      // Calculate how many seconds from NOW until the selected date
+      const triggerSeconds = Math.floor((date.getTime() - now.getTime()) / 1000);
+
       const id = await Notifications.scheduleNotificationAsync({
         content: {
           title: "FarmSmart Reminder 🚜",
           body: `It's time to: ${taskTitle}`,
           sound: 'default',
         },
-        trigger, // Fires at this date
+        trigger: {
+          seconds: triggerSeconds, // Logic: "Ring in X seconds"
+        },
       });
 
-      // Add to local list so we can see it on screen
       const newReminder = { id, title: taskTitle, time: date.toLocaleString() };
       setReminders([...reminders, newReminder]);
       
@@ -59,10 +79,9 @@ export default function TaskScreen() {
       Alert.alert("Success", "Reminder set successfully!");
     } catch (error) {
       console.log(error);
-      Alert.alert("Error", "Failed to schedule notification");
+      Alert.alert("Error", "Failed to schedule notification. Please try again.");
     }
   };
-
   // Date Picker Handler
   const onDateChange = (event, selectedDate) => {
     const currentDate = selectedDate || date;
