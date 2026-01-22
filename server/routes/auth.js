@@ -8,8 +8,16 @@ router.post('/register', async (req, res) => {
     // 1. Destructure the data sent from the app
     const { fullName, email, password, role } = req.body;
 
-    // 2. Check if user already exists
-    const existingUser = await User.findOne({ email });
+    // 2. Validate input
+    if (!fullName || !email || !password) {
+      return res.status(400).json({ message: 'Please provide all required fields' });
+    }
+
+    // 3. Normalize email (trim and lowercase for consistency)
+    const normalizedEmail = email.trim().toLowerCase();
+
+    // 4. Check if user already exists
+    const existingUser = await User.findOne({ email: normalizedEmail });
     if (existingUser) {
       return res.status(400).json({ message: 'User with this email already exists!' });
     }
@@ -18,10 +26,10 @@ router.post('/register', async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // 4. Create the new user
+    // 5. Create the new user
     const newUser = new User({
-      fullName,
-      email,
+      fullName: fullName.trim(),
+      email: normalizedEmail,
       password: hashedPassword,
       role, // 'farmer' or 'buyer'
     });
@@ -42,28 +50,35 @@ router.post('/login', async (req, res) => {
     // 1. Get email and password from the app
     const { email, password } = req.body;
 
-    // 2. Check if the user exists in the database
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+    // 2. Validate input
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Please provide both email and password' });
     }
 
-    // 3. Check if the password matches the scrambled one in DB
+    // 3. Normalize email (trim and lowercase for consistency)
+    const normalizedEmail = email.trim().toLowerCase();
+
+    // 4. Check if the user exists in the database
+    const user = await User.findOne({ email: normalizedEmail });
+    if (!user) {
+      return res.status(400).json({ message: 'Invalid email or password' });
+    }
+
+    // 5. Check if the password matches the scrambled one in DB
     const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword) {
-      return res.status(400).json({ message: 'Invalid password' });
+      return res.status(400).json({ message: 'Invalid email or password' });
     }
 
-    // 4. Success! Remove the password from the data we send back
-    const { password: _, ...others } = user._doc;
+    // 6. Success! Remove the password from the data we send back
+    const userObject = user.toObject();
+    const { password: _, ...userWithoutPassword } = userObject;
     
-    res.status(200).json({ message: 'Login successful', user: others });
+    res.status(200).json({ message: 'Login successful', user: userWithoutPassword });
 
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
-
-module.exports = router;
 
 module.exports = router;

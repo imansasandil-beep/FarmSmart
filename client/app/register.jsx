@@ -16,7 +16,8 @@ export default function RegisterScreen() {
   const [loading, setLoading] = useState(false); 
 
   // <--- DOUBLE CHECK THIS IP ADDRESS --->
-  const API_URL = 'http://192.168.8.119:5000/api/user/register'; 
+  const API_URL = 'http://192.168.8.119:5000/api/user/register';
+
 
   const handleRegister = async () => {
     // 1. Basic Validation
@@ -37,7 +38,7 @@ export default function RegisterScreen() {
       });
 
       // 3. Show success screen
-      setLoading(false)
+      setLoading(false);
       router.replace('/success');
 
     } catch (error) { 

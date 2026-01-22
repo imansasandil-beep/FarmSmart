@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Image, Alert, ActivityIndicator} from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityIndicator} from 'react-native';
 import { Ionicons } from '@expo/vector-icons'; // Built-in icons in Expo
 import { useRouter } from 'expo-router';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -17,8 +18,16 @@ const [loading, setLoading] = useState(false);
 // 2. The Login Function
 const handleLogin = async () => {
   // Basic Validation
-  if (!email || !password) {
+  const trimmedEmail = email.trim();
+  if (!trimmedEmail || !password) {
     Alert.alert("Error", "Please enter both email and password");
+    return;
+  }
+
+  // Email format validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(trimmedEmail)) {
+    Alert.alert("Error", "Please enter a valid email address");
     return;
   }
 
@@ -27,11 +36,24 @@ const handleLogin = async () => {
   try {
     // Send Data to Backend
     const response = await axios.post(API_URL, {
-      email: email,
+      email: trimmedEmail,
       password: password
     });
 
-    // Success!
+    // Success! Save user data to AsyncStorage
+    if (response.data.user) {
+      try {
+        await AsyncStorage.setItem('user', JSON.stringify(response.data.user));
+      } catch (storageError) {
+        console.error('Error saving user data:', storageError);
+        // Still navigate even if storage fails, but log the error
+      }
+    } else {
+      Alert.alert("Error", "Login successful but user data not received");
+      setLoading(false);
+      return;
+    }
+
     setLoading(false);
     // Navigate to Home
     router.replace('/home');

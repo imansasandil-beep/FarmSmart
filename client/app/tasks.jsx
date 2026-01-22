@@ -76,15 +76,22 @@ export default function TaskScreen() {
       // Calculate seconds from now
       const triggerSeconds = Math.floor((date.getTime() - now.getTime()) / 1000);
 
+      // Build notification content
+      const notificationContent = {
+        title: "FarmSmart Reminder 🚜",
+        body: `It's time to: ${taskTitle}`,
+        sound: 'default',
+      };
+
+      // Add channelId for Android (must be in content, not trigger)
+      if (Platform.OS === 'android') {
+        notificationContent.channelId = 'default';
+      }
+
       const id = await Notifications.scheduleNotificationAsync({
-        content: {
-          title: "FarmSmart Reminder 🚜",
-          body: `It's time to: ${taskTitle}`,
-          sound: 'default',
-        },
+        content: notificationContent,
         trigger: {
           seconds: triggerSeconds,
-          channelId: 'default', // Important for Android
         },
       });
 
