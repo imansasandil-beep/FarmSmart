@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityIndicator} from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons'; // Built-in icons in Expo
 import { useRouter } from 'expo-router';
 import axios from 'axios';
@@ -13,74 +13,77 @@ export default function LoginScreen() {
   const API_URL = 'http://192.168.8.119:5000/api/user/login';
 
   // 1. Add Loading State
-const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-// 2. The Login Function
-const handleLogin = async () => {
-  // Basic Validation
-  const trimmedEmail = email.trim();
-  if (!trimmedEmail || !password) {
-    Alert.alert("Error", "Please enter both email and password");
-    return;
-  }
-
-  // Email format validation
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(trimmedEmail)) {
-    Alert.alert("Error", "Please enter a valid email address");
-    return;
-  }
-
-  setLoading(true);
-
-  try {
-    // Send Data to Backend
-    const response = await axios.post(API_URL, {
-      email: trimmedEmail,
-      password: password
-    });
-
-    // Success! Save user data to AsyncStorage
-    if (response.data.user) {
-      try {
-        await AsyncStorage.setItem('user', JSON.stringify(response.data.user));
-      } catch (storageError) {
-        console.error('Error saving user data:', storageError);
-        // Still navigate even if storage fails, but log the error
-      }
-    } else {
-      Alert.alert("Error", "Login successful but user data not received");
-      setLoading(false);
+  // 2. The Login Function
+  const handleLogin = async () => {
+    // Basic Validation
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail || !password) {
+      Alert.alert("Error", "Please enter both email and password");
       return;
     }
 
-    setLoading(false);
-    // Navigate to Home
-    router.replace('/home');
-
-  } catch (error) {
-    setLoading(false);
-
-    if (error.response) {
-      // Server error (e.g., "Invalid credentials")
-      Alert.alert("Login Failed", error.response.data.message);
-    } else if (error.request) {
-      // Network error
-      Alert.alert("Network Error", "Could not connect to server. Check your IP.");
-    } else {
-      Alert.alert("Error", "Something went wrong.");
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(trimmedEmail)) {
+      Alert.alert("Error", "Please enter a valid email address");
+      return;
     }
-  }
-};
+
+    setLoading(true);
+
+    try {
+      // Send Data to Backend
+      console.log('Attempting login to:', API_URL);
+      const response = await axios.post(API_URL, {
+        email: trimmedEmail,
+        password: password
+      }, {
+        timeout: 10000, // 10 second timeout
+      });
+
+      // Success! Save user data to AsyncStorage
+      if (response.data.user) {
+        try {
+          await AsyncStorage.setItem('user', JSON.stringify(response.data.user));
+        } catch (storageError) {
+          console.error('Error saving user data:', storageError);
+          // Still navigate even if storage fails, but log the error
+        }
+      } else {
+        Alert.alert("Error", "Login successful but user data not received");
+        setLoading(false);
+        return;
+      }
+
+      setLoading(false);
+      // Navigate to Home
+      router.replace('/home');
+
+    } catch (error) {
+      setLoading(false);
+
+      if (error.response) {
+        // Server error (e.g., "Invalid credentials")
+        Alert.alert("Login Failed", error.response.data.message);
+      } else if (error.request) {
+        // Network error
+        Alert.alert("Network Error", "Could not connect to server. Check your IP.");
+      } else {
+        Alert.alert("Error", "Something went wrong.");
+      }
+    }
+  };
 
   return (
     // Replaces the cloud background image. 
     // Once you have the image file, use: source={require('../../assets/clouds.png')}
     <View style={styles.container}>
-      
+
       {/* Top Right Logo Placeholder */}
       <View style={styles.logoContainer}>
-         <Ionicons name="leaf" size={32} color="white" />
+        <Ionicons name="leaf" size={32} color="white" />
       </View>
 
       <View style={styles.content}>
@@ -90,7 +93,7 @@ const handleLogin = async () => {
         {/* Email Input */}
         <View style={styles.inputContainer}>
           <View style={styles.iconBox}>
-             <Ionicons name="mail-outline" size={20} color="white" />
+            <Ionicons name="mail-outline" size={20} color="white" />
           </View>
           <TextInput
             style={styles.input}
@@ -103,8 +106,8 @@ const handleLogin = async () => {
 
         {/* Password Input */}
         <View style={styles.inputContainer}>
-           <View style={styles.iconBox}>
-             <Ionicons name="lock-closed-outline" size={20} color="white" />
+          <View style={styles.iconBox}>
+            <Ionicons name="lock-closed-outline" size={20} color="white" />
           </View>
           <TextInput
             style={styles.input}
@@ -117,39 +120,39 @@ const handleLogin = async () => {
         </View>
 
         {/* Login Button */}
-       <TouchableOpacity 
-          style={styles.loginButton} 
+        <TouchableOpacity
+          style={styles.loginButton}
           onPress={handleLogin}   // <--- Connects the click
           disabled={loading}      // <--- Stops double-clicks
         >
-        {loading ? (
-        <ActivityIndicator color="white" /> // <--- Shows spinner
-        ) : (
-        <Text style={styles.loginButtonText}>Log in</Text>
-        )}
+          {loading ? (
+            <ActivityIndicator color="white" /> // <--- Shows spinner
+          ) : (
+            <Text style={styles.loginButtonText}>Log in</Text>
+          )}
         </TouchableOpacity>
 
         <Text style={styles.forgotText}>Forgot Password?</Text>
-        
+
         <View style={styles.dividerContainer}>
-           <View style={styles.line} />
-           <Text style={styles.orText}>or</Text>
-           <View style={styles.line} />
+          <View style={styles.line} />
+          <Text style={styles.orText}>or</Text>
+          <View style={styles.line} />
         </View>
 
         <Text style={styles.socialText}>Social Media Login</Text>
-        
+
         {/* Social Icons */}
         <View style={styles.socialIconsContainer}>
-           <Ionicons name="logo-apple" size={30} color="white" style={styles.socialIcon} />
-           <Ionicons name="logo-facebook" size={30} color="white" style={styles.socialIcon} />
-           <Ionicons name="logo-google" size={30} color="white" style={styles.socialIcon} />
+          <Ionicons name="logo-apple" size={30} color="white" style={styles.socialIcon} />
+          <Ionicons name="logo-facebook" size={30} color="white" style={styles.socialIcon} />
+          <Ionicons name="logo-google" size={30} color="white" style={styles.socialIcon} />
         </View>
 
         <View style={styles.footer}>
           <Text style={styles.footerText}>Don't have an account? </Text>
           <TouchableOpacity onPress={() => router.push('/register')}>
-          <Text style={styles.signupText}>Sign up</Text>
+            <Text style={styles.signupText}>Sign up</Text>
           </TouchableOpacity>
         </View>
       </View>

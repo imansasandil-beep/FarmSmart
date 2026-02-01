@@ -6,14 +6,14 @@ import axios from 'axios';
 
 export default function RegisterScreen() {
   const router = useRouter();
-  
+
   // STATE variables
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [phone, setPhone] = useState('');
   const [role, setRole] = useState('farmer'); // Default is farmer
-  const [loading, setLoading] = useState(false); 
+  const [loading, setLoading] = useState(false);
 
   // <--- DOUBLE CHECK THIS IP ADDRESS --->
   const API_URL = 'http://192.168.8.119:5000/api/user/register';
@@ -41,9 +41,9 @@ export default function RegisterScreen() {
       setLoading(false);
       router.replace('/success');
 
-    } catch (error) { 
+    } catch (error) {
       setLoading(false);
-      
+
       if (error.response) {
         // Server responded with an error (e.g., "Email already exists")
         Alert.alert("Registration Failed", error.response.data.message);
@@ -60,7 +60,7 @@ export default function RegisterScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.logoContainer}>
-         <Ionicons name="leaf" size={32} color="white" />
+        <Ionicons name="leaf" size={32} color="white" />
       </View>
 
       <View style={styles.content}>
@@ -72,16 +72,16 @@ export default function RegisterScreen() {
           <Text style={styles.roleLabel}>I am a:</Text>
           <View style={styles.roleButtonRow}>
             {['farmer', 'buyer', 'expert'].map((r) => (
-              <TouchableOpacity 
-                key={r} 
+              <TouchableOpacity
+                key={r}
                 style={[
-                  styles.roleButton, 
+                  styles.roleButton,
                   role === r && styles.roleButtonActive
                 ]}
                 onPress={() => setRole(r)}
               >
                 <Text style={[
-                  styles.roleButtonText, 
+                  styles.roleButtonText,
                   role === r && styles.roleButtonTextActive
                 ]}>
                   {r.charAt(0).toUpperCase() + r.slice(1)}
@@ -94,7 +94,7 @@ export default function RegisterScreen() {
         {/* Name Input */}
         <View style={styles.inputContainer}>
           <View style={styles.iconBox}>
-             <Ionicons name="person" size={20} color="white" />
+            <Ionicons name="person" size={20} color="white" />
           </View>
           <TextInput
             style={styles.input}
@@ -108,7 +108,7 @@ export default function RegisterScreen() {
         {/* Email Input */}
         <View style={styles.inputContainer}>
           <View style={styles.iconBox}>
-             <Ionicons name="mail-outline" size={20} color="white" />
+            <Ionicons name="mail-outline" size={20} color="white" />
           </View>
           <TextInput
             style={styles.input}
@@ -123,8 +123,8 @@ export default function RegisterScreen() {
 
         {/* Password Input */}
         <View style={styles.inputContainer}>
-           <View style={styles.iconBox}>
-             <Ionicons name="lock-closed-outline" size={20} color="white" />
+          <View style={styles.iconBox}>
+            <Ionicons name="lock-closed-outline" size={20} color="white" />
           </View>
           <TextInput
             style={styles.input}
@@ -138,8 +138,8 @@ export default function RegisterScreen() {
 
         {/* Phone Input */}
         <View style={styles.inputContainer}>
-           <View style={styles.iconBox}>
-             <Ionicons name="call-outline" size={20} color="white" />
+          <View style={styles.iconBox}>
+            <Ionicons name="call-outline" size={20} color="white" />
           </View>
           <TextInput
             style={styles.input}
@@ -152,9 +152,9 @@ export default function RegisterScreen() {
         </View>
 
         {/* Sign Up Button */}
-        <TouchableOpacity 
-          style={styles.signupButton} 
-          onPress={handleRegister} 
+        <TouchableOpacity
+          style={styles.signupButton}
+          onPress={handleRegister}
           disabled={loading}
         >
           {loading ? (
@@ -167,7 +167,7 @@ export default function RegisterScreen() {
         <View style={styles.footer}>
           <Text style={styles.footerText}>Already have an account? </Text>
           <TouchableOpacity onPress={() => router.back()}>
-             <Text style={styles.loginLink}>Log in</Text>
+            <Text style={styles.loginLink}>Log in</Text>
           </TouchableOpacity>
         </View>
 
@@ -179,7 +179,7 @@ export default function RegisterScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0a1f1c', 
+    backgroundColor: '#0a1f1c',
     paddingHorizontal: 20,
     justifyContent: 'center',
   },
@@ -233,14 +233,14 @@ const styles = StyleSheet.create({
     marginHorizontal: 4,
   },
   roleButtonActive: {
-    backgroundColor: '#6fdfc4', 
+    backgroundColor: '#6fdfc4',
   },
   roleButtonText: {
     color: '#6fdfc4',
     fontWeight: 'bold',
   },
   roleButtonTextActive: {
-    color: '#0a1f1c', 
+    color: '#0a1f1c',
   },
   // Input Styles
   inputContainer: {
@@ -266,14 +266,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   signupButton: {
-    backgroundColor: '#6fdfc4', 
+    backgroundColor: '#6fdfc4',
     paddingVertical: 15,
     borderRadius: 25,
     alignItems: 'center',
     marginTop: 10,
   },
   signupButtonText: {
-    color: '#000', 
+    color: '#000',
     fontSize: 18,
     fontWeight: 'bold',
   },
