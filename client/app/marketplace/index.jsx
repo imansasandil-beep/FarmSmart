@@ -6,14 +6,14 @@ import {
     FlatList,
     TouchableOpacity,
     RefreshControl,
-    Linking,
     ActivityIndicator,
-    Alert
+    Alert,
+    Image,
 } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-
-const API_URL = 'http://192.168.8.119:5000'; // Update this to your server IP
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API_BASE_URL } from '../../config';
 
 export default function MarketplaceScreen() {
     const router = useRouter();
@@ -23,9 +23,13 @@ export default function MarketplaceScreen() {
 
     const fetchListings = async () => {
         try {
-            const response = await fetch(`${API_URL}/api/marketplace`);
+            const response = await fetch(`${API_BASE_URL}/api/marketplace`);
             const data = await response.json();
-            setListings(data);
+            // Only show active listings with available stock
+            const activeListings = Array.isArray(data)
+                ? data.filter(item => item.isActive !== false && item.availableQuantity > 0)
+                : [];
+            setListings(activeListings);
         } catch (error) {
             console.error('Error fetching listings:', error);
             Alert.alert('Error', 'Could not load marketplace listings. Please check your connection.');
@@ -35,7 +39,6 @@ export default function MarketplaceScreen() {
         }
     };
 
-    // Refresh listings when screen comes into focus
     useFocusEffect(
         useCallback(() => {
             fetchListings();
@@ -47,83 +50,76 @@ export default function MarketplaceScreen() {
         fetchListings();
     };
 
-    const handleCallSeller = (phone) => {
-        const phoneUrl = `tel:${phone}`;
-        Linking.canOpenURL(phoneUrl)
-            .then((supported) => {
-                if (supported) {
-                    Linking.openURL(phoneUrl);
-                } else {
-                    Alert.alert('Error', 'Phone dialer is not available on this device');
-                }
-            })
-            .catch((err) => console.error('Error opening phone dialer:', err));
-    };
+    const handleBuyNow = async (item) => {
+        // Check if user is logged in
+        const user = await AsyncStorage.getItem('user');
+        if (!user) {
+            Alert.alert('Login Required', 'Please login to make a purchase', [
+                { text: 'Cancel', style: 'cancel' },
+                { text: 'Login', onPress: () => router.push('/') },
+            ]);
+            return;
+        }
 
-    const handleWhatsApp = (phone) => {
-        // Remove any non-numeric characters from phone
-        const cleanPhone = phone.replace(/\D/g, '');
-        const whatsappUrl = `whatsapp://send?phone=${cleanPhone}`;
-        Linking.canOpenURL(whatsappUrl)
-            .then((supported) => {
-                if (supported) {
-                    Linking.openURL(whatsappUrl);
-                } else {
-                    Alert.alert('Error', 'WhatsApp is not installed on this device');
-                }
-            })
-            .catch((err) => console.error('Error opening WhatsApp:', err));
+        // Navigate to checkout with listing info
+        router.push({
+            pathname: '/marketplace/checkout',
+            params: {
+                listingId: item._id,
+                title: item.title,
+                price: item.price,
+                availableQuantity: item.availableQuantity,
+                unit: item.unit || 'kg',
+                imageUrl: item.imageUrl,
+                location: item.location,
+            },
+        });
     };
 
     const renderItem = ({ item }) => (
         <View style={styles.card}>
-            <View style={styles.cardHeader}>
-                <Text style={styles.cardTitle}>{item.title}</Text>
-                <Text style={styles.cardPrice}>Rs. {item.price}</Text>
-            </View>
+            {/* Product Image */}
+            <Image
+                source={{ uri: item.imageUrl }}
+                style={styles.cardImage}
+                resizeMode="cover"
+            />
 
-            <View style={styles.cardDetails}>
-                <View style={styles.detailRow}>
-                    <Ionicons name="cube-outline" size={16} color="#6fdfc4" />
-                    <Text style={styles.detailText}>Qty: {item.quantity}</Text>
+            <View style={styles.cardContent}>
+                <View style={styles.cardHeader}>
+                    <Text style={styles.cardTitle} numberOfLines={1}>{item.title}</Text>
+                    <Text style={styles.cardPrice}>Rs. {item.price}/{item.unit || 'kg'}</Text>
                 </View>
 
-                {item.location ? (
+                <View style={styles.cardDetails}>
                     <View style={styles.detailRow}>
-                        <Ionicons name="location-outline" size={16} color="#6fdfc4" />
-                        <Text style={styles.detailText}>{item.location}</Text>
+                        <Ionicons name="cube-outline" size={14} color="#6fdfc4" />
+                        <Text style={styles.detailText}>
+                            {item.availableQuantity} {item.unit || 'kg'} available
+                        </Text>
                     </View>
+
+                    {item.location ? (
+                        <View style={styles.detailRow}>
+                            <Ionicons name="location-outline" size={14} color="#6fdfc4" />
+                            <Text style={styles.detailText} numberOfLines={1}>{item.location}</Text>
+                        </View>
+                    ) : null}
+                </View>
+
+                {item.description ? (
+                    <Text style={styles.cardDescription} numberOfLines={2}>
+                        {item.description}
+                    </Text>
                 ) : null}
 
-                {item.sellerName ? (
-                    <View style={styles.detailRow}>
-                        <Ionicons name="person-outline" size={16} color="#6fdfc4" />
-                        <Text style={styles.detailText}>{item.sellerName}</Text>
-                    </View>
-                ) : null}
-            </View>
-
-            {item.description ? (
-                <Text style={styles.cardDescription} numberOfLines={2}>
-                    {item.description}
-                </Text>
-            ) : null}
-
-            <View style={styles.buttonRow}>
+                {/* Buy Now Button */}
                 <TouchableOpacity
-                    style={styles.callButton}
-                    onPress={() => handleCallSeller(item.sellerPhone)}
+                    style={styles.buyButton}
+                    onPress={() => handleBuyNow(item)}
                 >
-                    <Ionicons name="call" size={18} color="white" />
-                    <Text style={styles.buttonText}>Call Seller</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                    style={styles.whatsappButton}
-                    onPress={() => handleWhatsApp(item.sellerPhone)}
-                >
-                    <Ionicons name="logo-whatsapp" size={18} color="white" />
-                    <Text style={styles.buttonText}>WhatsApp</Text>
+                    <Ionicons name="cart" size={18} color="white" />
+                    <Text style={styles.buyButtonText}>Buy Now</Text>
                 </TouchableOpacity>
             </View>
         </View>
@@ -132,8 +128,8 @@ export default function MarketplaceScreen() {
     const renderEmptyList = () => (
         <View style={styles.emptyContainer}>
             <Ionicons name="storefront-outline" size={80} color="#6fdfc4" />
-            <Text style={styles.emptyTitle}>No Listings Yet</Text>
-            <Text style={styles.emptySubtitle}>Be the first to post a crop for sale!</Text>
+            <Text style={styles.emptyTitle}>No Listings Available</Text>
+            <Text style={styles.emptySubtitle}>Check back later for fresh produce!</Text>
         </View>
     );
 
@@ -154,7 +150,12 @@ export default function MarketplaceScreen() {
                     <Ionicons name="arrow-back" size={24} color="white" />
                 </TouchableOpacity>
                 <Text style={styles.headerTitle}>Marketplace</Text>
-                <View style={{ width: 40 }} />
+                <TouchableOpacity
+                    onPress={() => router.push('/marketplace/orders')}
+                    style={styles.ordersButton}
+                >
+                    <Ionicons name="receipt-outline" size={22} color="white" />
+                </TouchableOpacity>
             </View>
 
             {/* Listings */}
@@ -175,7 +176,7 @@ export default function MarketplaceScreen() {
                 showsVerticalScrollIndicator={false}
             />
 
-            {/* Floating Action Button */}
+            {/* FAB for adding listing */}
             <TouchableOpacity
                 style={styles.fab}
                 onPress={() => router.push('/marketplace/add')}
@@ -212,6 +213,14 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
+    ordersButton: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: 'rgba(255,255,255,0.1)',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
     headerTitle: {
         fontSize: 22,
         fontWeight: 'bold',
@@ -227,21 +236,29 @@ const styles = StyleSheet.create({
     card: {
         backgroundColor: '#1a4d45',
         borderRadius: 15,
-        padding: 16,
         marginBottom: 15,
+        overflow: 'hidden',
         borderWidth: 1,
-        borderColor: '#6fdfc4',
+        borderColor: 'rgba(111, 223, 196, 0.3)',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.25,
         shadowRadius: 3.84,
         elevation: 5,
     },
+    cardImage: {
+        width: '100%',
+        height: 120,
+        backgroundColor: '#0a1f1c',
+    },
+    cardContent: {
+        padding: 16,
+    },
     cardHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 12,
+        marginBottom: 10,
     },
     cardTitle: {
         fontSize: 18,
@@ -251,58 +268,42 @@ const styles = StyleSheet.create({
         marginRight: 10,
     },
     cardPrice: {
-        fontSize: 18,
+        fontSize: 16,
         fontWeight: 'bold',
         color: '#6fdfc4',
     },
     cardDetails: {
-        marginBottom: 10,
+        marginBottom: 8,
     },
     detailRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 6,
+        marginBottom: 4,
     },
     detailText: {
-        color: 'rgba(255,255,255,0.8)',
-        marginLeft: 8,
-        fontSize: 14,
+        color: 'rgba(255,255,255,0.7)',
+        marginLeft: 6,
+        fontSize: 13,
     },
     cardDescription: {
-        color: 'rgba(255,255,255,0.6)',
-        fontSize: 13,
+        color: 'rgba(255,255,255,0.5)',
+        fontSize: 12,
         marginBottom: 12,
-        lineHeight: 18,
+        lineHeight: 16,
     },
-    buttonRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        gap: 10,
-    },
-    callButton: {
-        flex: 1,
+    buyButton: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#2d7d6e',
+        backgroundColor: '#6fdfc4',
         paddingVertical: 12,
         borderRadius: 10,
-        gap: 6,
+        gap: 8,
     },
-    whatsappButton: {
-        flex: 1,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: '#25D366',
-        paddingVertical: 12,
-        borderRadius: 10,
-        gap: 6,
-    },
-    buttonText: {
-        color: 'white',
+    buyButtonText: {
+        color: '#0a1f1c',
         fontWeight: 'bold',
-        fontSize: 14,
+        fontSize: 16,
     },
     emptyContainer: {
         flex: 1,

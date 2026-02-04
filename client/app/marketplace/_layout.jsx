@@ -5,6 +5,8 @@ export default function MarketplaceLayout() {
         <Stack screenOptions={{ headerShown: false }}>
             <Stack.Screen name="index" />
             <Stack.Screen name="add" />
+            <Stack.Screen name="checkout" />
+            <Stack.Screen name="orders" />
         </Stack>
     );
 }

@@ -3,6 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityInd
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import axios from 'axios';
+import { API_BASE_URL } from '../config';
 
 export default function RegisterScreen() {
   const router = useRouter();
@@ -14,9 +15,6 @@ export default function RegisterScreen() {
   const [phone, setPhone] = useState('');
   const [role, setRole] = useState('farmer'); // Default is farmer
   const [loading, setLoading] = useState(false);
-
-  // <--- DOUBLE CHECK THIS IP ADDRESS --->
-  const API_URL = 'http://192.168.8.119:5000/api/user/register';
 
 
   const handleRegister = async () => {
@@ -30,10 +28,11 @@ export default function RegisterScreen() {
 
     try {
       // 2. Send Data to Backend
-      const response = await axios.post(API_URL, {
+      const response = await axios.post(`${API_BASE_URL}/api/user/register`, {
         fullName: name,
         email: email,
         password: password,
+        phone: phone,
         role: role // Sending the selected role
       });
 

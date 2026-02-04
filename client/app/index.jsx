@@ -4,13 +4,12 @@ import { Ionicons } from '@expo/vector-icons'; // Built-in icons in Expo
 import { useRouter } from 'expo-router';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API_BASE_URL } from '../config';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
-
-  const API_URL = 'http://192.168.8.119:5000/api/user/login';
 
   // 1. Add Loading State
   const [loading, setLoading] = useState(false);
@@ -35,8 +34,9 @@ export default function LoginScreen() {
 
     try {
       // Send Data to Backend
-      console.log('Attempting login to:', API_URL);
-      const response = await axios.post(API_URL, {
+      const loginUrl = `${API_BASE_URL}/api/user/login`;
+      console.log('Attempting login to:', loginUrl);
+      const response = await axios.post(loginUrl, {
         email: trimmedEmail,
         password: password
       }, {

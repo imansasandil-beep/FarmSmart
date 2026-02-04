@@ -6,8 +6,14 @@ const cors = require('cors');
 // IMPORT ROUTES
 const authRoute = require('./routes/auth');
 const marketplaceRoute = require('./routes/marketplace');
+const paymentsRoute = require('./routes/payments');
+const deliveryRoute = require('./routes/delivery');
+const ordersRoute = require('./routes/orders');
 
 const app = express();
+
+// Stripe webhook needs raw body
+app.use('/api/payments/webhook', express.raw({ type: 'application/json' }));
 
 // Middleware
 app.use(express.json()); // Allows us to parse JSON data
@@ -16,6 +22,9 @@ app.use(cors()); // Allows frontend to communicate with backend
 // Route Middlewares
 app.use('/api/user', authRoute);
 app.use('/api/marketplace', marketplaceRoute);
+app.use('/api/payments', paymentsRoute);
+app.use('/api/delivery', deliveryRoute);
+app.use('/api/orders', ordersRoute);
 
 // 1. Database Connection
 mongoose.connect(process.env.MONGO_URI)
