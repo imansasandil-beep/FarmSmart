@@ -14,6 +14,7 @@ import {
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useStripe } from '@stripe/stripe-react-native';
 import { API_BASE_URL } from '../../config';
 const PLATFORM_FEE_PERCENT = 2;
 
@@ -21,6 +22,9 @@ export default function CheckoutScreen() {
     const router = useRouter();
     const params = useLocalSearchParams();
     const { listingId, title, price, availableQuantity, unit, imageUrl, location } = params;
+
+    // Stripe hooks
+    const { initPaymentSheet, presentPaymentSheet } = useStripe();
 
     const [loading, setLoading] = useState(false);
     const [quantity, setQuantity] = useState('1');
@@ -103,7 +107,7 @@ export default function CheckoutScreen() {
             }
             const user = JSON.parse(userStr);
 
-            // Create payment intent
+            // Create payment intent on backend
             const response = await fetch(`${API_BASE_URL}/api/payments/create-payment-intent`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -117,11 +121,15 @@ export default function CheckoutScreen() {
 
             const data = await response.json();
 
-            if (response.ok) {
-                // In production, you'd use Stripe's payment sheet here
-                // For now, we'll simulate payment success
+            if (!response.ok) {
+                Alert.alert('Error', data.message || 'Failed to create order');
+                return;
+            }
+
+            // Check if this is dev mode (no real payment needed)
+            if (data.devMode || !data.clientSecret) {
                 Alert.alert(
-                    'Order Placed!',
+                    'Order Placed! 🎉',
                     `Your order for ${quantity} ${unit} of ${title} has been placed.\n\nTotal: Rs. ${data.breakdown.total}\n\nOrder ID: ${data.orderId}`,
                     [
                         {
@@ -130,9 +138,48 @@ export default function CheckoutScreen() {
                         },
                     ]
                 );
-            } else {
-                Alert.alert('Error', data.message || 'Failed to process payment');
+                return;
             }
+
+            // Initialize Payment Sheet
+            const { error: initError } = await initPaymentSheet({
+                paymentIntentClientSecret: data.clientSecret,
+                merchantDisplayName: 'FarmSmart',
+                returnURL: 'farmsmart://stripe-redirect',
+                defaultBillingDetails: {
+                    name: user.fullName,
+                },
+            });
+
+            if (initError) {
+                Alert.alert('Error', initError.message);
+                return;
+            }
+
+            // Present Payment Sheet
+            const { error: paymentError } = await presentPaymentSheet();
+
+            if (paymentError) {
+                if (paymentError.code === 'Canceled') {
+                    // User cancelled - do nothing
+                    return;
+                }
+                Alert.alert('Payment Failed', paymentError.message);
+                return;
+            }
+
+            // Payment successful!
+            Alert.alert(
+                'Payment Successful! 🎉',
+                `Your order for ${quantity} ${unit} of ${title} has been placed.\n\nTotal: Rs. ${data.breakdown.total}\n\nOrder ID: ${data.orderId}`,
+                [
+                    {
+                        text: 'View Orders',
+                        onPress: () => router.replace('/marketplace/orders'),
+                    },
+                ]
+            );
+
         } catch (error) {
             console.error('Checkout error:', error);
             Alert.alert('Error', 'Could not process payment. Please try again.');

@@ -39,27 +39,42 @@ router.post('/create-payment-intent', async (req, res) => {
 
         let paymentIntentId = null;
         let clientSecret = null;
+        let useDevMode = false;
 
-        // If Stripe is configured, create real payment intent
-        if (stripe) {
-            const paymentIntent = await stripe.paymentIntents.create({
-                amount: Math.round(totalAmount * 100), // Convert to cents
-                currency: 'lkr', // Sri Lankan Rupees
-                metadata: {
-                    listingId: listingId,
-                    buyerId: buyerId,
-                    sellerId: listing.sellerId.toString(),
-                    quantity: quantity,
-                    platformFee: platformFee,
-                    sellerPayout: sellerPayout,
-                },
-            });
-            paymentIntentId = paymentIntent.id;
-            clientSecret = paymentIntent.client_secret;
+        // Stripe minimum is ~$0.50 USD, which is about Rs. 160
+        const MINIMUM_STRIPE_AMOUNT_LKR = 160;
+
+        // If Stripe is configured AND amount meets minimum, create real payment intent
+        if (stripe && totalAmount >= MINIMUM_STRIPE_AMOUNT_LKR) {
+            try {
+                const paymentIntent = await stripe.paymentIntents.create({
+                    amount: Math.round(totalAmount * 100), // Convert to cents
+                    currency: 'lkr', // Sri Lankan Rupees
+                    metadata: {
+                        listingId: listingId,
+                        buyerId: buyerId,
+                        sellerId: listing.sellerId.toString(),
+                        quantity: quantity,
+                        platformFee: platformFee,
+                        sellerPayout: sellerPayout,
+                    },
+                });
+                paymentIntentId = paymentIntent.id;
+                clientSecret = paymentIntent.client_secret;
+            } catch (stripeError) {
+                console.log('Stripe error, falling back to dev mode:', stripeError.message);
+                useDevMode = true;
+            }
         } else {
-            // Development mode - simulate payment
+            useDevMode = true;
+            if (stripe && totalAmount < MINIMUM_STRIPE_AMOUNT_LKR) {
+                console.log(`Order amount Rs. ${totalAmount} below minimum (Rs. ${MINIMUM_STRIPE_AMOUNT_LKR}), using dev mode`);
+            }
+        }
+
+        // Dev mode - simulate payment
+        if (useDevMode) {
             paymentIntentId = `dev_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-            console.log('⚠️ Stripe not configured - running in development mode');
         }
 
         // Create order (with paid status in dev mode since no actual payment)
