@@ -19,7 +19,8 @@ export default function OrdersScreen() {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
-    const [activeTab, setActiveTab] = useState('buyer'); // 'buyer' or 'seller'
+    const [activeTab, setActiveTab] = useState('buyer');
+    const [updatingOrder, setUpdatingOrder] = useState(null);
 
     const fetchOrders = async () => {
         try {
@@ -58,6 +59,63 @@ export default function OrdersScreen() {
         fetchOrders();
     };
 
+    const updateOrderStatus = async (orderId, newStatus) => {
+        setUpdatingOrder(orderId);
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/orders/${orderId}/status`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: newStatus }),
+            });
+
+            if (response.ok) {
+                Alert.alert('Success', `Order marked as ${newStatus}`);
+                fetchOrders();
+            } else {
+                const data = await response.json();
+                Alert.alert('Error', data.message || 'Failed to update order');
+            }
+        } catch (error) {
+            console.error('Error updating order:', error);
+            Alert.alert('Error', 'Could not update order status');
+        } finally {
+            setUpdatingOrder(null);
+        }
+    };
+
+    const requestRefund = async (orderId) => {
+        Alert.alert(
+            'Request Refund',
+            'Are you sure you want to request a refund for this order?',
+            [
+                { text: 'Cancel', style: 'cancel' },
+                {
+                    text: 'Request Refund',
+                    style: 'destructive',
+                    onPress: async () => {
+                        setUpdatingOrder(orderId);
+                        try {
+                            const response = await fetch(`${API_BASE_URL}/api/payments/refund/${orderId}`, {
+                                method: 'POST',
+                            });
+                            const data = await response.json();
+                            if (response.ok) {
+                                Alert.alert('Refund Requested', data.message || 'Your refund request has been submitted.');
+                                fetchOrders();
+                            } else {
+                                Alert.alert('Error', data.message || 'Could not request refund');
+                            }
+                        } catch (error) {
+                            Alert.alert('Error', 'Could not process refund request');
+                        } finally {
+                            setUpdatingOrder(null);
+                        }
+                    },
+                },
+            ]
+        );
+    };
+
     const getStatusColor = (status) => {
         switch (status) {
             case 'pending': return '#f59e0b';
@@ -76,6 +134,7 @@ export default function OrdersScreen() {
             case 'pending': return '#f59e0b';
             case 'failed': return '#ef4444';
             case 'refunded': return '#6b7280';
+            case 'refund_requested': return '#f59e0b';
             default: return '#6b7280';
         }
     };
@@ -89,56 +148,142 @@ export default function OrdersScreen() {
         });
     };
 
-    const renderOrder = ({ item }) => (
-        <View style={styles.orderCard}>
-            <View style={styles.orderHeader}>
-                <Text style={styles.orderId}>Order #{item._id.slice(-8).toUpperCase()}</Text>
-                <Text style={styles.orderDate}>{formatDate(item.createdAt)}</Text>
-            </View>
+    const getNextStatus = (currentStatus) => {
+        switch (currentStatus) {
+            case 'pending':
+            case 'confirmed':
+                return 'shipped';
+            case 'shipped':
+                return 'delivered';
+            default:
+                return null;
+        }
+    };
 
-            <View style={styles.productInfo}>
-                <Text style={styles.productName}>{item.listingId?.title || 'Product'}</Text>
-                <Text style={styles.quantity}>
-                    {item.quantity} × Rs. {item.unitPrice}
-                </Text>
-            </View>
+    const renderOrder = ({ item }) => {
+        const nextStatus = activeTab === 'seller' ? getNextStatus(item.status) : null;
+        const isUpdating = updatingOrder === item._id;
+        const canRequestRefund = activeTab === 'buyer' &&
+            item.paymentStatus === 'paid' &&
+            item.status !== 'delivered' &&
+            item.paymentStatus !== 'refund_requested' &&
+            item.paymentStatus !== 'refunded';
 
-            <View style={styles.statusRow}>
-                <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.status) }]}>
-                    <Text style={styles.statusText}>{item.status.toUpperCase()}</Text>
+        return (
+            <View style={styles.orderCard}>
+                <View style={styles.orderHeader}>
+                    <Text style={styles.orderId}>Order #{item._id.slice(-8).toUpperCase()}</Text>
+                    <Text style={styles.orderDate}>{formatDate(item.createdAt)}</Text>
                 </View>
-                <View style={[styles.statusBadge, { backgroundColor: getPaymentStatusColor(item.paymentStatus) }]}>
-                    <Ionicons
-                        name={item.paymentStatus === 'paid' ? 'checkmark-circle' : 'time'}
-                        size={12}
-                        color="white"
-                    />
-                    <Text style={styles.statusText}>{item.paymentStatus.toUpperCase()}</Text>
-                </View>
-            </View>
 
-            <View style={styles.priceRow}>
-                <Text style={styles.priceLabel}>Total</Text>
-                <Text style={styles.priceValue}>Rs. {item.totalAmount}</Text>
-            </View>
-
-            {activeTab === 'seller' && (
-                <View style={styles.earningsRow}>
-                    <Text style={styles.earningsLabel}>Your Earnings</Text>
-                    <Text style={styles.earningsValue}>Rs. {item.sellerPayout}</Text>
-                </View>
-            )}
-
-            {item.deliveryStatus && item.deliveryStatus !== 'pending' && (
-                <View style={styles.deliveryRow}>
-                    <Ionicons name="bicycle" size={16} color="#6fdfc4" />
-                    <Text style={styles.deliveryText}>
-                        Delivery: {item.deliveryStatus}
+                <View style={styles.productInfo}>
+                    <Text style={styles.productName}>{item.listingId?.title || 'Product'}</Text>
+                    <Text style={styles.quantity}>
+                        {item.quantity} × Rs. {item.unitPrice}
                     </Text>
                 </View>
-            )}
-        </View>
-    );
+
+                {/* Buyer info for sellers */}
+                {activeTab === 'seller' && item.buyerId && (
+                    <View style={styles.buyerInfo}>
+                        <Ionicons name="person" size={14} color="#6fdfc4" />
+                        <Text style={styles.buyerName}>
+                            Buyer: {item.buyerId.fullName || 'Unknown'}
+                        </Text>
+                    </View>
+                )}
+
+                {/* Delivery Address for sellers */}
+                {activeTab === 'seller' && item.deliveryAddress && (
+                    <View style={styles.addressInfo}>
+                        <Ionicons name="location" size={14} color="#6fdfc4" />
+                        <Text style={styles.addressText} numberOfLines={2}>
+                            {item.deliveryAddress.street}, {item.deliveryAddress.city}
+                        </Text>
+                    </View>
+                )}
+
+                <View style={styles.statusRow}>
+                    <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.status) }]}>
+                        <Text style={styles.statusText}>{item.status.toUpperCase()}</Text>
+                    </View>
+                    <View style={[styles.statusBadge, { backgroundColor: getPaymentStatusColor(item.paymentStatus) }]}>
+                        <Ionicons
+                            name={item.paymentStatus === 'paid' ? 'checkmark-circle' : 'time'}
+                            size={12}
+                            color="white"
+                        />
+                        <Text style={styles.statusText}>
+                            {item.paymentStatus.replace('_', ' ').toUpperCase()}
+                        </Text>
+                    </View>
+                </View>
+
+                <View style={styles.priceRow}>
+                    <Text style={styles.priceLabel}>Total</Text>
+                    <Text style={styles.priceValue}>Rs. {item.totalAmount}</Text>
+                </View>
+
+                {activeTab === 'seller' && (
+                    <View style={styles.earningsRow}>
+                        <Text style={styles.earningsLabel}>Your Earnings</Text>
+                        <Text style={styles.earningsValue}>Rs. {item.sellerPayout}</Text>
+                    </View>
+                )}
+
+                {item.deliveryStatus && item.deliveryStatus !== 'pending' && (
+                    <View style={styles.deliveryRow}>
+                        <Ionicons name="bicycle" size={16} color="#6fdfc4" />
+                        <Text style={styles.deliveryText}>
+                            Delivery: {item.deliveryStatus}
+                        </Text>
+                    </View>
+                )}
+
+                {/* Seller Action Buttons */}
+                {activeTab === 'seller' && nextStatus && item.paymentStatus === 'paid' && (
+                    <TouchableOpacity
+                        style={[styles.actionButton, isUpdating && styles.actionButtonDisabled]}
+                        onPress={() => updateOrderStatus(item._id, nextStatus)}
+                        disabled={isUpdating}
+                    >
+                        {isUpdating ? (
+                            <ActivityIndicator size="small" color="#0a1f1c" />
+                        ) : (
+                            <>
+                                <Ionicons
+                                    name={nextStatus === 'shipped' ? 'airplane' : 'checkmark-done'}
+                                    size={18}
+                                    color="#0a1f1c"
+                                />
+                                <Text style={styles.actionButtonText}>
+                                    Mark as {nextStatus.charAt(0).toUpperCase() + nextStatus.slice(1)}
+                                </Text>
+                            </>
+                        )}
+                    </TouchableOpacity>
+                )}
+
+                {/* Buyer Refund Button */}
+                {canRequestRefund && (
+                    <TouchableOpacity
+                        style={[styles.refundButton, isUpdating && styles.actionButtonDisabled]}
+                        onPress={() => requestRefund(item._id)}
+                        disabled={isUpdating}
+                    >
+                        {isUpdating ? (
+                            <ActivityIndicator size="small" color="#ef4444" />
+                        ) : (
+                            <>
+                                <Ionicons name="return-down-back" size={16} color="#ef4444" />
+                                <Text style={styles.refundButtonText}>Request Refund</Text>
+                            </>
+                        )}
+                    </TouchableOpacity>
+                )}
+            </View>
+        );
+    };
 
     const renderEmptyList = () => (
         <View style={styles.emptyContainer}>
@@ -311,7 +456,7 @@ const styles = StyleSheet.create({
         fontSize: 12,
     },
     productInfo: {
-        marginBottom: 12,
+        marginBottom: 10,
     },
     productName: {
         color: 'white',
@@ -322,6 +467,27 @@ const styles = StyleSheet.create({
     quantity: {
         color: 'rgba(255,255,255,0.7)',
         fontSize: 14,
+    },
+    buyerInfo: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 6,
+        gap: 6,
+    },
+    buyerName: {
+        color: 'rgba(255,255,255,0.8)',
+        fontSize: 13,
+    },
+    addressInfo: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        marginBottom: 10,
+        gap: 6,
+    },
+    addressText: {
+        color: 'rgba(255,255,255,0.6)',
+        fontSize: 12,
+        flex: 1,
     },
     statusRow: {
         flexDirection: 'row',
@@ -379,6 +545,41 @@ const styles = StyleSheet.create({
     },
     deliveryText: {
         color: 'rgba(255,255,255,0.7)',
+        fontSize: 13,
+    },
+    actionButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#6fdfc4',
+        paddingVertical: 12,
+        borderRadius: 10,
+        marginTop: 12,
+        gap: 8,
+    },
+    actionButtonDisabled: {
+        opacity: 0.6,
+    },
+    actionButtonText: {
+        color: '#0a1f1c',
+        fontWeight: 'bold',
+        fontSize: 14,
+    },
+    refundButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'transparent',
+        borderWidth: 1,
+        borderColor: '#ef4444',
+        paddingVertical: 10,
+        borderRadius: 10,
+        marginTop: 12,
+        gap: 6,
+    },
+    refundButtonText: {
+        color: '#ef4444',
+        fontWeight: '600',
         fontSize: 13,
     },
     emptyContainer: {

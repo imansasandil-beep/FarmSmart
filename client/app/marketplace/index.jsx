@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import {
     View,
     Text,
@@ -9,11 +9,32 @@ import {
     ActivityIndicator,
     Alert,
     Image,
+    TextInput,
+    Modal,
+    ScrollView,
 } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_BASE_URL } from '../../config';
+
+// Crop categories for filtering
+const CROP_CATEGORIES = [
+    { id: 'all', label: 'All Crops', icon: 'leaf' },
+    { id: 'vegetables', label: 'Vegetables', icon: 'nutrition' },
+    { id: 'fruits', label: 'Fruits', icon: 'egg' },
+    { id: 'grains', label: 'Grains & Rice', icon: 'grid' },
+    { id: 'spices', label: 'Spices', icon: 'flame' },
+    { id: 'dairy', label: 'Dairy', icon: 'water' },
+    { id: 'other', label: 'Other', icon: 'ellipsis-horizontal' },
+];
+
+const SORT_OPTIONS = [
+    { id: 'newest', label: 'Newest First' },
+    { id: 'oldest', label: 'Oldest First' },
+    { id: 'price_low', label: 'Price: Low to High' },
+    { id: 'price_high', label: 'Price: High to Low' },
+];
 
 export default function MarketplaceScreen() {
     const router = useRouter();
@@ -21,18 +42,25 @@ export default function MarketplaceScreen() {
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
 
+    // Filter states
+    const [searchText, setSearchText] = useState('');
+    const [selectedCategory, setSelectedCategory] = useState('all');
+    const [selectedSort, setSelectedSort] = useState('newest');
+    const [minPrice, setMinPrice] = useState('');
+    const [maxPrice, setMaxPrice] = useState('');
+    const [showFilters, setShowFilters] = useState(false);
+
     const fetchListings = async () => {
         try {
             const response = await fetch(`${API_BASE_URL}/api/marketplace`);
             const data = await response.json();
-            // Only show active listings with available stock
             const activeListings = Array.isArray(data)
                 ? data.filter(item => item.isActive !== false && item.availableQuantity > 0)
                 : [];
             setListings(activeListings);
         } catch (error) {
             console.error('Error fetching listings:', error);
-            Alert.alert('Error', 'Could not load marketplace listings. Please check your connection.');
+            Alert.alert('Error', 'Could not load marketplace listings.');
         } finally {
             setLoading(false);
             setRefreshing(false);
@@ -45,13 +73,70 @@ export default function MarketplaceScreen() {
         }, [])
     );
 
+    // Apply filters and sorting
+    const filteredListings = useMemo(() => {
+        let result = [...listings];
+
+        // Search filter
+        if (searchText.trim()) {
+            const search = searchText.toLowerCase();
+            result = result.filter(item =>
+                item.title.toLowerCase().includes(search) ||
+                (item.description && item.description.toLowerCase().includes(search)) ||
+                (item.location && item.location.toLowerCase().includes(search))
+            );
+        }
+
+        // Category filter
+        if (selectedCategory !== 'all') {
+            result = result.filter(item => {
+                const itemCategory = (item.category || 'other').toLowerCase();
+                return itemCategory === selectedCategory ||
+                    (selectedCategory === 'vegetables' && itemCategory === 'crops');
+            });
+        }
+
+        // Price range filter
+        if (minPrice) {
+            result = result.filter(item => item.price >= parseFloat(minPrice));
+        }
+        if (maxPrice) {
+            result = result.filter(item => item.price <= parseFloat(maxPrice));
+        }
+
+        // Sorting
+        switch (selectedSort) {
+            case 'newest':
+                result.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                break;
+            case 'oldest':
+                result.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+                break;
+            case 'price_low':
+                result.sort((a, b) => a.price - b.price);
+                break;
+            case 'price_high':
+                result.sort((a, b) => b.price - a.price);
+                break;
+        }
+
+        return result;
+    }, [listings, searchText, selectedCategory, selectedSort, minPrice, maxPrice]);
+
     const onRefresh = () => {
         setRefreshing(true);
         fetchListings();
     };
 
+    const clearFilters = () => {
+        setSearchText('');
+        setSelectedCategory('all');
+        setSelectedSort('newest');
+        setMinPrice('');
+        setMaxPrice('');
+    };
+
     const handleBuyNow = async (item) => {
-        // Check if user is logged in
         const user = await AsyncStorage.getItem('user');
         if (!user) {
             Alert.alert('Login Required', 'Please login to make a purchase', [
@@ -61,7 +146,6 @@ export default function MarketplaceScreen() {
             return;
         }
 
-        // Navigate to checkout with listing info
         router.push({
             pathname: '/marketplace/checkout',
             params: {
@@ -76,9 +160,32 @@ export default function MarketplaceScreen() {
         });
     };
 
+    const renderCategoryChip = (category) => (
+        <TouchableOpacity
+            key={category.id}
+            style={[
+                styles.categoryChip,
+                selectedCategory === category.id && styles.categoryChipActive
+            ]}
+            onPress={() => setSelectedCategory(category.id)}
+        >
+            <Ionicons
+                name={category.icon}
+                size={14}
+                color={selectedCategory === category.id ? '#0a1f1c' : '#6fdfc4'}
+                style={{ marginTop: 1 }}
+            />
+            <Text style={[
+                styles.categoryChipText,
+                selectedCategory === category.id && styles.categoryChipTextActive
+            ]}>
+                {category.label}
+            </Text>
+        </TouchableOpacity>
+    );
+
     const renderItem = ({ item }) => (
         <View style={styles.card}>
-            {/* Product Image */}
             <Image
                 source={{ uri: item.imageUrl }}
                 style={styles.cardImage}
@@ -90,6 +197,12 @@ export default function MarketplaceScreen() {
                     <Text style={styles.cardTitle} numberOfLines={1}>{item.title}</Text>
                     <Text style={styles.cardPrice}>Rs. {item.price}/{item.unit || 'kg'}</Text>
                 </View>
+
+                {item.category && (
+                    <View style={styles.categoryBadge}>
+                        <Text style={styles.categoryBadgeText}>{item.category}</Text>
+                    </View>
+                )}
 
                 <View style={styles.cardDetails}>
                     <View style={styles.detailRow}>
@@ -113,12 +226,11 @@ export default function MarketplaceScreen() {
                     </Text>
                 ) : null}
 
-                {/* Buy Now Button */}
                 <TouchableOpacity
                     style={styles.buyButton}
                     onPress={() => handleBuyNow(item)}
                 >
-                    <Ionicons name="cart" size={18} color="white" />
+                    <Ionicons name="cart" size={18} color="#0a1f1c" />
                     <Text style={styles.buyButtonText}>Buy Now</Text>
                 </TouchableOpacity>
             </View>
@@ -127,10 +239,129 @@ export default function MarketplaceScreen() {
 
     const renderEmptyList = () => (
         <View style={styles.emptyContainer}>
-            <Ionicons name="storefront-outline" size={80} color="#6fdfc4" />
-            <Text style={styles.emptyTitle}>No Listings Available</Text>
-            <Text style={styles.emptySubtitle}>Check back later for fresh produce!</Text>
+            <Ionicons name="search-outline" size={80} color="#6fdfc4" />
+            <Text style={styles.emptyTitle}>No Results Found</Text>
+            <Text style={styles.emptySubtitle}>
+                {searchText || selectedCategory !== 'all'
+                    ? 'Try adjusting your filters'
+                    : 'Check back later for fresh produce!'}
+            </Text>
+            {(searchText || selectedCategory !== 'all') && (
+                <TouchableOpacity style={styles.clearFiltersBtn} onPress={clearFilters}>
+                    <Text style={styles.clearFiltersBtnText}>Clear Filters</Text>
+                </TouchableOpacity>
+            )}
         </View>
+    );
+
+    // Filter Modal
+    const renderFilterModal = () => (
+        <Modal
+            visible={showFilters}
+            animationType="slide"
+            transparent={true}
+            onRequestClose={() => setShowFilters(false)}
+        >
+            <View style={styles.modalOverlay}>
+                <View style={styles.modalContent}>
+                    <View style={styles.modalHeader}>
+                        <Text style={styles.modalTitle}>Filters</Text>
+                        <TouchableOpacity onPress={() => setShowFilters(false)}>
+                            <Ionicons name="close" size={24} color="white" />
+                        </TouchableOpacity>
+                    </View>
+
+                    <ScrollView showsVerticalScrollIndicator={false}>
+                        {/* Price Range */}
+                        <Text style={styles.filterLabel}>Price Range (Rs.)</Text>
+                        <View style={styles.priceRow}>
+                            <TextInput
+                                style={styles.priceInput}
+                                placeholder="Min"
+                                placeholderTextColor="rgba(255,255,255,0.4)"
+                                keyboardType="numeric"
+                                value={minPrice}
+                                onChangeText={setMinPrice}
+                            />
+                            <Text style={styles.priceSeparator}>to</Text>
+                            <TextInput
+                                style={styles.priceInput}
+                                placeholder="Max"
+                                placeholderTextColor="rgba(255,255,255,0.4)"
+                                keyboardType="numeric"
+                                value={maxPrice}
+                                onChangeText={setMaxPrice}
+                            />
+                        </View>
+
+                        {/* Sort */}
+                        <Text style={styles.filterLabel}>Sort By</Text>
+                        <View style={styles.sortOptions}>
+                            {SORT_OPTIONS.map(option => (
+                                <TouchableOpacity
+                                    key={option.id}
+                                    style={[
+                                        styles.sortOption,
+                                        selectedSort === option.id && styles.sortOptionActive
+                                    ]}
+                                    onPress={() => setSelectedSort(option.id)}
+                                >
+                                    <Text style={[
+                                        styles.sortOptionText,
+                                        selectedSort === option.id && styles.sortOptionTextActive
+                                    ]}>
+                                        {option.label}
+                                    </Text>
+                                </TouchableOpacity>
+                            ))}
+                        </View>
+
+                        {/* Category in Modal */}
+                        <Text style={styles.filterLabel}>Crop Category</Text>
+                        <View style={styles.modalCategories}>
+                            {CROP_CATEGORIES.map(category => (
+                                <TouchableOpacity
+                                    key={category.id}
+                                    style={[
+                                        styles.modalCategoryItem,
+                                        selectedCategory === category.id && styles.modalCategoryItemActive
+                                    ]}
+                                    onPress={() => setSelectedCategory(category.id)}
+                                >
+                                    <Ionicons
+                                        name={category.icon}
+                                        size={20}
+                                        color={selectedCategory === category.id ? '#0a1f1c' : '#6fdfc4'}
+                                    />
+                                    <Text style={[
+                                        styles.modalCategoryText,
+                                        selectedCategory === category.id && styles.modalCategoryTextActive
+                                    ]}>
+                                        {category.label}
+                                    </Text>
+                                </TouchableOpacity>
+                            ))}
+                        </View>
+                    </ScrollView>
+
+                    {/* Modal Actions */}
+                    <View style={styles.modalActions}>
+                        <TouchableOpacity
+                            style={styles.clearBtn}
+                            onPress={clearFilters}
+                        >
+                            <Text style={styles.clearBtnText}>Clear All</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={styles.applyBtn}
+                            onPress={() => setShowFilters(false)}
+                        >
+                            <Text style={styles.applyBtnText}>Apply Filters</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </View>
+        </Modal>
     );
 
     if (loading) {
@@ -141,6 +372,14 @@ export default function MarketplaceScreen() {
             </View>
         );
     }
+
+    const activeFiltersCount = [
+        searchText,
+        selectedCategory !== 'all',
+        minPrice,
+        maxPrice,
+        selectedSort !== 'newest'
+    ].filter(Boolean).length;
 
     return (
         <View style={styles.container}>
@@ -158,13 +397,66 @@ export default function MarketplaceScreen() {
                 </TouchableOpacity>
             </View>
 
+            {/* Search Bar */}
+            <View style={styles.searchContainer}>
+                <View style={styles.searchBar}>
+                    <Ionicons name="search" size={20} color="rgba(255,255,255,0.5)" />
+                    <TextInput
+                        style={styles.searchInput}
+                        placeholder="Search crops, vegetables, fruits..."
+                        placeholderTextColor="rgba(255,255,255,0.4)"
+                        value={searchText}
+                        onChangeText={setSearchText}
+                    />
+                    {searchText ? (
+                        <TouchableOpacity onPress={() => setSearchText('')}>
+                            <Ionicons name="close-circle" size={20} color="rgba(255,255,255,0.5)" />
+                        </TouchableOpacity>
+                    ) : null}
+                </View>
+                <TouchableOpacity
+                    style={[styles.filterBtn, activeFiltersCount > 0 && styles.filterBtnActive]}
+                    onPress={() => setShowFilters(true)}
+                >
+                    <Ionicons name="options" size={22} color="white" />
+                    {activeFiltersCount > 0 && (
+                        <View style={styles.filterBadge}>
+                            <Text style={styles.filterBadgeText}>{activeFiltersCount}</Text>
+                        </View>
+                    )}
+                </TouchableOpacity>
+            </View>
+
+            {/* Category Chips */}
+            <View style={{ height: 44, marginBottom: 10 }}>
+                <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={styles.categoryScrollContent}
+                >
+                    {CROP_CATEGORIES.map(renderCategoryChip)}
+                </ScrollView>
+            </View>
+
+            {/* Results Count */}
+            <View style={styles.resultsHeader}>
+                <Text style={styles.resultsCount}>
+                    {filteredListings.length} {filteredListings.length === 1 ? 'listing' : 'listings'} found
+                </Text>
+                {activeFiltersCount > 0 && (
+                    <TouchableOpacity onPress={clearFilters}>
+                        <Text style={styles.clearFiltersText}>Clear filters</Text>
+                    </TouchableOpacity>
+                )}
+            </View>
+
             {/* Listings */}
             <FlatList
-                data={listings}
+                data={filteredListings}
                 keyExtractor={(item) => item._id}
                 renderItem={renderItem}
                 ListEmptyComponent={renderEmptyList}
-                contentContainerStyle={listings.length === 0 ? styles.emptyList : styles.listContent}
+                contentContainerStyle={filteredListings.length === 0 ? styles.emptyList : styles.listContent}
                 refreshControl={
                     <RefreshControl
                         refreshing={refreshing}
@@ -176,13 +468,15 @@ export default function MarketplaceScreen() {
                 showsVerticalScrollIndicator={false}
             />
 
-            {/* FAB for adding listing */}
+            {/* FAB */}
             <TouchableOpacity
                 style={styles.fab}
                 onPress={() => router.push('/marketplace/add')}
             >
-                <Ionicons name="add" size={30} color="white" />
+                <Ionicons name="add" size={30} color="#0a1f1c" />
             </TouchableOpacity>
+
+            {renderFilterModal()}
         </View>
     );
 }
@@ -202,7 +496,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         paddingTop: 60,
         paddingHorizontal: 20,
-        paddingBottom: 20,
+        paddingBottom: 15,
         backgroundColor: '#0a1f1c',
     },
     backButton: {
@@ -226,6 +520,109 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: 'white',
     },
+
+    // Search
+    searchContainer: {
+        flexDirection: 'row',
+        paddingHorizontal: 20,
+        gap: 10,
+        marginBottom: 10,
+    },
+    searchBar: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: 'rgba(255,255,255,0.1)',
+        borderRadius: 12,
+        paddingHorizontal: 15,
+        height: 48,
+    },
+    searchInput: {
+        flex: 1,
+        color: 'white',
+        marginLeft: 10,
+        fontSize: 15,
+    },
+    filterBtn: {
+        width: 48,
+        height: 48,
+        borderRadius: 12,
+        backgroundColor: 'rgba(255,255,255,0.1)',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    filterBtnActive: {
+        backgroundColor: '#6fdfc4',
+    },
+    filterBadge: {
+        position: 'absolute',
+        top: 6,
+        right: 6,
+        backgroundColor: '#ff6b6b',
+        borderRadius: 10,
+        minWidth: 16,
+        height: 16,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    filterBadgeText: {
+        color: 'white',
+        fontSize: 10,
+        fontWeight: 'bold',
+    },
+
+    // Categories
+    categoryScroll: {
+        marginBottom: 12,
+    },
+    categoryScrollContent: {
+        paddingHorizontal: 20,
+        paddingRight: 30,
+        gap: 10,
+    },
+    categoryChip: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 14,
+        paddingVertical: 8,
+        backgroundColor: 'rgba(111, 223, 196, 0.15)',
+        borderRadius: 20,
+        borderWidth: 1,
+        borderColor: 'rgba(111, 223, 196, 0.3)',
+        gap: 5,
+    },
+    categoryChipActive: {
+        backgroundColor: '#6fdfc4',
+        borderColor: '#6fdfc4',
+    },
+    categoryChipText: {
+        color: '#6fdfc4',
+        fontSize: 12,
+        fontWeight: '600',
+    },
+    categoryChipTextActive: {
+        color: '#0a1f1c',
+    },
+
+    // Results Header
+    resultsHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: 20,
+        paddingVertical: 10,
+    },
+    resultsCount: {
+        color: 'rgba(255,255,255,0.6)',
+        fontSize: 13,
+    },
+    clearFiltersText: {
+        color: '#6fdfc4',
+        fontSize: 13,
+        fontWeight: '500',
+    },
+
+    // Cards
     listContent: {
         paddingHorizontal: 20,
         paddingBottom: 100,
@@ -258,7 +655,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 10,
+        marginBottom: 8,
     },
     cardTitle: {
         fontSize: 18,
@@ -271,6 +668,20 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
         color: '#6fdfc4',
+    },
+    categoryBadge: {
+        alignSelf: 'flex-start',
+        backgroundColor: 'rgba(111, 223, 196, 0.2)',
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        borderRadius: 12,
+        marginBottom: 8,
+    },
+    categoryBadgeText: {
+        color: '#6fdfc4',
+        fontSize: 11,
+        fontWeight: '500',
+        textTransform: 'capitalize',
     },
     cardDetails: {
         marginBottom: 8,
@@ -305,6 +716,8 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         fontSize: 16,
     },
+
+    // Empty State
     emptyContainer: {
         flex: 1,
         justifyContent: 'center',
@@ -322,6 +735,17 @@ const styles = StyleSheet.create({
         color: 'rgba(255,255,255,0.6)',
         marginTop: 8,
         textAlign: 'center',
+    },
+    clearFiltersBtn: {
+        marginTop: 20,
+        paddingHorizontal: 20,
+        paddingVertical: 10,
+        backgroundColor: '#6fdfc4',
+        borderRadius: 20,
+    },
+    clearFiltersBtnText: {
+        color: '#0a1f1c',
+        fontWeight: 'bold',
     },
     loadingText: {
         color: '#6fdfc4',
@@ -343,5 +767,131 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.3,
         shadowRadius: 4.65,
         elevation: 8,
+    },
+
+    // Modal
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.7)',
+        justifyContent: 'flex-end',
+    },
+    modalContent: {
+        backgroundColor: '#1a4d45',
+        borderTopLeftRadius: 25,
+        borderTopRightRadius: 25,
+        paddingHorizontal: 20,
+        paddingTop: 20,
+        paddingBottom: 40,
+        maxHeight: '80%',
+    },
+    modalHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 25,
+    },
+    modalTitle: {
+        fontSize: 22,
+        fontWeight: 'bold',
+        color: 'white',
+    },
+    filterLabel: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: '600',
+        marginBottom: 12,
+        marginTop: 15,
+    },
+    priceRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
+    },
+    priceInput: {
+        flex: 1,
+        backgroundColor: 'rgba(255,255,255,0.1)',
+        borderRadius: 10,
+        paddingHorizontal: 15,
+        paddingVertical: 12,
+        color: 'white',
+        fontSize: 16,
+    },
+    priceSeparator: {
+        color: 'rgba(255,255,255,0.5)',
+    },
+    sortOptions: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: 10,
+    },
+    sortOption: {
+        paddingHorizontal: 16,
+        paddingVertical: 10,
+        backgroundColor: 'rgba(255,255,255,0.1)',
+        borderRadius: 20,
+    },
+    sortOptionActive: {
+        backgroundColor: '#6fdfc4',
+    },
+    sortOptionText: {
+        color: 'white',
+        fontSize: 13,
+    },
+    sortOptionTextActive: {
+        color: '#0a1f1c',
+        fontWeight: '600',
+    },
+    modalCategories: {
+        gap: 10,
+    },
+    modalCategoryItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 14,
+        paddingHorizontal: 16,
+        backgroundColor: 'rgba(255,255,255,0.1)',
+        borderRadius: 12,
+        gap: 12,
+    },
+    modalCategoryItemActive: {
+        backgroundColor: '#6fdfc4',
+    },
+    modalCategoryText: {
+        color: 'white',
+        fontSize: 15,
+    },
+    modalCategoryTextActive: {
+        color: '#0a1f1c',
+        fontWeight: '600',
+    },
+    modalActions: {
+        flexDirection: 'row',
+        gap: 15,
+        marginTop: 25,
+    },
+    clearBtn: {
+        flex: 1,
+        paddingVertical: 14,
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.3)',
+        alignItems: 'center',
+    },
+    clearBtnText: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: '600',
+    },
+    applyBtn: {
+        flex: 2,
+        paddingVertical: 14,
+        borderRadius: 12,
+        backgroundColor: '#6fdfc4',
+        alignItems: 'center',
+    },
+    applyBtnText: {
+        color: '#0a1f1c',
+        fontSize: 16,
+        fontWeight: 'bold',
     },
 });

@@ -10,15 +10,30 @@ import {
     ActivityIndicator,
     KeyboardAvoidingView,
     Platform,
+    Image,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as ImagePicker from 'expo-image-picker';
 import { API_BASE_URL } from '../../config';
+
+// Crop categories
+const CROP_CATEGORIES = [
+    { id: 'vegetables', label: 'Vegetables', icon: 'nutrition' },
+    { id: 'fruits', label: 'Fruits', icon: 'egg' },
+    { id: 'grains', label: 'Grains & Rice', icon: 'grid' },
+    { id: 'spices', label: 'Spices', icon: 'flame' },
+    { id: 'dairy', label: 'Dairy', icon: 'water' },
+    { id: 'other', label: 'Other', icon: 'ellipsis-horizontal' },
+];
 
 export default function AddListingScreen() {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
+    const [uploading, setUploading] = useState(false);
+    const [imageUri, setImageUri] = useState(null);
+    const [uploadedImageUrl, setUploadedImageUrl] = useState(null);
     const [formData, setFormData] = useState({
         title: '',
         price: '',
@@ -26,6 +41,7 @@ export default function AddListingScreen() {
         unit: 'kg',
         location: '',
         description: '',
+        category: 'vegetables',
     });
     const [pickupAddress, setPickupAddress] = useState({
         street: '',
@@ -40,6 +56,88 @@ export default function AddListingScreen() {
 
     const handleAddressChange = (field, value) => {
         setPickupAddress((prev) => ({ ...prev, [field]: value }));
+    };
+
+    const pickImage = async () => {
+        Alert.alert(
+            'Add Photo',
+            'Choose how to add a photo',
+            [
+                {
+                    text: 'Camera',
+                    onPress: async () => {
+                        const permission = await ImagePicker.requestCameraPermissionsAsync();
+                        if (!permission.granted) {
+                            Alert.alert('Permission needed', 'Camera permission is required');
+                            return;
+                        }
+                        const result = await ImagePicker.launchCameraAsync({
+                            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                            allowsEditing: true,
+                            aspect: [4, 3],
+                            quality: 0.8,
+                        });
+                        if (!result.canceled && result.assets[0]) {
+                            setImageUri(result.assets[0].uri);
+                            uploadImage(result.assets[0]);
+                        }
+                    },
+                },
+                {
+                    text: 'Gallery',
+                    onPress: async () => {
+                        const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+                        if (!permission.granted) {
+                            Alert.alert('Permission needed', 'Gallery permission is required');
+                            return;
+                        }
+                        const result = await ImagePicker.launchImageLibraryAsync({
+                            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                            allowsEditing: true,
+                            aspect: [4, 3],
+                            quality: 0.8,
+                        });
+                        if (!result.canceled && result.assets[0]) {
+                            setImageUri(result.assets[0].uri);
+                            uploadImage(result.assets[0]);
+                        }
+                    },
+                },
+                { text: 'Cancel', style: 'cancel' },
+            ]
+        );
+    };
+
+    const uploadImage = async (imageAsset) => {
+        setUploading(true);
+        try {
+            const formData = new FormData();
+            formData.append('image', {
+                uri: imageAsset.uri,
+                type: 'image/jpeg',
+                name: 'listing_image.jpg',
+            });
+
+            const response = await fetch(`${API_BASE_URL}/api/upload/image`, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                setUploadedImageUrl(data.url);
+            } else {
+                Alert.alert('Upload Failed', data.message || 'Could not upload image');
+            }
+        } catch (error) {
+            console.error('Upload error:', error);
+            Alert.alert('Error', 'Failed to upload image');
+        } finally {
+            setUploading(false);
+        }
     };
 
     const validateForm = () => {
@@ -88,6 +186,7 @@ export default function AddListingScreen() {
                     sellerId: user._id,
                     pickupAddress,
                     location: `${pickupAddress.city}, ${pickupAddress.state}`,
+                    imageUrl: uploadedImageUrl || 'https://via.placeholder.com/400x300.png?text=No+Image',
                 }),
             });
 
@@ -130,6 +229,36 @@ export default function AddListingScreen() {
             >
                 {/* Product Details Section */}
                 <Text style={styles.sectionTitle}>Product Details</Text>
+
+                {/* Image Upload */}
+                <View style={styles.inputGroup}>
+                    <Text style={styles.label}>Product Image</Text>
+                    <TouchableOpacity
+                        style={styles.imagePicker}
+                        onPress={pickImage}
+                        disabled={uploading}
+                    >
+                        {imageUri ? (
+                            <Image source={{ uri: imageUri }} style={styles.previewImage} />
+                        ) : (
+                            <View style={styles.imagePickerContent}>
+                                <Ionicons name="camera" size={40} color="#6fdfc4" />
+                                <Text style={styles.imagePickerText}>Add Photo</Text>
+                            </View>
+                        )}
+                        {uploading && (
+                            <View style={styles.uploadingOverlay}>
+                                <ActivityIndicator size="large" color="#6fdfc4" />
+                                <Text style={styles.uploadingText}>Uploading...</Text>
+                            </View>
+                        )}
+                        {uploadedImageUrl && !uploading && (
+                            <View style={styles.uploadedBadge}>
+                                <Ionicons name="checkmark-circle" size={20} color="#22c55e" />
+                            </View>
+                        )}
+                    </TouchableOpacity>
+                </View>
 
                 {/* Title */}
                 <View style={styles.inputGroup}>
@@ -208,6 +337,37 @@ export default function AddListingScreen() {
                         numberOfLines={4}
                         textAlignVertical="top"
                     />
+                </View>
+
+                {/* Category */}
+                <View style={styles.inputGroup}>
+                    <Text style={styles.label}>Category *</Text>
+                    <View style={styles.categoryGrid}>
+                        {CROP_CATEGORIES.map((cat) => (
+                            <TouchableOpacity
+                                key={cat.id}
+                                style={[
+                                    styles.categoryOption,
+                                    formData.category === cat.id && styles.categoryOptionActive,
+                                ]}
+                                onPress={() => handleChange('category', cat.id)}
+                            >
+                                <Ionicons
+                                    name={cat.icon}
+                                    size={18}
+                                    color={formData.category === cat.id ? '#0a1f1c' : '#6fdfc4'}
+                                />
+                                <Text
+                                    style={[
+                                        styles.categoryOptionText,
+                                        formData.category === cat.id && styles.categoryOptionTextActive,
+                                    ]}
+                                >
+                                    {cat.label}
+                                </Text>
+                            </TouchableOpacity>
+                        ))}
+                    </View>
                 </View>
 
                 {/* Pickup Address Section */}
@@ -378,6 +538,34 @@ const styles = StyleSheet.create({
     unitOptionTextActive: {
         color: '#0a1f1c',
     },
+    categoryGrid: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: 10,
+    },
+    categoryOption: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 14,
+        paddingVertical: 10,
+        backgroundColor: '#1a4d45',
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: 'rgba(111, 223, 196, 0.3)',
+        gap: 6,
+    },
+    categoryOptionActive: {
+        backgroundColor: '#6fdfc4',
+        borderColor: '#6fdfc4',
+    },
+    categoryOptionText: {
+        color: 'rgba(255,255,255,0.7)',
+        fontSize: 13,
+        fontWeight: '500',
+    },
+    categoryOptionTextActive: {
+        color: '#0a1f1c',
+    },
     infoBox: {
         flexDirection: 'row',
         backgroundColor: 'rgba(111, 223, 196, 0.1)',
@@ -422,5 +610,49 @@ const styles = StyleSheet.create({
         fontSize: 12,
         textAlign: 'center',
         marginTop: 15,
+    },
+    imagePicker: {
+        height: 180,
+        backgroundColor: '#1a4d45',
+        borderRadius: 15,
+        borderWidth: 2,
+        borderColor: 'rgba(111, 223, 196, 0.3)',
+        borderStyle: 'dashed',
+        overflow: 'hidden',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    imagePickerContent: {
+        alignItems: 'center',
+        gap: 10,
+    },
+    imagePickerText: {
+        color: '#6fdfc4',
+        fontSize: 14,
+        fontWeight: '500',
+    },
+    previewImage: {
+        width: '100%',
+        height: '100%',
+        resizeMode: 'cover',
+    },
+    uploadingOverlay: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'rgba(10, 31, 28, 0.8)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    uploadingText: {
+        color: '#6fdfc4',
+        fontSize: 12,
+        marginTop: 8,
+    },
+    uploadedBadge: {
+        position: 'absolute',
+        top: 10,
+        right: 10,
+        backgroundColor: 'rgba(10, 31, 28, 0.8)',
+        borderRadius: 12,
+        padding: 4,
     },
 });

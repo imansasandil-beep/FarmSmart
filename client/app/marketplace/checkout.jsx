@@ -36,6 +36,7 @@ export default function CheckoutScreen() {
     });
     const [deliveryFee, setDeliveryFee] = useState(0);
     const [gettingQuote, setGettingQuote] = useState(false);
+    const [deliveryInfo, setDeliveryInfo] = useState(null);
 
     // Calculate pricing
     const unitPrice = parseFloat(price) || 0;
@@ -45,18 +46,21 @@ export default function CheckoutScreen() {
     const total = subtotal + platformFee + deliveryFee;
 
     const getDeliveryQuote = async () => {
-        if (!deliveryAddress.street || !deliveryAddress.city) {
-            Alert.alert('Error', 'Please enter your delivery address');
+        if (!deliveryAddress.city) {
+            Alert.alert('Error', 'Please enter your city');
             return;
         }
 
         setGettingQuote(true);
         try {
+            // Parse the listing location (format: "City, State")
+            const pickupCity = location ? location.split(',')[0].trim() : '';
+
             const response = await fetch(`${API_BASE_URL}/api/delivery/quote`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    pickupAddress: location, // Simplified for now
+                    pickupAddress: { city: pickupCity, street: location },
                     dropoffAddress: deliveryAddress,
                 }),
             });
@@ -64,17 +68,22 @@ export default function CheckoutScreen() {
             const data = await response.json();
             if (response.ok) {
                 setDeliveryFee(data.fee);
-                Alert.alert('Delivery Quote', `Estimated delivery fee: Rs. ${data.fee}`);
+                setDeliveryInfo(data);
+
+                let message = `Delivery Fee: Rs. ${data.fee}`;
+                if (data.distance > 0) {
+                    message += `\nDistance: ~${data.distance} km`;
+                }
+                message += `\nEstimated Time: ${data.estimatedDeliveryTime}`;
+
+                Alert.alert('📦 Delivery Quote', message);
             } else {
-                // Use estimated fee if Uber Direct not configured
-                const estimatedFee = 150; // Default delivery fee
-                setDeliveryFee(estimatedFee);
-                Alert.alert('Delivery Fee', `Estimated delivery fee: Rs. ${estimatedFee}`);
+                setDeliveryFee(250);
+                Alert.alert('Delivery Fee', 'Estimated delivery fee: Rs. 250');
             }
         } catch (error) {
             console.error('Quote error:', error);
-            // Use default fee on error
-            setDeliveryFee(150);
+            setDeliveryFee(250);
         } finally {
             setGettingQuote(false);
         }
@@ -168,7 +177,15 @@ export default function CheckoutScreen() {
                 return;
             }
 
-            // Payment successful!
+            // Payment successful - confirm with backend
+            try {
+                await fetch(`${API_BASE_URL}/api/payments/confirm-payment/${data.orderId}`, {
+                    method: 'POST',
+                });
+            } catch (confirmError) {
+                console.log('Could not confirm payment, will be processed by webhook:', confirmError);
+            }
+
             Alert.alert(
                 'Payment Successful! 🎉',
                 `Your order for ${quantity} ${unit} of ${title} has been placed.\n\nTotal: Rs. ${data.breakdown.total}\n\nOrder ID: ${data.orderId}`,
