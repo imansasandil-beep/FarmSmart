@@ -5,6 +5,7 @@ const Listing = require('../models/Listing');
 router.get('/', async (req, res) => {
     try {
         const listings = await Listing.find({ isActive: { $ne: false } })
+            .populate('sellerId', 'fullName isVerified averageRating totalReviews')
             .sort({ createdAt: -1 });
         res.status(200).json(listings);
     } catch (err) {
@@ -15,7 +16,8 @@ router.get('/', async (req, res) => {
 // GET /api/marketplace/:id - Get single listing
 router.get('/:id', async (req, res) => {
     try {
-        const listing = await Listing.findById(req.params.id);
+        const listing = await Listing.findById(req.params.id)
+            .populate('sellerId', 'fullName isVerified averageRating totalReviews');
         if (!listing) {
             return res.status(404).json({ message: 'Listing not found' });
         }

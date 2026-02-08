@@ -6,7 +6,7 @@ const bcrypt = require('bcryptjs'); // Import the security tool
 router.post('/register', async (req, res) => {
   try {
     // 1. Destructure the data sent from the app
-    const { fullName, email, password, role } = req.body;
+    const { fullName, email, password, phone, role } = req.body;
 
     // 2. Validate input
     if (!fullName || !email || !password) {
@@ -31,6 +31,7 @@ router.post('/register', async (req, res) => {
       fullName: fullName.trim(),
       email: normalizedEmail,
       password: hashedPassword,
+      phone: phone || '',
       role, // 'farmer' or 'buyer'
     });
 
@@ -73,8 +74,38 @@ router.post('/login', async (req, res) => {
     // 6. Success! Remove the password from the data we send back
     const userObject = user.toObject();
     const { password: _, ...userWithoutPassword } = userObject;
-    
+
     res.status(200).json({ message: 'Login successful', user: userWithoutPassword });
+
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Request verification
+router.post('/request-verification', async (req, res) => {
+  try {
+    const { userId, idNumber, address } = req.body;
+
+    if (!userId || !idNumber || !address) {
+      return res.status(400).json({ message: 'Missing required fields' });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    user.verificationStatus = 'pending';
+    // In a real app, we would save the ID number/address to a secure location or separate model
+    // For this demo, just updating status is enough
+
+    await user.save();
+
+    res.status(200).json({
+      message: 'Verification request submitted',
+      verificationStatus: 'pending'
+    });
 
   } catch (err) {
     res.status(500).json({ message: err.message });

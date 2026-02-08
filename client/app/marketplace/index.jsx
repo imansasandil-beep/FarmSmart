@@ -160,6 +160,43 @@ export default function MarketplaceScreen() {
         });
     };
 
+    const handleMessageSeller = async (item) => {
+        const userStr = await AsyncStorage.getItem('user');
+        if (!userStr) {
+            Alert.alert('Login Required', 'Please login to message the seller');
+            return;
+        }
+        const user = JSON.parse(userStr);
+
+        // Get the seller ID as a string (sellerId may be populated as object or just a string)
+        const sellerIdStr = item.sellerId?._id || item.sellerId;
+        const sellerName = item.sellerId?.fullName || 'Seller';
+
+        if (user._id === sellerIdStr) {
+            Alert.alert('Note', 'This is your own listing');
+            return;
+        }
+
+        // Fetch conversation ID
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/messages/conversation-id/${user._id}/${sellerIdStr}`);
+            const data = await response.json();
+
+            if (response.ok) {
+                router.push({
+                    pathname: `/marketplace/chat/${data.conversationId}`,
+                    params: {
+                        receiverId: sellerIdStr,
+                        receiverName: sellerName,
+                    },
+                });
+            }
+        } catch (error) {
+            console.error('Error starting chat:', error);
+            Alert.alert('Error', 'Could not start chat');
+        }
+    };
+
     const renderCategoryChip = (category) => (
         <TouchableOpacity
             key={category.id}
@@ -194,7 +231,23 @@ export default function MarketplaceScreen() {
 
             <View style={styles.cardContent}>
                 <View style={styles.cardHeader}>
-                    <Text style={styles.cardTitle} numberOfLines={1}>{item.title}</Text>
+                    <View style={{ flex: 1, marginRight: 10 }}>
+                        <Text style={styles.cardTitle} numberOfLines={1}>{item.title}</Text>
+                        <View style={styles.sellerRow}>
+                            {item.sellerId?.isVerified && (
+                                <Ionicons name="checkmark-circle" size={14} color="#6fdfc4" style={{ marginRight: 4 }} />
+                            )}
+                            <Text style={styles.sellerName} numberOfLines={1}>
+                                {item.sellerId?.fullName || 'Seller'}
+                            </Text>
+                            <View style={styles.ratingBadge}>
+                                <Ionicons name="star" size={10} color="#f59e0b" />
+                                <Text style={styles.ratingText}>
+                                    {item.sellerId?.averageRating ? item.sellerId.averageRating.toFixed(1) : 'New'}
+                                </Text>
+                            </View>
+                        </View>
+                    </View>
                     <Text style={styles.cardPrice}>Rs. {item.price}/{item.unit || 'kg'}</Text>
                 </View>
 
@@ -226,13 +279,22 @@ export default function MarketplaceScreen() {
                     </Text>
                 ) : null}
 
-                <TouchableOpacity
-                    style={styles.buyButton}
-                    onPress={() => handleBuyNow(item)}
-                >
-                    <Ionicons name="cart" size={18} color="#0a1f1c" />
-                    <Text style={styles.buyButtonText}>Buy Now</Text>
-                </TouchableOpacity>
+                <View style={styles.actionButtons}>
+                    <TouchableOpacity
+                        style={styles.messageButton}
+                        onPress={() => handleMessageSeller(item)}
+                    >
+                        <Ionicons name="chatbubble-ellipses-outline" size={22} color="#6fdfc4" />
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        style={styles.buyButton}
+                        onPress={() => handleBuyNow(item)}
+                    >
+                        <Ionicons name="cart" size={18} color="#0a1f1c" />
+                        <Text style={styles.buyButtonText}>Buy Now</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
         </View>
     );
@@ -389,12 +451,17 @@ export default function MarketplaceScreen() {
                     <Ionicons name="arrow-back" size={24} color="white" />
                 </TouchableOpacity>
                 <Text style={styles.headerTitle}>Marketplace</Text>
-                <TouchableOpacity
-                    onPress={() => router.push('/marketplace/orders')}
-                    style={styles.ordersButton}
-                >
-                    <Ionicons name="receipt-outline" size={22} color="white" />
-                </TouchableOpacity>
+                <View style={styles.headerActions}>
+                    <TouchableOpacity onPress={() => router.push('/notifications')} style={styles.headerBtn}>
+                        <Ionicons name="notifications-outline" size={22} color="white" />
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => router.push('/chat')} style={styles.headerBtn}>
+                        <Ionicons name="chatbubbles-outline" size={22} color="white" />
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => router.push('/marketplace/orders')} style={styles.headerBtn}>
+                        <Ionicons name="receipt-outline" size={22} color="white" />
+                    </TouchableOpacity>
+                </View>
             </View>
 
             {/* Search Bar */}
@@ -654,8 +721,32 @@ const styles = StyleSheet.create({
     cardHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'center',
+        alignItems: 'flex-start',
         marginBottom: 8,
+    },
+    sellerRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 4,
+    },
+    sellerName: {
+        color: 'rgba(255,255,255,0.7)',
+        fontSize: 12,
+        marginRight: 8,
+    },
+    ratingBadge: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: 'rgba(245, 158, 11, 0.15)',
+        paddingHorizontal: 6,
+        paddingVertical: 2,
+        borderRadius: 4,
+        gap: 3,
+    },
+    ratingText: {
+        color: '#f59e0b',
+        fontSize: 10,
+        fontWeight: 'bold',
     },
     cardTitle: {
         fontSize: 18,
@@ -715,6 +806,21 @@ const styles = StyleSheet.create({
         color: '#0a1f1c',
         fontWeight: 'bold',
         fontSize: 16,
+    },
+    actionButtons: {
+        flexDirection: 'row',
+        gap: 12,
+        marginTop: 5,
+    },
+    messageButton: {
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+        borderRadius: 10,
+        backgroundColor: 'rgba(111, 223, 196, 0.15)',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 1,
+        borderColor: 'rgba(111, 223, 196, 0.3)',
     },
 
     // Empty State

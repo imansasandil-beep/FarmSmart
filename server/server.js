@@ -9,6 +9,10 @@ const marketplaceRoute = require('./routes/marketplace');
 const paymentsRoute = require('./routes/payments');
 const deliveryRoute = require('./routes/delivery');
 const ordersRoute = require('./routes/orders');
+const uploadRoute = require('./routes/upload');
+const notificationsRoute = require('./routes/notifications');
+const messagesRoute = require('./routes/messages');
+const reviewsRoute = require('./routes/reviews');
 
 const app = express();
 
@@ -25,6 +29,10 @@ app.use('/api/marketplace', marketplaceRoute);
 app.use('/api/payments', paymentsRoute);
 app.use('/api/delivery', deliveryRoute);
 app.use('/api/orders', ordersRoute);
+app.use('/api/upload', uploadRoute);
+app.use('/api/notifications', notificationsRoute);
+app.use('/api/messages', messagesRoute);
+app.use('/api/reviews', reviewsRoute);
 
 // 1. Database Connection
 mongoose.connect(process.env.MONGO_URI)
@@ -35,7 +43,7 @@ mongoose.connect(process.env.MONGO_URI)
     console.error('❌ MongoDB Connection Error:', err);
   });
 
-// 2. Basic Route (To test if server is alive)
+// 2. Basic Route (To test if server is alive)F
 app.get('/', (req, res) => {
   res.send('FarmSmart API is running...');
 });

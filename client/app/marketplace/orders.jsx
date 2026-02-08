@@ -21,6 +21,7 @@ export default function OrdersScreen() {
     const [refreshing, setRefreshing] = useState(false);
     const [activeTab, setActiveTab] = useState('buyer');
     const [updatingOrder, setUpdatingOrder] = useState(null);
+    const [currentUser, setCurrentUser] = useState(null);
 
     const fetchOrders = async () => {
         try {
@@ -31,6 +32,7 @@ export default function OrdersScreen() {
                 return;
             }
             const user = JSON.parse(userStr);
+            setCurrentUser(user);
 
             const endpoint = activeTab === 'buyer'
                 ? `${API_BASE_URL}/api/orders/buyer/${user._id}`
@@ -187,9 +189,16 @@ export default function OrdersScreen() {
                 {activeTab === 'seller' && item.buyerId && (
                     <View style={styles.buyerInfo}>
                         <Ionicons name="person" size={14} color="#6fdfc4" />
-                        <Text style={styles.buyerName}>
-                            Buyer: {item.buyerId.fullName || 'Unknown'}
-                        </Text>
+                        <View>
+                            <Text style={styles.buyerName}>
+                                Buyer: {item.buyerId.fullName || 'Unknown'}
+                            </Text>
+                            {item.buyerId.phone && (
+                                <Text style={styles.buyerPhone}>
+                                    {item.buyerId.phone}
+                                </Text>
+                            )}
+                        </View>
                     </View>
                 )}
 
@@ -264,6 +273,24 @@ export default function OrdersScreen() {
                     </TouchableOpacity>
                 )}
 
+                {/* Rate Order Button */}
+                {activeTab === 'buyer' && item.status === 'delivered' && (
+                    <TouchableOpacity
+                        style={styles.reviewButton}
+                        onPress={() => router.push({
+                            pathname: '/marketplace/review',
+                            params: {
+                                orderId: item._id,
+                                listingTitle: item.listingId?.title,
+                                listingImage: item.listingId?.imageUrl,
+                            }
+                        })}
+                    >
+                        <Ionicons name="star" size={16} color="#0a1f1c" />
+                        <Text style={styles.reviewButtonText}>Rate Order</Text>
+                    </TouchableOpacity>
+                )}
+
                 {/* Buyer Refund Button */}
                 {canRequestRefund && (
                     <TouchableOpacity
@@ -282,6 +309,38 @@ export default function OrdersScreen() {
                     </TouchableOpacity>
                 )}
             </View>
+        );
+    };
+
+    const renderVerificationCard = () => {
+        if (!currentUser || currentUser.isVerified) return null;
+
+        if (currentUser.verificationStatus === 'pending') {
+            return (
+                <View style={[styles.verificationCard, styles.pendingCard]}>
+                    <Ionicons name="time" size={24} color="#0a1f1c" />
+                    <View style={styles.verificationTextContainer}>
+                        <Text style={styles.verificationTitle}>Verification Pending</Text>
+                        <Text style={styles.verificationSubtitle}>We are reviewing your details</Text>
+                    </View>
+                </View>
+            );
+        }
+
+        return (
+            <TouchableOpacity
+                style={styles.verificationCard}
+                onPress={() => router.push('/marketplace/verification')}
+            >
+                <View style={styles.verificationContent}>
+                    <Ionicons name="shield-checkmark" size={24} color="#0a1f1c" />
+                    <View style={styles.verificationTextContainer}>
+                        <Text style={styles.verificationTitle}>Become a Verified Seller</Text>
+                        <Text style={styles.verificationSubtitle}>Get a badge and build trust</Text>
+                    </View>
+                </View>
+                <Ionicons name="chevron-forward" size={20} color="#0a1f1c" />
+            </TouchableOpacity>
         );
     };
 
@@ -352,6 +411,7 @@ export default function OrdersScreen() {
                 data={orders}
                 keyExtractor={(item) => item._id}
                 renderItem={renderOrder}
+                ListHeaderComponent={activeTab === 'seller' ? renderVerificationCard : null}
                 ListEmptyComponent={renderEmptyList}
                 contentContainerStyle={orders.length === 0 ? styles.emptyList : styles.listContent}
                 refreshControl={
@@ -600,9 +660,61 @@ const styles = StyleSheet.create({
         marginTop: 8,
         textAlign: 'center',
     },
+    buyerPhone: {
+        color: 'rgba(255,255,255,0.6)',
+        fontSize: 12,
+        marginTop: 2,
+    },
+    reviewButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#f59e0b',
+        paddingVertical: 10,
+        borderRadius: 8,
+        gap: 6,
+        marginBottom: 10,
+    },
+    reviewButtonText: {
+        color: '#0a1f1c',
+        fontWeight: 'bold',
+        fontSize: 14,
+    },
     loadingText: {
         color: '#6fdfc4',
         marginTop: 15,
         fontSize: 16,
+    },
+    verificationCard: {
+        backgroundColor: '#6fdfc4',
+        marginHorizontal: 20,
+        marginTop: 20,
+        marginBottom: 10,
+        borderRadius: 12,
+        padding: 15,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+    pendingCard: {
+        backgroundColor: 'rgba(111, 223, 196, 0.5)',
+    },
+    verificationContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+    },
+    verificationTextContainer: {
+        marginLeft: 10,
+    },
+    verificationTitle: {
+        color: '#0a1f1c',
+        fontWeight: 'bold',
+        fontSize: 16,
+    },
+    verificationSubtitle: {
+        color: '#0a1f1c',
+        fontSize: 12,
+        opacity: 0.8,
     },
 });

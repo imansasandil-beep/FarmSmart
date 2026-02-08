@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const Order = require('../models/Order');
 const Listing = require('../models/Listing');
+const { createNotification } = require('./notifications');
 
 // Create new order (called after delivery quote, before payment)
 router.post('/create', async (req, res) => {
@@ -95,7 +96,7 @@ router.get('/seller/:userId', async (req, res) => {
 
         const orders = await Order.find({ sellerId: userId })
             .populate('listingId', 'title imageUrl price')
-            .populate('buyerId', 'fullName')
+            .populate('buyerId', 'fullName phone')
             .sort({ createdAt: -1 });
 
         res.status(200).json(orders);
@@ -149,6 +150,81 @@ router.post('/:orderId/cancel', async (req, res) => {
         res.status(200).json({ message: 'Order cancelled successfully' });
 
     } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+// Update order status (for seller to mark as shipped/delivered)
+router.patch('/:orderId/status', async (req, res) => {
+    try {
+        const { orderId } = req.params;
+        const { status } = req.body;
+
+        const validStatuses = ['confirmed', 'processing', 'shipped', 'delivered'];
+        if (!validStatuses.includes(status)) {
+            return res.status(400).json({
+                message: `Invalid status. Must be one of: ${validStatuses.join(', ')}`
+            });
+        }
+
+        const order = await Order.findById(orderId).populate('listingId', 'title');
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+
+        if (order.paymentStatus !== 'paid') {
+            return res.status(400).json({
+                message: 'Cannot update status for unpaid orders'
+            });
+        }
+
+        order.status = status;
+
+        // Update delivery status based on order status
+        let notifTitle = 'Order Update 📦';
+        let notifMessage = `Your order status has been updated to ${status}`;
+        let notifType = 'system';
+
+        if (status === 'shipped') {
+            order.deliveryStatus = 'dispatched';
+            notifTitle = 'Order Shipped 🚚';
+            notifMessage = `Your order for ${order.listingId?.title || 'item'} is on the way!`;
+            notifType = 'order_shipped';
+        } else if (status === 'delivered') {
+            order.deliveryStatus = 'delivered';
+            notifTitle = 'Order Delivered 🎉';
+            notifMessage = `Your order for ${order.listingId?.title || 'item'} has been delivered!`;
+            notifType = 'order_delivered';
+        }
+
+        await order.save();
+
+        // Notify Buyer
+        if (createNotification) {
+            try {
+                await createNotification(
+                    order.buyerId,
+                    notifType,
+                    notifTitle,
+                    notifMessage,
+                    { orderId: order._id }
+                );
+            } catch (err) {
+                console.error('Notification Error:', err);
+            }
+        }
+
+        res.status(200).json({
+            message: `Order marked as ${status}`,
+            order: {
+                _id: order._id,
+                status: order.status,
+                deliveryStatus: order.deliveryStatus
+            }
+        });
+
+    } catch (error) {
+        console.error('Update Order Status Error:', error);
         res.status(500).json({ message: error.message });
     }
 });

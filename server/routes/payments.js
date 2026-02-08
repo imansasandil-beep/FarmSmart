@@ -1,6 +1,8 @@
 const router = require('express').Router();
 const Order = require('../models/Order');
 const Listing = require('../models/Listing');
+const User = require('../models/User');
+const { createNotification } = require('./notifications');
 
 // Initialize Stripe only if key is configured
 const stripeKey = process.env.STRIPE_SECRET_KEY;
@@ -157,6 +159,30 @@ router.post('/webhook', async (req, res) => {
                 await Listing.findByIdAndUpdate(order.listingId, {
                     $inc: { availableQuantity: -order.quantity }
                 });
+
+                // Get listing details for notification
+                const listing = await Listing.findById(order.listingId);
+                const itemName = listing ? listing.title : 'item';
+
+                // Notify Buyer
+                if (createNotification) {
+                    await createNotification(
+                        order.buyerId,
+                        'order_paid',
+                        'Payment Successful ✅',
+                        `Your payment for ${itemName} has been confirmed!`,
+                        { orderId: order._id }
+                    );
+
+                    // Notify Seller
+                    await createNotification(
+                        order.sellerId,
+                        'new_sale',
+                        'New Sale! 💰',
+                        `You sold ${order.quantity} of ${itemName}`,
+                        { orderId: order._id }
+                    );
+                }
             }
             break;
 
@@ -173,6 +199,86 @@ router.post('/webhook', async (req, res) => {
     }
 
     res.json({ received: true });
+});
+
+// Manual payment confirmation (fallback when webhooks not configured)
+router.post('/confirm-payment/:orderId', async (req, res) => {
+    try {
+        const { orderId } = req.params;
+
+        const order = await Order.findById(orderId);
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+
+        // Already paid - no action needed
+        if (order.paymentStatus === 'paid') {
+            return res.status(200).json({ message: 'Payment already confirmed' });
+        }
+
+        // Verify with Stripe if we have a payment intent
+        if (stripe && order.stripePaymentIntentId && !order.stripePaymentIntentId.startsWith('dev_')) {
+            try {
+                const paymentIntent = await stripe.paymentIntents.retrieve(order.stripePaymentIntentId);
+
+                if (paymentIntent.status !== 'succeeded') {
+                    return res.status(400).json({
+                        message: `Payment not successful. Status: ${paymentIntent.status}`
+                    });
+                }
+            } catch (stripeError) {
+                console.error('Error verifying payment:', stripeError);
+                // Continue anyway if Stripe verification fails
+            }
+        }
+
+        // Update order status
+        order.paymentStatus = 'paid';
+        order.status = 'confirmed';
+        await order.save();
+
+        // Reduce stock
+        await Listing.findByIdAndUpdate(order.listingId, {
+            $inc: { availableQuantity: -order.quantity }
+        });
+
+        // Get listing details for notification
+        const listing = await Listing.findById(order.listingId);
+        const itemName = listing ? listing.title : 'item';
+
+        // Notify Buyer
+        if (createNotification) {
+            await createNotification(
+                order.buyerId,
+                'order_paid',
+                'Payment Successful ✅',
+                `Your payment for ${itemName} has been confirmed!`,
+                { orderId: order._id }
+            );
+
+            // Notify Seller
+            await createNotification(
+                order.sellerId,
+                'new_sale',
+                'New Sale! 💰',
+                `You sold ${order.quantity} of ${itemName}`,
+                { orderId: order._id }
+            );
+        }
+
+        res.status(200).json({
+            message: 'Payment confirmed',
+            order: {
+                _id: order._id,
+                paymentStatus: order.paymentStatus,
+                status: order.status
+            }
+        });
+
+    } catch (error) {
+        console.error('Confirm Payment Error:', error);
+        res.status(500).json({ message: error.message });
+    }
 });
 
 // Get seller earnings summary
@@ -199,6 +305,74 @@ router.get('/seller-balance/:sellerId', async (req, res) => {
         });
 
     } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+// Request refund
+router.post('/refund/:orderId', async (req, res) => {
+    try {
+        const { orderId } = req.params;
+
+        const order = await Order.findById(orderId);
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+
+        if (order.paymentStatus !== 'paid') {
+            return res.status(400).json({
+                message: 'Can only refund paid orders'
+            });
+        }
+
+        if (order.status === 'delivered') {
+            return res.status(400).json({
+                message: 'Cannot refund delivered orders. Please contact support.'
+            });
+        }
+
+        if (order.paymentStatus === 'refund_requested' || order.paymentStatus === 'refunded') {
+            return res.status(400).json({
+                message: 'Refund already requested or processed'
+            });
+        }
+
+        // If Stripe payment, process actual refund
+        if (stripe && order.stripePaymentIntentId && !order.stripePaymentIntentId.startsWith('dev_')) {
+            try {
+                await stripe.refunds.create({
+                    payment_intent: order.stripePaymentIntentId,
+                });
+                order.paymentStatus = 'refunded';
+                order.status = 'cancelled';
+
+                // Restore stock
+                await Listing.findByIdAndUpdate(order.listingId, {
+                    $inc: { availableQuantity: order.quantity }
+                });
+
+                await order.save();
+                return res.status(200).json({
+                    message: 'Refund processed successfully'
+                });
+            } catch (stripeError) {
+                console.error('Stripe refund error:', stripeError);
+                return res.status(500).json({
+                    message: 'Failed to process refund through Stripe'
+                });
+            }
+        }
+
+        // For dev mode or non-Stripe payments, just mark as refund requested
+        order.paymentStatus = 'refund_requested';
+        await order.save();
+
+        res.status(200).json({
+            message: 'Refund request submitted. Seller will be notified.'
+        });
+
+    } catch (error) {
+        console.error('Refund Error:', error);
         res.status(500).json({ message: error.message });
     }
 });
