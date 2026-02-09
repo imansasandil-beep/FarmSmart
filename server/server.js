@@ -5,6 +5,7 @@ const cors = require('cors');
 
 // IMPORT ROUTES
 const authRoute = require('./routes/auth');
+const marketplaceRoute = require('./routes/marketplace');
 
 const app = express();
 
@@ -13,7 +14,8 @@ app.use(express.json()); // Allows us to parse JSON data
 app.use(cors()); // Allows frontend to communicate with backend
 
 // Route Middlewares
-app.use('/api/user', authRoute); // <--- ADD THIS
+app.use('/api/user', authRoute);
+app.use('/api/marketplace', marketplaceRoute); // Marketplace listings API
 
 // 1. Database Connection
 mongoose.connect(process.env.MONGO_URI)
