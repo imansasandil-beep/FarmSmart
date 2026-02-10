@@ -11,7 +11,7 @@ export default function HomeScreen() {
 
   // List of Menu Options matching your screenshot
   const menuItems = [
-    { title: 'Crop calendar', route: 'tasks' },
+    { title: 'Crop calendar', route: 'cropcalender' },
     { title: 'Crop-specific recommendations', route: 'recommendations' },
     { title: 'Personal insights', route: 'insights' },
     { title: 'Chat platform', route: 'chat' },
@@ -38,7 +38,7 @@ export default function HomeScreen() {
     getUser();
   }, []);
 
-const handleMenuPress = async (item) => {
+  const handleMenuPress = async (item) => {
     // 1. Check for Settings (Logout)
     if (item.title === 'Settings') {
       Alert.alert(
@@ -46,8 +46,8 @@ const handleMenuPress = async (item) => {
         "Do you want to log out?",
         [
           { text: "Cancel", style: "cancel" },
-          { 
-            text: "Log Out", 
+          {
+            text: "Log Out",
             style: 'destructive',
             onPress: async () => {
               await AsyncStorage.removeItem('user');
@@ -56,11 +56,11 @@ const handleMenuPress = async (item) => {
           }
         ]
       );
-    } 
+    }
     // 2. Check for Crop Calendar (which now goes to Tasks)
-    else if (item.route === 'tasks') {
-      router.push('/tasks'); 
-    } 
+    else if (item.route === 'cropcalender') {
+      router.push('/cropcalender');
+    }
     // 3. Everything else
     else {
       Alert.alert(item.title, "This feature is coming soon!");
@@ -80,9 +80,9 @@ const handleMenuPress = async (item) => {
       {/* HEADER */}
       <View style={styles.header}>
         <View>
-           <Text style={styles.appTitle}>FarmSmart</Text>
-           {/* Small personalization subtitle */}
-           <Text style={styles.greeting}>Hello, {userName}</Text>
+          <Text style={styles.appTitle}>FarmSmart</Text>
+          {/* Small personalization subtitle */}
+          <Text style={styles.greeting}>Hello, {userName}</Text>
         </View>
         <View style={styles.logoCircle}>
           <Ionicons name="leaf" size={24} color="white" />
@@ -92,8 +92,8 @@ const handleMenuPress = async (item) => {
       {/* MENU LIST */}
       <ScrollView contentContainerStyle={styles.menuContainer} showsVerticalScrollIndicator={false}>
         {menuItems.map((item, index) => (
-          <TouchableOpacity 
-            key={index} 
+          <TouchableOpacity
+            key={index}
             style={styles.menuButton}
             onPress={() => handleMenuPress(item)}
           >
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#6fdfc4', // Mint border to match theme
     alignItems: 'center',
-    
+
     // Shadow for depth
     shadowColor: "#000",
     shadowOffset: {
