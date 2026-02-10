@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, FlatList, Alert } from 'react
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { ZONES } from './data/zones';
+import { ZONES } from './_data/zones';
 
 export default function ZoneSelectionScreen() {
     const router = useRouter();

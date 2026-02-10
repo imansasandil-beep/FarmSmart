@@ -3,8 +3,8 @@ import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-nati
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getCurrentSeason, getMonthlyTips, SEASONS } from './data/seasons';
-import { getCropsByZoneAndSeason } from './data/crops';
+import { getCurrentSeason, getMonthlyTips, SEASONS } from './_data/seasons';
+import { getCropsByZoneAndSeason } from './_data/crops';
 
 export default function SuggestionsScreen() {
     const router = useRouter();

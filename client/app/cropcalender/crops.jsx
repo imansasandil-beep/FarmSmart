@@ -3,8 +3,8 @@ import { View, Text, TouchableOpacity, StyleSheet, FlatList, Alert } from 'react
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getCropsByZone, getCropsByZoneAndSeason } from './data/crops';
-import { getCurrentSeason } from './data/seasons';
+import { getCropsByZone, getCropsByZoneAndSeason } from './_data/crops';
+import { getCurrentSeason } from './_data/seasons';
 
 export default function CropsScreen() {
     const router = useRouter();

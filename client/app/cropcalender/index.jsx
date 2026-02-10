@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, FlatList, Alert, Platform } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useFocusEffect } from 'expo-router';
 import * as Notifications from 'expo-notifications';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getCurrentSeason, getMonthlyTips } from './data/seasons';
+import { getCurrentSeason, getMonthlyTips } from './_data/seasons';
 
 // Configure Notification Handler
 Notifications.setNotificationHandler({
@@ -94,7 +94,7 @@ export default function CropCalendarScreen() {
 
             const id = await Notifications.scheduleNotificationAsync({
                 content: notificationContent,
-                trigger: { seconds: triggerSeconds },
+                trigger: { type: 'timeInterval', seconds: triggerSeconds },
             });
 
             const newReminder = { id, title: taskTitle, time: date.toLocaleString() };
@@ -131,119 +131,6 @@ export default function CropCalendarScreen() {
 
     const monthlyTip = zone ? getMonthlyTips(zone.id) : null;
 
-    const ListHeader = () => (
-        <>
-            {/* Zone Info Card */}
-            {zone ? (
-                <TouchableOpacity
-                    style={[styles.zoneCard, { borderColor: zone.color }]}
-                    onPress={() => router.push('/cropcalender/zone')}
-                    activeOpacity={0.7}
-                >
-                    <View style={styles.zoneCardRow}>
-                        <View style={{ flex: 1 }}>
-                            <Text style={styles.zoneCardTitle}>{zone.emoji} {zone.name}</Text>
-                            <Text style={styles.zoneCardDistrict}>📍 {district || 'Tap to select district'}</Text>
-                        </View>
-                        <View style={[styles.seasonBadge, { backgroundColor: currentSeason.color }]}>
-                            <Text style={styles.seasonBadgeText}>
-                                {currentSeason.emoji} {currentSeason.name}
-                            </Text>
-                        </View>
-                    </View>
-                    {monthlyTip && (
-                        <Text style={styles.quickTip} numberOfLines={2}>
-                            💡 {monthlyTip.zoneTip}
-                        </Text>
-                    )}
-                </TouchableOpacity>
-            ) : (
-                <TouchableOpacity
-                    style={styles.setupZoneCard}
-                    onPress={() => router.push('/cropcalender/zone')}
-                >
-                    <Ionicons name="location-outline" size={28} color="#6fdfc4" />
-                    <View style={{ flex: 1, marginLeft: 12 }}>
-                        <Text style={styles.setupTitle}>Set Up Your Zone</Text>
-                        <Text style={styles.setupSubtitle}>
-                            Select your agro-ecological zone for personalized crop advice
-                        </Text>
-                    </View>
-                    <Ionicons name="chevron-forward" size={24} color="#6fdfc4" />
-                </TouchableOpacity>
-            )}
-
-            {/* Quick Navigation */}
-            <View style={styles.navRow}>
-                <TouchableOpacity
-                    style={styles.navButton}
-                    onPress={() => router.push('/cropcalender/crops')}
-                >
-                    <Ionicons name="leaf" size={22} color="#2ecc71" />
-                    <Text style={styles.navButtonText}>Crops</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    style={styles.navButton}
-                    onPress={() => router.push('/cropcalender/suggestions')}
-                >
-                    <Ionicons name="bulb" size={22} color="#f39c12" />
-                    <Text style={styles.navButtonText}>Advice</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    style={styles.navButton}
-                    onPress={() => router.push('/cropcalender/zone')}
-                >
-                    <Ionicons name="map" size={22} color="#3498db" />
-                    <Text style={styles.navButtonText}>Zone</Text>
-                </TouchableOpacity>
-            </View>
-
-            {/* Add Reminder Section */}
-            <View style={styles.inputCard}>
-                <Text style={styles.label}>Activity Name:</Text>
-                <TextInput
-                    style={styles.input}
-                    placeholder="e.g. Water the Corn"
-                    placeholderTextColor="#8aa6a3"
-                    value={taskTitle}
-                    onChangeText={setTaskTitle}
-                />
-
-                <Text style={styles.label}>When?</Text>
-                <TouchableOpacity style={styles.dateButton} onPress={() => setShowPicker(true)}>
-                    <Ionicons name="calendar" size={20} color="white" />
-                    <Text style={styles.dateText}>{date.toLocaleString()}</Text>
-                </TouchableOpacity>
-
-                {showPicker && (
-                    <DateTimePicker
-                        value={date}
-                        mode="datetime"
-                        display="default"
-                        onChange={onDateChange}
-                        minimumDate={new Date()}
-                    />
-                )}
-
-                <TouchableOpacity style={styles.addButton} onPress={handleScheduleNotification}>
-                    <Text style={styles.addButtonText}>Set Reminder</Text>
-                </TouchableOpacity>
-            </View>
-
-            <Text style={styles.subTitle}>Upcoming Reminders</Text>
-        </>
-    );
-
-    const EmptyReminders = () => (
-        <View style={styles.emptyReminders}>
-            <Ionicons name="calendar-outline" size={40} color="#2a5d55" />
-            <Text style={styles.emptyText}>No reminders yet</Text>
-            <Text style={styles.emptySubtext}>
-                Add a reminder above or tap "Crops" to create one from crop data
-            </Text>
-        </View>
-    );
-
     return (
         <View style={styles.container}>
             {/* Header */}
@@ -255,26 +142,130 @@ export default function CropCalendarScreen() {
                 <View style={{ width: 28 }} />
             </View>
 
-            <FlatList
-                data={reminders}
-                keyExtractor={(item) => item.id}
-                ListHeaderComponent={ListHeader}
-                ListEmptyComponent={EmptyReminders}
-                renderItem={({ item }) => (
-                    <View style={styles.taskItem}>
-                        <View style={{ flex: 1 }}>
-                            <Text style={styles.taskTitle}>{item.title}</Text>
-                            <Text style={styles.taskTime}>{item.time}</Text>
+            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.listContent}>
+                {/* Zone Info Card */}
+                {zone ? (
+                    <TouchableOpacity
+                        style={[styles.zoneCard, { borderColor: zone.color }]}
+                        onPress={() => router.push('/cropcalender/zone')}
+                        activeOpacity={0.7}
+                    >
+                        <View style={styles.zoneCardRow}>
+                            <View style={{ flex: 1 }}>
+                                <Text style={styles.zoneCardTitle}>{zone.emoji} {zone.name}</Text>
+                                <Text style={styles.zoneCardDistrict}>📍 {district || 'Tap to select district'}</Text>
+                            </View>
+                            <View style={[styles.seasonBadge, { backgroundColor: currentSeason.color }]}>
+                                <Text style={styles.seasonBadgeText}>
+                                    {currentSeason.emoji} {currentSeason.name}
+                                </Text>
+                            </View>
                         </View>
-                        <TouchableOpacity onPress={() => handleDeleteReminder(item.id)}>
-                            <Ionicons name="trash-outline" size={24} color="#ff4444" />
-                        </TouchableOpacity>
-                        <Ionicons name="alarm" size={24} color="#f9a825" style={{ marginLeft: 15 }} />
-                    </View>
+                        {monthlyTip && (
+                            <Text style={styles.quickTip} numberOfLines={2}>
+                                💡 {monthlyTip.zoneTip}
+                            </Text>
+                        )}
+                    </TouchableOpacity>
+                ) : (
+                    <TouchableOpacity
+                        style={styles.setupZoneCard}
+                        onPress={() => router.push('/cropcalender/zone')}
+                    >
+                        <Ionicons name="location-outline" size={28} color="#6fdfc4" />
+                        <View style={{ flex: 1, marginLeft: 12 }}>
+                            <Text style={styles.setupTitle}>Set Up Your Zone</Text>
+                            <Text style={styles.setupSubtitle}>
+                                Select your agro-ecological zone for personalized crop advice
+                            </Text>
+                        </View>
+                        <Ionicons name="chevron-forward" size={24} color="#6fdfc4" />
+                    </TouchableOpacity>
                 )}
-                contentContainerStyle={styles.listContent}
-                showsVerticalScrollIndicator={false}
-            />
+
+                {/* Quick Navigation */}
+                <View style={styles.navRow}>
+                    <TouchableOpacity
+                        style={styles.navButton}
+                        onPress={() => router.push('/cropcalender/crops')}
+                    >
+                        <Ionicons name="leaf" size={22} color="#2ecc71" />
+                        <Text style={styles.navButtonText}>Crops</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={styles.navButton}
+                        onPress={() => router.push('/cropcalender/suggestions')}
+                    >
+                        <Ionicons name="bulb" size={22} color="#f39c12" />
+                        <Text style={styles.navButtonText}>Advice</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={styles.navButton}
+                        onPress={() => router.push('/cropcalender/zone')}
+                    >
+                        <Ionicons name="map" size={22} color="#3498db" />
+                        <Text style={styles.navButtonText}>Zone</Text>
+                    </TouchableOpacity>
+                </View>
+
+                {/* Add Reminder Section */}
+                <View style={styles.inputCard}>
+                    <Text style={styles.label}>Activity Name:</Text>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="e.g. Water the Corn"
+                        placeholderTextColor="#8aa6a3"
+                        value={taskTitle}
+                        onChangeText={setTaskTitle}
+                    />
+
+                    <Text style={styles.label}>When?</Text>
+                    <TouchableOpacity style={styles.dateButton} onPress={() => setShowPicker(true)}>
+                        <Ionicons name="calendar" size={20} color="white" />
+                        <Text style={styles.dateText}>{date.toLocaleString()}</Text>
+                    </TouchableOpacity>
+
+                    {showPicker && (
+                        <DateTimePicker
+                            value={date}
+                            mode="datetime"
+                            display="default"
+                            onChange={onDateChange}
+                            minimumDate={new Date()}
+                        />
+                    )}
+
+                    <TouchableOpacity style={styles.addButton} onPress={handleScheduleNotification}>
+                        <Text style={styles.addButtonText}>Set Reminder</Text>
+                    </TouchableOpacity>
+                </View>
+
+                <Text style={styles.subTitle}>Upcoming Reminders</Text>
+
+                {/* Reminders List */}
+                {reminders.length === 0 ? (
+                    <View style={styles.emptyReminders}>
+                        <Ionicons name="calendar-outline" size={40} color="#2a5d55" />
+                        <Text style={styles.emptyText}>No reminders yet</Text>
+                        <Text style={styles.emptySubtext}>
+                            Add a reminder above or tap "Crops" to create one from crop data
+                        </Text>
+                    </View>
+                ) : (
+                    reminders.map((item) => (
+                        <View key={item.id} style={styles.taskItem}>
+                            <View style={{ flex: 1 }}>
+                                <Text style={styles.taskTitle}>{item.title}</Text>
+                                <Text style={styles.taskTime}>{item.time}</Text>
+                            </View>
+                            <TouchableOpacity onPress={() => handleDeleteReminder(item.id)}>
+                                <Ionicons name="trash-outline" size={24} color="#ff4444" />
+                            </TouchableOpacity>
+                            <Ionicons name="alarm" size={24} color="#f9a825" style={{ marginLeft: 15 }} />
+                        </View>
+                    ))
+                )}
+            </ScrollView>
         </View>
     );
 }
