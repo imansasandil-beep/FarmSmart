@@ -5,7 +5,7 @@
 // Find your IP by running 'ipconfig' in terminal (Windows)
 // or 'ifconfig' on Mac/Linux
 
-const SERVER_IP = '192.168.8.119';
+const SERVER_IP = '192.168.1.13';
 const SERVER_PORT = '5000';
 
 export const API_BASE_URL = `http://${SERVER_IP}:${SERVER_PORT}`;
