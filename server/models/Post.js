@@ -18,6 +18,17 @@ const PostSchema = new mongoose.Schema({
     type: String,
     default: null,
   },
+  likes: [{
+    type: String,
+  }],
+  likesCount: {
+    type: Number,
+    default: 0,
+  },
+  commentsCount: {
+    type: Number,
+    default: 0,
+  },
   createdAt: {
     type: Date,
     default: Date.now,
