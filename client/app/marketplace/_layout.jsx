@@ -7,6 +7,9 @@ export default function MarketplaceLayout() {
             <Stack.Screen name="add" />
             <Stack.Screen name="checkout" />
             <Stack.Screen name="orders" />
+            <Stack.Screen name="review" />
+            <Stack.Screen name="verification" />
+            <Stack.Screen name="chat" />
         </Stack>
     );
 }

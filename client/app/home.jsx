@@ -11,7 +11,7 @@ export default function HomeScreen() {
 
   // List of Menu Options matching your screenshot
   const menuItems = [
-    { title: 'Crop calendar', route: 'tasks' },
+    { title: 'Crop calendar', route: 'cropcalender' },
     { title: 'Marketplace', route: 'marketplace' },
     { title: 'Crop-specific recommendations', route: 'recommendations' },
     { title: 'Personal insights', route: 'insights' },
@@ -59,8 +59,8 @@ export default function HomeScreen() {
       );
     }
     // 2. Check for Crop Calendar (which now goes to Tasks)
-    else if (item.route === 'tasks') {
-      router.push('/tasks');
+    else if (item.route === 'cropcalender') {
+      router.push('/cropcalender');
     }
     // 3. Navigate to Marketplace
     else if (item.route === 'marketplace') {

@@ -41,6 +41,7 @@ export default function LoginScreen() {
         password: password
       }, {
         timeout: 10000, // 10 second timeout
+
       });
 
       // Success! Save user data to AsyncStorage

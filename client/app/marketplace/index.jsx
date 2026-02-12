@@ -455,7 +455,7 @@ export default function MarketplaceScreen() {
                     <TouchableOpacity onPress={() => router.push('/notifications')} style={styles.headerBtn}>
                         <Ionicons name="notifications-outline" size={22} color="white" />
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => router.push('/chat')} style={styles.headerBtn}>
+                    <TouchableOpacity onPress={() => router.push('/marketplace/chat')} style={styles.headerBtn}>
                         <Ionicons name="chatbubbles-outline" size={22} color="white" />
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => router.push('/marketplace/orders')} style={styles.headerBtn}>
