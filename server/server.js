@@ -7,6 +7,7 @@ const cors = require('cors');
 const authRoute = require('./routes/auth');
 const marketplaceRoute = require('./routes/marketplace');
 const uploadRoute = require('./routes/upload');
+const deliveryRoute = require('./routes/delivery');
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use(cors()); // Allows frontend to communicate with backend
 app.use('/api/user', authRoute);
 app.use('/api/marketplace', marketplaceRoute); // Marketplace listings API
 app.use('/api/upload', uploadRoute); // Image uploads
+app.use('/api/delivery', deliveryRoute); // Delivery fee calculation
 
 // 1. Database Connection
 mongoose.connect(process.env.MONGO_URI)
