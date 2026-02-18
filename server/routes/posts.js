@@ -6,14 +6,12 @@ const { requireClerkAuth } = require('../middleware/clerkAuth');
 const Post = require('../models/Post');
 const Comment = require('../models/Comment');
 
-// Cloudinary config
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// Multer memory storage for image uploads
 const storage = multer.memoryStorage();
 const upload = multer({
   storage,
@@ -27,7 +25,6 @@ const upload = multer({
   },
 });
 
-// Helper to stream buffer to Cloudinary
 const uploadToCloudinary = (buffer) => {
   return new Promise((resolve, reject) => {
     const uploadStream = cloudinary.uploader.upload_stream(
@@ -51,18 +48,15 @@ const uploadToCloudinary = (buffer) => {
   });
 };
 
-// POST /api/posts - Create a new post (with optional image)
+// POST /api/posts - Create a new post
 router.post('/', requireClerkAuth, upload.single('image'), async (req, res) => {
   try {
     const { content, authorName } = req.body;
-
     if (!content || content.trim().length === 0) {
       return res.status(400).json({ message: 'Post content is required' });
     }
 
     let imageUrl = null;
-
-    // Handle direct file upload
     if (req.file) {
       try {
         const result = await uploadToCloudinary(req.file.buffer);
@@ -71,8 +65,6 @@ router.post('/', requireClerkAuth, upload.single('image'), async (req, res) => {
         console.error('Image upload failed:', uploadErr);
       }
     }
-
-    // Fallback: accept pre-uploaded image URL
     if (!imageUrl && req.body.image) {
       imageUrl = req.body.image;
     }
@@ -89,6 +81,33 @@ router.post('/', requireClerkAuth, upload.single('image'), async (req, res) => {
   } catch (error) {
     console.error('Create post error:', error);
     res.status(500).json({ message: 'Failed to create post' });
+  }
+});
+
+// GET /api/posts - Fetch post feed with pagination
+router.get('/', async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const skip = (page - 1) * limit;
+
+    const posts = await Post.find()
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean();
+
+    const total = await Post.countDocuments();
+
+    res.json({
+      posts,
+      currentPage: page,
+      totalPages: Math.ceil(total / limit),
+      totalPosts: total,
+    });
+  } catch (error) {
+    console.error('Get posts error:', error);
+    res.status(500).json({ message: 'Failed to fetch posts' });
   }
 });
 
