@@ -111,4 +111,18 @@ router.get('/', async (req, res) => {
   }
 });
 
+
+// GET /api/posts/:id - Get a single post by ID
+router.get('/:id', async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id).lean();
+    if (!post) {
+      return res.status(404).json({ message: 'Post not found' });
+    }
+    res.json(post);
+  } catch (error) {
+    console.error('Get post error:', error);
+    res.status(500).json({ message: 'Failed to fetch post' });
+  }
+});
 module.exports = router;
