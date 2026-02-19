@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const Question = require('../models/Question');
+const User = require('../models/User');
 const { requireClerkAuth } = require('../middleware/clerkAuth');
 
 // ============================================
@@ -32,6 +33,40 @@ router.get('/:id', requireClerkAuth, async (req, res) => {
     res.status(200).json({ question });
   } catch (err) {
     console.error('Get question error:', err);
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// ============================================
+// CREATE QUESTION - Farmers post new questions
+// ============================================
+router.post('/', requireClerkAuth, async (req, res) => {
+  try {
+    const clerkId = req.clerkUserId;
+    const user = await User.findOne({ clerkId });
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const { title, body, category } = req.body;
+
+    if (!title || !body) {
+      return res.status(400).json({ message: 'Title and body are required' });
+    }
+
+    const newQuestion = new Question({
+      title: title.trim(),
+      body: body.trim(),
+      category: category || 'General',
+      authorId: clerkId,
+      authorName: user.fullName,
+    });
+
+    const savedQuestion = await newQuestion.save();
+    res.status(201).json({ question: savedQuestion });
+  } catch (err) {
+    console.error('Create question error:', err);
     res.status(500).json({ message: err.message });
   }
 });
