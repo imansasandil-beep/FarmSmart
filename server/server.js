@@ -8,6 +8,8 @@ const authRoute = require('./routes/auth');
 const marketplaceRoute = require('./routes/marketplace');
 const uploadRoute = require('./routes/upload');
 const deliveryRoute = require('./routes/delivery');
+const ordersRoute = require('./routes/orders');
+const paymentsRoute = require('./routes/payments');
 
 const app = express();
 
@@ -20,6 +22,8 @@ app.use('/api/user', authRoute);
 app.use('/api/marketplace', marketplaceRoute); // Marketplace listings API
 app.use('/api/upload', uploadRoute); // Image uploads
 app.use('/api/delivery', deliveryRoute); // Delivery fee calculation
+app.use('/api/orders', ordersRoute); // Order management
+app.use('/api/payments', paymentsRoute); // Payment processing
 
 // 1. Database Connection
 mongoose.connect(process.env.MONGO_URI)
