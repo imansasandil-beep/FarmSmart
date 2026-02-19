@@ -1,6 +1,6 @@
 /**
  * Pest & Disease Seed Script - Sri Lankan Agriculture
- * Sources: DOA Sri Lanka (doa.gov.lk), RRDI
+ * Sources: DOA Sri Lanka (doa.gov.lk), RRDI, FAO (fao.org)
  */
 require('dotenv').config();
 const mongoose = require('mongoose');
@@ -20,6 +20,20 @@ const seedData = [
     affectedCrops: ['Rice', 'Paddy'],
     symptoms: 'Dead heart in the vegetative stage - the central shoot turns brown and can be pulled out easily. White ear in the reproductive stage - panicles turn white and bear no grain. Bore holes visible at the stem base with frass inside.',
     treatment: 'Clip and destroy egg masses during transplanting. Harvest at ground level and plough in stubble to destroy overwintering larvae. Use pheromone traps for monitoring. Apply Carbofuran 3G granules in the leaf whorl when damage exceeds 5% dead hearts (DOA recommendation).',
+  },
+  {
+    name: 'Rice Gall Midge',
+    type: 'Pest',
+    affectedCrops: ['Rice', 'Paddy'],
+    symptoms: 'Affected tillers produce hollow, silvery-white tubular galls (silver shoots) instead of normal leaves. Infested plants fail to produce panicles. Severe attacks cause heavy tiller loss, particularly in the wet zone.',
+    treatment: 'Use resistant varieties recommended by RRDI (e.g. Bg 380). Synchronise planting across the area to break the pest cycle. Remove and destroy galled tillers. Apply Carbofuran 3G in the root zone during early vegetative stage if damage exceeds 5% silver shoots.',
+  },
+  {
+    name: 'Fall Armyworm',
+    type: 'Pest',
+    affectedCrops: ['Maize', 'Rice', 'Sorghum', 'Millet'],
+    symptoms: 'Irregular holes and ragged feeding damage on leaves, often with visible frass. Young larvae scrape the leaf surface creating translucent window-panes. Severe attacks destroy the growing point of maize (dead heart). Larvae identifiable by an inverted Y-mark on the head.',
+    treatment: 'Early detection using pheromone traps and the FAO FAMEWS mobile app. Apply Bacillus thuringiensis (Bt) or Spodoptera-specific NPV for biological control. As a last resort, use Emamectin benzoate 5% SG (DOA-approved). Practise crop rotation with non-host crops, deep tillage after harvest.',
   },
 ];
 
