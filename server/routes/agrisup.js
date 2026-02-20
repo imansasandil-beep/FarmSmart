@@ -71,4 +71,42 @@ router.post('/', requireClerkAuth, async (req, res) => {
   }
 });
 
+// ============================================
+// SUBMIT ANSWER - Experts answer questions
+// ============================================
+router.post('/:id/answer', requireClerkAuth, async (req, res) => {
+  try {
+    const clerkId = req.clerkUserId;
+    const user = await User.findOne({ clerkId });
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const { body } = req.body;
+    if (!body) {
+      return res.status(400).json({ message: 'Answer body is required' });
+    }
+
+    const question = await Question.findById(req.params.id);
+    if (!question) {
+      return res.status(404).json({ message: 'Question not found' });
+    }
+
+    question.answers.push({
+      body: body.trim(),
+      expertId: clerkId,
+      expertName: user.fullName,
+    });
+
+    question.status = 'answered';
+    const updatedQuestion = await question.save();
+
+    res.status(201).json({ question: updatedQuestion });
+  } catch (err) {
+    console.error('Submit answer error:', err);
+    res.status(500).json({ message: err.message });
+  }
+});
+
 module.exports = router;
