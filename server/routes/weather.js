@@ -17,10 +17,27 @@ router.get('/', async (req, res) => {
             });
         }
 
-        // TODO: Add weather API calls here
+        // 2. Fetch current weather from OpenWeatherMap
+        const currentWeatherRes = await axios.get(`${BASE_URL}/weather`, {
+            params: {
+                lat,
+                lon,
+                appid: WEATHER_API_KEY,
+                units: 'metric', // Celsius
+            },
+        });
 
-        res.status(200).json({ message: 'Weather route is working', lat, lon });
+        // 3. Send response to the client
+        res.status(200).json({
+            current: currentWeatherRes.data,
+        });
     } catch (err) {
+        // If OpenWeatherMap returns an error, forward its status & message
+        if (err.response) {
+            return res.status(err.response.status).json({
+                message: err.response.data.message || 'Weather API error',
+            });
+        }
         res.status(500).json({ message: err.message });
     }
 });
