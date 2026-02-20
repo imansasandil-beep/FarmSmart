@@ -1,6 +1,8 @@
 /**
  * Pest & Disease Seed Script - Sri Lankan Agriculture
  * Sources: DOA Sri Lanka (doa.gov.lk), RRDI, FAO (fao.org)
+ *   University of Ruhuna (ruh.ac.lk) - Rice disease compendium
+ *   Coconut Research Institute (cri.gov.lk)
  */
 require('dotenv').config();
 const mongoose = require('mongoose');
