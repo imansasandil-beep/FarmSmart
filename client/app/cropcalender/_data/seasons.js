@@ -99,3 +99,70 @@ export const MONTHLY_TIPS = [
         },
     },
     {
+        month: 7, // July
+        name: 'July',
+        sinhalaName: 'α╢çα╖âα╖à / α╢▒α╖Æα╢Üα╖Æα╢½α╖Æ',
+        general: 'Yala crops maturing. Begin harvest preparations.',
+        tips: {
+            wet: 'Tea plucking continues. Monitor paddy for grain formation. Begin harvesting early vegetables.',
+            dry: 'Monitor grain filling in rice. Reduce water in paddy fields gradually. Harvest mung beans.',
+            intermediate: 'Harvest maize. Prepare storage for upcoming rice harvest. Continue vegetable harvesting.',
+        },
+    },
+    {
+        month: 8, // August
+        name: 'August',
+        sinhalaName: 'α╢▒α╖Æα╢Üα╖Æα╢½α╖Æ / α╢╢α╖Æα╢▒α╢╗',
+        general: 'Yala harvest season. Plan seed storage for Maha season.',
+        tips: {
+            wet: 'Harvest Yala paddy. Process and store seeds. Maintain tea and rubber plantations.',
+            dry: 'Complete rice harvesting. Dry and store paddy properly. Begin collecting seeds for Maha.',
+            intermediate: 'Complete all Yala harvests. Clean and prepare fields for Maha season. Soil testing recommended.',
+        },
+    },
+    {
+        month: 9, // September
+        name: 'September',
+        sinhalaName: 'α╢╢α╖Æα╢▒α╢╗ / α╖Çα╢┤α╖è',
+        general: 'Inter-season. Prepare for Maha season. Second inter-monsoon rains begin.',
+        tips: {
+            wet: 'Prepare paddy fields for Maha sowing. Prune tea bushes. Repair drainage systems.',
+            dry: 'Critical land preparation for Maha. Repair tanks and irrigation. Begin chili nurseries.',
+            intermediate: 'Prepare seed beds. Apply organic manure to fields. Start vegetable nurseries.',
+        },
+    },
+    {
+        month: 10, // October
+        name: 'October',
+        sinhalaName: 'α╖Çα╢┤α╖è / α╢ëα╢╜α╖è',
+        general: 'Maha season begins! Northeast monsoon rains start. Major planting month.',
+        tips: {
+            wet: 'Begin Maha paddy sowing. Plant spice crops. Tea flush season begins.',
+            dry: 'Start Maha rice planting. Sow chili, maize, and pulses. Ensure irrigation is ready.',
+            intermediate: 'Plant vegetables, maize, and cowpea. Good month for establishing new fruit trees.',
+        },
+    },
+    {
+        month: 11, // November
+        name: 'November',
+        sinhalaName: 'α╢ëα╢╜α╖è / α╢ïα╢│α╖öα╖Çα╢┤α╖è',
+        general: 'Peak of Northeast monsoon. Heavy rainfall across the island.',
+        tips: {
+            wet: 'Monitor paddy water levels. Watch for blast disease in rice. Continue tea harvesting.',
+            dry: 'Complete all Maha planting. Apply basal fertilizer. Ensure field drainage in low-lying areas.',
+            intermediate: 'Monitor crops for water logging. Apply fungicides preventively. Stake up tall vegetable plants.',
+        },
+    },
+    {
+        month: 12, // December
+        name: 'December',
+        sinhalaName: 'α╢ïα╢│α╖öα╖Çα╢┤α╖è / α╢»α╖öα╢╗α╖öα╢¡α╖ö',
+        general: 'Maha crops in active growth. Pest and disease monitoring essential.',
+        tips: {
+            wet: 'Fertilize paddy fields. Monitor for pests in spice crops. Harvest black pepper.',
+            dry: 'Apply top-dressing fertilizer to rice and chili. Monitor irrigation water levels.',
+            intermediate: 'Harvest early vegetables. Monitor cashew flowering. Apply foliar fertilizer to fruit crops.',
+        },
+    },
+];
+
