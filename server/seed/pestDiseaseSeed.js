@@ -4,6 +4,7 @@
  *   University of Ruhuna (ruh.ac.lk) - Rice disease compendium
  *   Coconut Research Institute (cri.gov.lk)
  *   Tea Research Institute (tri.gov.lk)
+ *   Rubber Research Institute (rrisl.gov.lk)
  */
 require('dotenv').config();
 const mongoose = require('mongoose');
