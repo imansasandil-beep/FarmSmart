@@ -125,4 +125,33 @@ router.get('/:id', async (req, res) => {
     res.status(500).json({ message: 'Failed to fetch post' });
   }
 });
+
+// POST /api/posts/:id/like - Toggle like on a post
+router.post('/:id/like', requireClerkAuth, async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    if (!post) {
+      return res.status(404).json({ message: 'Post not found' });
+    }
+
+    const userId = req.clerkUserId;
+    const alreadyLiked = post.likes.indexOf(userId);
+
+    if (alreadyLiked === -1) {
+      post.likes.push(userId);
+    } else {
+      post.likes.splice(alreadyLiked, 1);
+    }
+    post.likesCount = post.likes.length;
+
+    await post.save();
+    res.json({
+      liked: alreadyLiked === -1,
+      likesCount: post.likesCount,
+    });
+  } catch (error) {
+    console.error('Like toggle error:', error);
+    res.status(500).json({ message: 'Failed to toggle like' });
+  }
+});
 module.exports = router;
