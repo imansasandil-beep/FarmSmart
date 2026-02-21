@@ -1,12 +1,10 @@
 const router = require('express').Router();
 const Order = require('../models/Order');
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 /**
  * Payment Routes
  * Handles Stripe payment integration for the marketplace.
- * 
- * In dev mode: we skip actual Stripe calls and simulate payments.
- * In production: this creates real payment intents and processes webhooks.
  * 
  * Flow:
  * 1. Client requests a payment intent
@@ -14,15 +12,6 @@ const Order = require('../models/Order');
  * 3. Client confirms payment using Stripe SDK
  * 4. Webhook confirms payment and we update the order
  */
-
-// Check if Stripe is configured
-const stripe = process.env.STRIPE_SECRET_KEY
-    ? require('stripe')(process.env.STRIPE_SECRET_KEY)
-    : null;
-
-if (!stripe) {
-    console.log('⚠️  Stripe not configured - payments will run in dev mode');
-}
 
 // POST /api/payments/create-intent - Create a Stripe payment intent
 router.post('/create-intent', async (req, res) => {
@@ -33,17 +22,7 @@ router.post('/create-intent', async (req, res) => {
             return res.status(400).json({ message: 'Order ID and amount are required' });
         }
 
-        // Dev mode: skip Stripe entirely
-        if (!stripe) {
-            return res.status(200).json({
-                clientSecret: 'dev_mode_secret',
-                paymentIntentId: `dev_pi_${Date.now()}`,
-                devMode: true,
-                message: 'Dev mode: no real payment processed',
-            });
-        }
-
-        // Production: create real Stripe payment intent
+        // Create Stripe payment intent
         const paymentIntent = await stripe.paymentIntents.create({
             amount: Math.round(amount * 100), // Stripe uses cents
             currency: 'lkr', // Sri Lankan Rupees
@@ -58,7 +37,6 @@ router.post('/create-intent', async (req, res) => {
         res.status(200).json({
             clientSecret: paymentIntent.client_secret,
             paymentIntentId: paymentIntent.id,
-            devMode: false,
         });
     } catch (error) {
         console.error('Payment intent error:', error);
@@ -66,7 +44,7 @@ router.post('/create-intent', async (req, res) => {
     }
 });
 
-// POST /api/payments/confirm - Confirm payment (dev mode shortcut)
+// POST /api/payments/confirm - Confirm payment after Stripe processes it
 router.post('/confirm', async (req, res) => {
     try {
         const { orderId } = req.body;
@@ -76,7 +54,6 @@ router.post('/confirm', async (req, res) => {
             return res.status(404).json({ message: 'Order not found' });
         }
 
-        // Mark as paid
         order.paymentStatus = 'paid';
         order.status = 'confirmed';
         await order.save();
@@ -91,7 +68,7 @@ router.post('/confirm', async (req, res) => {
     }
 });
 
-// POST /api/payments/refund - Process a refund
+// POST /api/payments/refund - Process a refund through Stripe
 router.post('/refund', async (req, res) => {
     try {
         const { orderId } = req.body;
@@ -101,8 +78,8 @@ router.post('/refund', async (req, res) => {
             return res.status(404).json({ message: 'Order not found' });
         }
 
-        // In production with Stripe configured
-        if (stripe && order.stripePaymentIntentId && !order.stripePaymentIntentId.startsWith('dev_')) {
+        // Process refund through Stripe
+        if (order.stripePaymentIntentId) {
             await stripe.refunds.create({
                 payment_intent: order.stripePaymentIntentId,
             });
@@ -125,7 +102,6 @@ router.post('/refund', async (req, res) => {
 // GET /api/payments/seller-balance/:sellerId - Get seller's earnings
 router.get('/seller-balance/:sellerId', async (req, res) => {
     try {
-        // Sum up all completed orders for this seller
         const orders = await Order.find({
             sellerId: req.params.sellerId,
             paymentStatus: 'paid',
@@ -148,14 +124,8 @@ router.get('/seller-balance/:sellerId', async (req, res) => {
 });
 
 // POST /api/payments/webhook - Stripe webhook handler
-// In production, Stripe sends events here when payment status changes
 router.post('/webhook', async (req, res) => {
     try {
-        // In dev mode, just acknowledge
-        if (!stripe) {
-            return res.status(200).json({ received: true });
-        }
-
         const sig = req.headers['stripe-signature'];
         const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
