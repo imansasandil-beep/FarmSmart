@@ -154,4 +154,26 @@ router.post('/:id/like', requireClerkAuth, async (req, res) => {
     res.status(500).json({ message: 'Failed to toggle like' });
   }
 });
+
+// DELETE /api/posts/:id - Delete a post (author only)
+router.delete('/:id', requireClerkAuth, async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    if (!post) {
+      return res.status(404).json({ message: 'Post not found' });
+    }
+    if (post.author !== req.clerkUserId) {
+      return res.status(403).json({ message: 'Not authorized to delete this post' });
+    }
+
+    // Remove associated comments too
+    await Comment.deleteMany({ postId: req.params.id });
+    await Post.findByIdAndDelete(req.params.id);
+
+    res.json({ message: 'Post deleted successfully' });
+  } catch (error) {
+    console.error('Delete post error:', error);
+    res.status(500).json({ message: 'Failed to delete post' });
+  }
+});
 module.exports = router;
