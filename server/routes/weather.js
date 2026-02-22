@@ -27,9 +27,20 @@ router.get('/', async (req, res) => {
             },
         });
 
-        // 3. Send response to the client
+        // 3. Fetch 5-day / 3-hour forecast from OpenWeatherMap
+        const forecastRes = await axios.get(`${BASE_URL}/forecast`, {
+            params: {
+                lat,
+                lon,
+                appid: WEATHER_API_KEY,
+                units: 'metric',
+            },
+        });
+
+        // 4. Send combined response to the client
         res.status(200).json({
             current: currentWeatherRes.data,
+            forecast: forecastRes.data,
         });
     } catch (err) {
         // If OpenWeatherMap returns an error, forward its status & message
