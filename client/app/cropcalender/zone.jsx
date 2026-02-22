@@ -87,3 +87,60 @@ export default function ZoneSelectionScreen() {
         </TouchableOpacity>
     );
 
+    return (
+        <View style={styles.container}>
+            {/* Header */}
+            <View style={styles.header}>
+                <TouchableOpacity onPress={() => (step === 2 ? setStep(1) : router.back())}>
+                    <Ionicons name="arrow-back" size={28} color="white" />
+                </TouchableOpacity>
+                <Text style={styles.title}>
+                    {step === 1 ? 'Select Your Zone' : 'Select District'}
+                </Text>
+                <View style={{ width: 28 }} />
+            </View>
+
+            {/* Step indicator */}
+            <View style={styles.stepRow}>
+                <View style={[styles.stepDot, step >= 1 && styles.stepDotActive]} />
+                <View style={styles.stepLine} />
+                <View style={[styles.stepDot, step >= 2 && styles.stepDotActive]} />
+            </View>
+            <View style={styles.stepLabelRow}>
+                <Text style={styles.stepLabel}>Zone</Text>
+                <Text style={styles.stepLabel}>District</Text>
+            </View>
+
+            {step === 1 ? (
+                <>
+                    <Text style={styles.subtitle}>
+                        Choose your agro-ecological zone to get personalized crop advice
+                    </Text>
+                    <FlatList
+                        data={ZONES}
+                        keyExtractor={(item) => item.id}
+                        renderItem={renderZoneCard}
+                        contentContainerStyle={styles.listContent}
+                        showsVerticalScrollIndicator={false}
+                    />
+                </>
+            ) : (
+                <>
+                    <View style={[styles.selectedZoneBanner, { backgroundColor: selectedZone?.color + '30' }]}>
+                        <Text style={styles.selectedZoneText}>
+                            {selectedZone?.emoji} {selectedZone?.name} ΓÇö {selectedZone?.sinhalaName}
+                        </Text>
+                    </View>
+                    <Text style={styles.subtitle}>Select your district</Text>
+                    <FlatList
+                        data={selectedZone?.districts || []}
+                        keyExtractor={(item) => item}
+                        renderItem={renderDistrictItem}
+                        contentContainerStyle={styles.listContent}
+                        showsVerticalScrollIndicator={false}
+                    />
+                </>
+            )}
+        </View>
+    );
+}
