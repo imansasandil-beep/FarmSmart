@@ -5,10 +5,25 @@ const { requireClerkAuth } = require('../middleware/clerkAuth');
 
 // ============================================
 // GET ALL QUESTIONS - Accessible by all authenticated users
+// Supports search query and category filter
 // ============================================
 router.get('/', requireClerkAuth, async (req, res) => {
   try {
-    const questions = await Question.find()
+    const { search, category } = req.query;
+    let filter = {};
+
+    if (category && category !== 'All') {
+      filter.category = category;
+    }
+
+    if (search) {
+      filter.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { body: { $regex: search, $options: 'i' } },
+      ];
+    }
+
+    const questions = await Question.find(filter)
       .sort({ createdAt: -1 })
       .lean();
 
@@ -38,15 +53,19 @@ router.get('/:id', requireClerkAuth, async (req, res) => {
 });
 
 // ============================================
-// CREATE QUESTION - Farmers post new questions
+// CREATE QUESTION - Only farmers can ask questions
 // ============================================
 router.post('/', requireClerkAuth, async (req, res) => {
   try {
     const clerkId = req.clerkUserId;
-    const user = await User.findOne({ clerkId });
 
+    // Verify the user is a farmer
+    const user = await User.findOne({ clerkId });
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
+    }
+    if (user.role !== 'farmer') {
+      return res.status(403).json({ message: 'Only farmers can ask questions' });
     }
 
     const { title, body, category } = req.body;
@@ -72,15 +91,19 @@ router.post('/', requireClerkAuth, async (req, res) => {
 });
 
 // ============================================
-// SUBMIT ANSWER - Experts answer questions
+// SUBMIT ANSWER - Only agricultural experts can answer
 // ============================================
 router.post('/:id/answer', requireClerkAuth, async (req, res) => {
   try {
     const clerkId = req.clerkUserId;
-    const user = await User.findOne({ clerkId });
 
+    // Verify the user is an expert
+    const user = await User.findOne({ clerkId });
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
+    }
+    if (user.role !== 'expert') {
+      return res.status(403).json({ message: 'Only agricultural experts can answer questions' });
     }
 
     const { body } = req.body;
@@ -99,12 +122,37 @@ router.post('/:id/answer', requireClerkAuth, async (req, res) => {
       expertName: user.fullName,
     });
 
+    // Mark question as answered
     question.status = 'answered';
     const updatedQuestion = await question.save();
 
     res.status(201).json({ question: updatedQuestion });
   } catch (err) {
     console.error('Submit answer error:', err);
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// ============================================
+// DELETE QUESTION - Only the question author can delete
+// ============================================
+router.delete('/:id', requireClerkAuth, async (req, res) => {
+  try {
+    const clerkId = req.clerkUserId;
+
+    const question = await Question.findById(req.params.id);
+    if (!question) {
+      return res.status(404).json({ message: 'Question not found' });
+    }
+
+    if (question.authorId !== clerkId) {
+      return res.status(403).json({ message: 'You can only delete your own questions' });
+    }
+
+    await Question.findByIdAndDelete(req.params.id);
+    res.status(200).json({ message: 'Question deleted successfully' });
+  } catch (err) {
+    console.error('Delete question error:', err);
     res.status(500).json({ message: err.message });
   }
 });
