@@ -5,6 +5,7 @@ const cors = require('cors');
 
 // IMPORT ROUTES
 const authRoute = require('./routes/auth');
+const weatherRoute = require('./routes/weather');
 
 const app = express();
 
@@ -14,6 +15,7 @@ app.use(cors()); // Allows frontend to communicate with backend
 
 // Route Middlewares
 app.use('/api/user', authRoute);
+app.use('/api/weather', weatherRoute);
 
 // 1. Database Connection
 mongoose.connect(process.env.MONGO_URI)
