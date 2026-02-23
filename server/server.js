@@ -16,6 +16,7 @@ const notificationsRoute = require('./routes/notifications');
 const messagesRoute = require('./routes/messages');
 const pestDiseaseRoute = require('./routes/pestDiseases');
 const weatherRoute = require('./routes/weather');
+const agrisupRoute = require('./routes/agrisup');
 
 const app = express();
 
@@ -65,6 +66,7 @@ app.use('/api/notifications', notificationsRoute); // User notifications
 app.use('/api/messages', messagesRoute); // Chat messaging
 app.use('/api/pest-diseases', pestDiseaseRoute); // Pest & diseases
 app.use('/api/weather', weatherRoute); // Weather forecast
+app.use('/api/agrisup', agrisupRoute); // AgriSup Q&A
 
 // 1. Database Connection
 mongoose.connect(process.env.MONGO_URI)
