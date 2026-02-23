@@ -6,6 +6,7 @@
  *   Tea Research Institute (tri.gov.lk)
  *   Rubber Research Institute (rrisl.gov.lk)
  *   Department of Export Agriculture (dea.gov.lk)
+ *   National Cinnamon Research Centre (cinnamon.gov.lk)
  */
 require('dotenv').config();
 const mongoose = require('mongoose');
