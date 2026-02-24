@@ -15,21 +15,27 @@ import {
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useStripe } from '@stripe/stripe-react-native';
 import { API_BASE_URL } from '../../config';
+
+// Platform takes a 2% commission on each sale
+const PLATFORM_FEE_PERCENT = 2;
 
 /**
  * Checkout Screen
  * Shows order summary, calculates delivery fees,
- * and handles payment (Stripe or dev mode).
+ * and handles payment through Stripe's PaymentSheet.
  */
 export default function CheckoutScreen() {
     const router = useRouter();
     const params = useLocalSearchParams();
-
-    // Listing data from route params
     const { listingId, title, price, availableQuantity, unit, imageUrl, location } = params;
 
+    // Stripe hooks - handles the payment sheet UI
+    const { initPaymentSheet, presentPaymentSheet } = useStripe();
+
     // Form state
+    const [loading, setLoading] = useState(false);
     const [quantity, setQuantity] = useState('1');
     const [deliveryAddress, setDeliveryAddress] = useState({
         street: '',
@@ -37,61 +43,37 @@ export default function CheckoutScreen() {
         state: '',
         zipCode: '',
     });
-
-    // Delivery quote
     const [deliveryFee, setDeliveryFee] = useState(0);
-    const [deliveryDistance, setDeliveryDistance] = useState(null);
-    const [deliveryTime, setDeliveryTime] = useState('');
-    const [loadingQuote, setLoadingQuote] = useState(false);
+    const [gettingQuote, setGettingQuote] = useState(false);
+    const [deliveryInfo, setDeliveryInfo] = useState(null);
 
-    // Payment
-    const [processing, setProcessing] = useState(false);
-    const [currentUser, setCurrentUser] = useState(null);
-
-    // Platform fee is 2%
-    const PLATFORM_FEE_PERCENT = 2;
-
-    // Load current user on mount
-    useEffect(() => {
-        loadUser();
-    }, []);
-
-    const loadUser = async () => {
-        try {
-            const userData = await AsyncStorage.getItem('userData');
-            if (userData) {
-                setCurrentUser(JSON.parse(userData));
-            }
-        } catch (error) {
-            console.error('Error loading user:', error);
-        }
-    };
-
-    // Calculate price breakdown
-    const unitPrice = Number(price) || 0;
-    const qty = Number(quantity) || 1;
+    // Calculate pricing
+    const unitPrice = parseFloat(price) || 0;
+    const qty = parseInt(quantity) || 1;
     const subtotal = unitPrice * qty;
-    const platformFee = Math.round(subtotal * PLATFORM_FEE_PERCENT / 100);
-    const totalAmount = subtotal + platformFee + deliveryFee;
-    const sellerPayout = subtotal - platformFee;
+    const platformFee = Math.round(subtotal * (PLATFORM_FEE_PERCENT / 100));
+    const total = subtotal + platformFee + deliveryFee;
 
     /**
      * Get a delivery fee quote from the API
      * Based on distance between seller's location and buyer's city
      */
     const getDeliveryQuote = async () => {
-        if (!deliveryAddress.city.trim()) {
-            Alert.alert('Enter City', 'Please enter your city to calculate delivery fees');
+        if (!deliveryAddress.city) {
+            Alert.alert('Error', 'Please enter your city');
             return;
         }
 
+        setGettingQuote(true);
         try {
-            setLoadingQuote(true);
+            // Parse the listing location (format: "City, State")
+            const pickupCity = location ? location.split(',')[0].trim() : '';
+
             const response = await fetch(`${API_BASE_URL}/api/delivery/quote`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    pickupLocation: location || '',
+                    pickupLocation: pickupCity,
                     deliveryLocation: deliveryAddress.city,
                 }),
             });
@@ -99,186 +81,188 @@ export default function CheckoutScreen() {
             const data = await response.json();
             if (response.ok) {
                 setDeliveryFee(data.deliveryFee);
-                setDeliveryDistance(data.distance);
-                setDeliveryTime(data.estimatedTime);
+                setDeliveryInfo(data);
+
+                let message = `Delivery Fee: Rs. ${data.deliveryFee}`;
+                if (data.distance) {
+                    message += `\nDistance: ~${data.distance} km`;
+                }
+                if (data.estimatedTime) {
+                    message += `\nEstimated Time: ${data.estimatedTime}`;
+                }
+                Alert.alert('📦 Delivery Quote', message);
             } else {
-                Alert.alert('Error', data.message || 'Could not get delivery quote');
+                // Fallback fee if quote fails
+                setDeliveryFee(250);
+                Alert.alert('Delivery Fee', 'Estimated delivery fee: Rs. 250');
             }
         } catch (error) {
             console.error('Quote error:', error);
-            Alert.alert('Error', 'Failed to get delivery quote');
+            setDeliveryFee(250);
         } finally {
-            setLoadingQuote(false);
+            setGettingQuote(false);
         }
     };
 
     /**
-     * Validate the order before processing payment
+     * Handle the full checkout flow:
+     * 1. Validate inputs
+     * 2. Create payment intent on backend
+     * 3. Initialize Stripe PaymentSheet
+     * 4. Present PaymentSheet to user
+     * 5. Confirm payment with backend
      */
-    const validateOrder = () => {
-        const qtyNum = Number(quantity);
-        if (!qtyNum || qtyNum < 1) {
-            Alert.alert('Invalid Quantity', 'Please enter a valid quantity');
-            return false;
+    const handleCheckout = async () => {
+        // Validation
+        if (!quantity || parseInt(quantity) < 1) {
+            Alert.alert('Error', 'Please enter a valid quantity');
+            return;
         }
-        if (qtyNum > Number(availableQuantity)) {
-            Alert.alert('Not Enough Stock', `Only ${availableQuantity} ${unit} available`);
-            return false;
+        if (parseInt(quantity) > parseInt(availableQuantity)) {
+            Alert.alert('Error', `Only ${availableQuantity} ${unit} available`);
+            return;
         }
-        if (!deliveryAddress.city.trim()) {
-            Alert.alert('Missing Address', 'Please enter your delivery address');
-            return false;
+        if (!deliveryAddress.street || !deliveryAddress.city) {
+            Alert.alert('Error', 'Please enter your delivery address');
+            return;
         }
-        if (!currentUser) {
-            Alert.alert('Not Logged In', 'Please log in to place an order');
-            return false;
-        }
-        return true;
-    };
 
-    /**
-     * Process the order
-     * In dev mode: creates the order directly
-     * In production: would initiate Stripe payment first
-     */
-    const handlePlaceOrder = async () => {
-        if (!validateOrder()) return;
-
+        setLoading(true);
         try {
-            setProcessing(true);
-
-            // Fetch the full listing to get sellerId
-            const listingResponse = await fetch(`${API_BASE_URL}/api/marketplace/${listingId}`);
-            const listing = await listingResponse.json();
-
-            if (!listingResponse.ok) {
-                Alert.alert('Error', 'Could not find listing');
+            const userStr = await AsyncStorage.getItem('userData');
+            if (!userStr) {
+                Alert.alert('Error', 'Please login to continue');
+                router.push('/login');
                 return;
             }
+            const user = JSON.parse(userStr);
 
-            const sellerId = listing.sellerId?._id || listing.sellerId;
-
-            // Don't let users buy their own stuff
-            if (sellerId === (currentUser._id || currentUser.id)) {
-                Alert.alert('Oops!', "You can't buy your own listing");
-                return;
-            }
-
-            // Build the order
-            const orderData = {
-                buyerId: currentUser._id || currentUser.id,
-                sellerId,
-                listingId,
-                quantity: Number(quantity),
-                unitPrice,
-                subtotal,
-                platformFeePercent: PLATFORM_FEE_PERCENT,
-                platformFee,
-                deliveryFee,
-                totalAmount,
-                sellerPayout,
-                deliveryAddress: {
-                    street: deliveryAddress.street,
-                    city: deliveryAddress.city,
-                    state: deliveryAddress.state,
-                    zipCode: deliveryAddress.zipCode,
-                    country: 'Sri Lanka',
-                },
-                paymentStatus: 'paid', // Dev mode: auto-mark as paid
-                status: 'confirmed',
-            };
-
-            // Create the order
-            const response = await fetch(`${API_BASE_URL}/api/orders`, {
+            // Step 1: Create payment intent on our backend
+            const response = await fetch(`${API_BASE_URL}/api/payments/create-intent`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(orderData),
+                body: JSON.stringify({
+                    listingId,
+                    quantity: parseInt(quantity),
+                    amount: total,
+                    deliveryFee,
+                    buyerId: user._id || user.id,
+                }),
             });
 
             const data = await response.json();
-
-            if (response.ok) {
-                Alert.alert(
-                    'Order Placed!',
-                    `Your order for ${quantity} ${unit} of ${title} has been confirmed.`,
-                    [{ text: 'View Orders', onPress: () => router.push('/marketplace/orders') }]
-                );
-            } else {
-                Alert.alert('Error', data.message || 'Failed to place order');
+            if (!response.ok) {
+                Alert.alert('Error', data.message || 'Failed to create payment');
+                return;
             }
+
+            // Step 2: Initialize the Stripe PaymentSheet
+            const { error: initError } = await initPaymentSheet({
+                paymentIntentClientSecret: data.clientSecret,
+                merchantDisplayName: 'FarmSmart',
+                returnURL: 'farmsmart://stripe-redirect',
+                defaultBillingDetails: {
+                    name: user.fullName,
+                },
+            });
+
+            if (initError) {
+                Alert.alert('Error', initError.message);
+                return;
+            }
+
+            // Step 3: Present the PaymentSheet to the user
+            const { error: paymentError } = await presentPaymentSheet();
+
+            if (paymentError) {
+                // User just cancelled - don't show error
+                if (paymentError.code === 'Canceled') return;
+                Alert.alert('Payment Failed', paymentError.message);
+                return;
+            }
+
+            // Step 4: Payment successful - confirm with our backend
+            try {
+                await fetch(`${API_BASE_URL}/api/payments/confirm`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ orderId: data.orderId }),
+                });
+            } catch (confirmError) {
+                // Even if confirm fails here, the webhook will handle it
+                console.log('Could not confirm payment, webhook will process:', confirmError);
+            }
+
+            // Show success
+            Alert.alert(
+                'Payment Successful! 🎉',
+                `Your order for ${quantity} ${unit} of ${title} has been placed.\n\nTotal: Rs. ${total}`,
+                [
+                    {
+                        text: 'View Orders',
+                        onPress: () => router.replace('/marketplace/orders'),
+                    },
+                ]
+            );
         } catch (error) {
-            console.error('Order error:', error);
-            Alert.alert('Error', 'Something went wrong. Please try again.');
+            console.error('Checkout error:', error);
+            Alert.alert('Error', 'Could not process payment. Please try again.');
         } finally {
-            setProcessing(false);
+            setLoading(false);
         }
     };
 
     return (
         <KeyboardAvoidingView
             style={styles.container}
-            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         >
             {/* Header */}
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-                    <Ionicons name="arrow-back" size={24} color="#1a4d45" />
+                    <Ionicons name="arrow-back" size={24} color="#fff" />
                 </TouchableOpacity>
                 <Text style={styles.headerTitle}>Checkout</Text>
                 <View style={{ width: 40 }} />
             </View>
 
-            <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-                {/* Product Summary */}
-                <View style={styles.productCard}>
-                    <Image source={{ uri: imageUrl }} style={styles.productImage} />
-                    <View style={styles.productInfo}>
-                        <Text style={styles.productTitle} numberOfLines={2}>{title}</Text>
-                        <Text style={styles.productPrice}>Rs. {unitPrice} / {unit || 'kg'}</Text>
-                        <Text style={styles.productAvailable}>
-                            {availableQuantity} {unit || 'kg'} available
-                        </Text>
-                        {location ? (
-                            <View style={styles.locationRow}>
-                                <Ionicons name="location-outline" size={14} color="#888" />
-                                <Text style={styles.locationText}>{location}</Text>
-                            </View>
-                        ) : null}
+            <ScrollView
+                contentContainerStyle={styles.scrollContent}
+                showsVerticalScrollIndicator={false}
+            >
+                {/* Product Info */}
+                <View style={styles.section}>
+                    <Text style={styles.sectionTitle}>Product</Text>
+                    <View style={styles.productCard}>
+                        <Text style={styles.productName}>{title}</Text>
+                        <Text style={styles.productPrice}>Rs. {unitPrice} / {unit}</Text>
+                        <Text style={styles.productStock}>{availableQuantity} {unit} available</Text>
                     </View>
                 </View>
 
-                {/* Quantity Selector */}
+                {/* Quantity */}
                 <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>Quantity</Text>
+                    <Text style={styles.sectionTitle}>Quantity ({unit})</Text>
                     <View style={styles.quantityRow}>
                         <TouchableOpacity
-                            style={styles.qtyButton}
-                            onPress={() => {
-                                const current = Number(quantity) || 1;
-                                if (current > 1) setQuantity(String(current - 1));
-                            }}
+                            style={styles.quantityBtn}
+                            onPress={() => setQuantity(Math.max(1, qty - 1).toString())}
                         >
-                            <Ionicons name="remove" size={20} color="#1a4d45" />
+                            <Ionicons name="remove" size={20} color="#fff" />
                         </TouchableOpacity>
                         <TextInput
-                            style={styles.qtyInput}
+                            style={styles.quantityInput}
                             value={quantity}
                             onChangeText={setQuantity}
                             keyboardType="numeric"
                             textAlign="center"
                         />
                         <TouchableOpacity
-                            style={styles.qtyButton}
-                            onPress={() => {
-                                const current = Number(quantity) || 0;
-                                if (current < Number(availableQuantity)) {
-                                    setQuantity(String(current + 1));
-                                }
-                            }}
+                            style={styles.quantityBtn}
+                            onPress={() => setQuantity(Math.min(parseInt(availableQuantity), qty + 1).toString())}
                         >
-                            <Ionicons name="add" size={20} color="#1a4d45" />
+                            <Ionicons name="add" size={20} color="#fff" />
                         </TouchableOpacity>
-                        <Text style={styles.qtyUnit}>{unit || 'kg'}</Text>
                     </View>
                 </View>
 
@@ -288,122 +272,92 @@ export default function CheckoutScreen() {
                     <TextInput
                         style={styles.input}
                         placeholder="Street Address"
-                        placeholderTextColor="#999"
+                        placeholderTextColor="rgba(255,255,255,0.4)"
                         value={deliveryAddress.street}
-                        onChangeText={(text) => setDeliveryAddress(prev => ({ ...prev, street: text }))}
+                        onChangeText={(text) => setDeliveryAddress({ ...deliveryAddress, street: text })}
+                    />
+                    <TextInput
+                        style={styles.input}
+                        placeholder="City"
+                        placeholderTextColor="rgba(255,255,255,0.4)"
+                        value={deliveryAddress.city}
+                        onChangeText={(text) => setDeliveryAddress({ ...deliveryAddress, city: text })}
                     />
                     <View style={styles.row}>
                         <TextInput
                             style={[styles.input, styles.halfInput]}
-                            placeholder="City *"
-                            placeholderTextColor="#999"
-                            value={deliveryAddress.city}
-                            onChangeText={(text) => setDeliveryAddress(prev => ({ ...prev, city: text }))}
+                            placeholder="Province"
+                            placeholderTextColor="rgba(255,255,255,0.4)"
+                            value={deliveryAddress.state}
+                            onChangeText={(text) => setDeliveryAddress({ ...deliveryAddress, state: text })}
                         />
                         <TextInput
                             style={[styles.input, styles.halfInput]}
-                            placeholder="Province"
-                            placeholderTextColor="#999"
-                            value={deliveryAddress.state}
-                            onChangeText={(text) => setDeliveryAddress(prev => ({ ...prev, state: text }))}
+                            placeholder="Postal Code"
+                            placeholderTextColor="rgba(255,255,255,0.4)"
+                            value={deliveryAddress.zipCode}
+                            onChangeText={(text) => setDeliveryAddress({ ...deliveryAddress, zipCode: text })}
+                            keyboardType="numeric"
                         />
                     </View>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Postal Code"
-                        placeholderTextColor="#999"
-                        keyboardType="numeric"
-                        value={deliveryAddress.zipCode}
-                        onChangeText={(text) => setDeliveryAddress(prev => ({ ...prev, zipCode: text }))}
-                    />
-
-                    {/* Get delivery quote button */}
                     <TouchableOpacity
                         style={styles.quoteButton}
                         onPress={getDeliveryQuote}
-                        disabled={loadingQuote}
+                        disabled={gettingQuote}
                     >
-                        {loadingQuote ? (
-                            <ActivityIndicator size="small" color="#fff" />
+                        {gettingQuote ? (
+                            <ActivityIndicator size="small" color="#0a1f1c" />
                         ) : (
                             <>
-                                <Ionicons name="bicycle-outline" size={18} color="#fff" />
-                                <Text style={styles.quoteButtonText}>Calculate Delivery Fee</Text>
+                                <Ionicons name="bicycle" size={18} color="#0a1f1c" />
+                                <Text style={styles.quoteButtonText}>Get Delivery Quote</Text>
                             </>
                         )}
                     </TouchableOpacity>
-
-                    {/* Show delivery info if we have a quote */}
-                    {deliveryFee > 0 && (
-                        <View style={styles.deliveryInfo}>
-                            <View style={styles.deliveryRow}>
-                                <Text style={styles.deliveryLabel}>Delivery Fee</Text>
-                                <Text style={styles.deliveryValue}>Rs. {deliveryFee}</Text>
-                            </View>
-                            {deliveryDistance && (
-                                <View style={styles.deliveryRow}>
-                                    <Text style={styles.deliveryLabel}>Distance</Text>
-                                    <Text style={styles.deliveryValue}>{deliveryDistance} km</Text>
-                                </View>
-                            )}
-                            {deliveryTime && (
-                                <View style={styles.deliveryRow}>
-                                    <Text style={styles.deliveryLabel}>Est. Time</Text>
-                                    <Text style={styles.deliveryValue}>{deliveryTime}</Text>
-                                </View>
-                            )}
-                        </View>
-                    )}
                 </View>
 
-                {/* Price Breakdown */}
+                {/* Order Summary */}
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>Order Summary</Text>
-                    <View style={styles.summaryRow}>
-                        <Text style={styles.summaryLabel}>
-                            {quantity} × Rs. {unitPrice}
-                        </Text>
-                        <Text style={styles.summaryValue}>Rs. {subtotal}</Text>
-                    </View>
-                    <View style={styles.summaryRow}>
-                        <Text style={styles.summaryLabel}>Platform Fee (2%)</Text>
-                        <Text style={styles.summaryValue}>Rs. {platformFee}</Text>
-                    </View>
-                    <View style={styles.summaryRow}>
-                        <Text style={styles.summaryLabel}>Delivery</Text>
-                        <Text style={styles.summaryValue}>
-                            {deliveryFee > 0 ? `Rs. ${deliveryFee}` : 'Calculate above'}
-                        </Text>
-                    </View>
-                    <View style={styles.divider} />
-                    <View style={styles.summaryRow}>
-                        <Text style={styles.totalLabel}>Total</Text>
-                        <Text style={styles.totalValue}>Rs. {totalAmount}</Text>
+                    <View style={styles.summaryCard}>
+                        <View style={styles.summaryRow}>
+                            <Text style={styles.summaryLabel}>Subtotal ({qty} {unit})</Text>
+                            <Text style={styles.summaryValue}>Rs. {subtotal}</Text>
+                        </View>
+                        <View style={styles.summaryRow}>
+                            <Text style={styles.summaryLabel}>Platform Fee ({PLATFORM_FEE_PERCENT}%)</Text>
+                            <Text style={styles.summaryValue}>Rs. {platformFee}</Text>
+                        </View>
+                        <View style={styles.summaryRow}>
+                            <Text style={styles.summaryLabel}>Delivery Fee</Text>
+                            <Text style={styles.summaryValue}>Rs. {deliveryFee}</Text>
+                        </View>
+                        <View style={[styles.summaryRow, styles.totalRow]}>
+                            <Text style={styles.totalLabel}>Total</Text>
+                            <Text style={styles.totalValue}>Rs. {total}</Text>
+                        </View>
                     </View>
                 </View>
 
-                {/* Dev mode notice */}
-                <View style={styles.devNotice}>
-                    <Ionicons name="information-circle-outline" size={16} color="#f59e0b" />
-                    <Text style={styles.devNoticeText}>
-                        Dev Mode: Orders are auto-confirmed without real payment
-                    </Text>
-                </View>
-
-                {/* Place Order Button */}
+                {/* Pay Button */}
                 <TouchableOpacity
-                    style={[styles.placeOrderButton, processing && styles.buttonDisabled]}
-                    onPress={handlePlaceOrder}
-                    disabled={processing}
+                    style={[styles.payButton, loading && styles.payButtonDisabled]}
+                    onPress={handleCheckout}
+                    disabled={loading}
                 >
-                    {processing ? (
+                    {loading ? (
                         <ActivityIndicator color="#fff" />
                     ) : (
-                        <Text style={styles.placeOrderText}>Place Order - Rs. {totalAmount}</Text>
+                        <>
+                            <Ionicons name="card" size={20} color="#0a1f1c" />
+                            <Text style={styles.payButtonText}>Pay Rs. {total}</Text>
+                        </>
                     )}
                 </TouchableOpacity>
 
-                <View style={{ height: 40 }} />
+                <Text style={styles.secureText}>
+                    🔒 Secure payment via Stripe
+                </Text>
             </ScrollView>
         </KeyboardAvoidingView>
     );
@@ -412,133 +366,108 @@ export default function CheckoutScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f5f5f5',
+        backgroundColor: '#0a1f1c',
     },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingHorizontal: 16,
-        paddingTop: 50,
-        paddingBottom: 10,
-        backgroundColor: '#fff',
-        borderBottomWidth: 1,
-        borderBottomColor: '#eee',
+        paddingTop: 60,
+        paddingHorizontal: 20,
+        paddingBottom: 20,
     },
     backButton: {
-        padding: 8,
-    },
-    headerTitle: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: '#1a4d45',
-    },
-    content: {
-        flex: 1,
-        padding: 16,
-    },
-    productCard: {
-        flexDirection: 'row',
-        backgroundColor: '#fff',
-        borderRadius: 12,
-        padding: 12,
-        marginBottom: 16,
-        elevation: 2,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.1,
-        shadowRadius: 3,
-    },
-    productImage: {
-        width: 80,
-        height: 80,
-        borderRadius: 8,
-        backgroundColor: '#e0e0e0',
-    },
-    productInfo: {
-        flex: 1,
-        marginLeft: 12,
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: 'rgba(255,255,255,0.1)',
+        alignItems: 'center',
         justifyContent: 'center',
     },
-    productTitle: {
-        fontSize: 16,
+    headerTitle: {
+        fontSize: 22,
+        fontWeight: 'bold',
+        color: '#fff',
+    },
+    scrollContent: {
+        paddingHorizontal: 20,
+        paddingBottom: 40,
+    },
+    section: {
+        marginBottom: 24,
+    },
+    sectionTitle: {
+        color: '#6fdfc4',
+        fontSize: 14,
         fontWeight: '600',
-        color: '#333',
+        marginBottom: 12,
+        textTransform: 'uppercase',
+        letterSpacing: 1,
+    },
+    productCard: {
+        backgroundColor: '#1a4d45',
+        borderRadius: 12,
+        padding: 16,
+        borderWidth: 1,
+        borderColor: 'rgba(111, 223, 196, 0.3)',
+    },
+    productName: {
+        color: '#fff',
+        fontSize: 18,
+        fontWeight: 'bold',
         marginBottom: 4,
     },
     productPrice: {
-        fontSize: 14,
-        fontWeight: 'bold',
-        color: '#1a4d45',
-        marginBottom: 2,
-    },
-    productAvailable: {
-        fontSize: 12,
-        color: '#888',
-    },
-    locationRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 4,
-        marginTop: 4,
-    },
-    locationText: {
-        fontSize: 12,
-        color: '#888',
-    },
-    section: {
-        backgroundColor: '#fff',
-        borderRadius: 12,
-        padding: 16,
-        marginBottom: 16,
-    },
-    sectionTitle: {
+        color: '#6fdfc4',
         fontSize: 16,
-        fontWeight: '700',
-        color: '#1a4d45',
-        marginBottom: 12,
+        fontWeight: '600',
+    },
+    productStock: {
+        color: 'rgba(255,255,255,0.5)',
+        fontSize: 12,
+        marginTop: 4,
     },
     quantityRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 12,
-    },
-    qtyButton: {
-        width: 36,
-        height: 36,
-        borderRadius: 18,
-        backgroundColor: '#e8f5e9',
         justifyContent: 'center',
+    },
+    quantityBtn: {
+        width: 44,
+        height: 44,
+        borderRadius: 22,
+        backgroundColor: '#1a4d45',
         alignItems: 'center',
-    },
-    qtyInput: {
-        width: 60,
-        height: 40,
+        justifyContent: 'center',
         borderWidth: 1,
-        borderColor: '#ddd',
-        borderRadius: 8,
-        fontSize: 16,
-        fontWeight: '600',
-        color: '#333',
+        borderColor: '#6fdfc4',
     },
-    qtyUnit: {
-        fontSize: 14,
-        color: '#666',
+    quantityInput: {
+        width: 80,
+        height: 44,
+        backgroundColor: '#1a4d45',
+        borderRadius: 10,
+        marginHorizontal: 15,
+        color: '#fff',
+        fontSize: 18,
+        fontWeight: 'bold',
+        borderWidth: 1,
+        borderColor: 'rgba(111, 223, 196, 0.3)',
     },
     input: {
-        backgroundColor: '#f9f9f9',
+        backgroundColor: '#1a4d45',
         borderRadius: 10,
-        paddingHorizontal: 14,
-        paddingVertical: 12,
+        paddingHorizontal: 16,
+        paddingVertical: 14,
         fontSize: 15,
-        color: '#333',
+        color: '#fff',
         borderWidth: 1,
-        borderColor: '#eee',
-        marginBottom: 10,
+        borderColor: 'rgba(111, 223, 196, 0.3)',
+        marginBottom: 12,
     },
     row: {
         flexDirection: 'row',
-        gap: 10,
+        gap: 12,
     },
     halfInput: {
         flex: 1,
@@ -547,90 +476,82 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#1a4d45',
+        backgroundColor: '#6fdfc4',
         paddingVertical: 12,
         borderRadius: 10,
         gap: 8,
-        marginTop: 8,
+        marginTop: 4,
     },
     quoteButtonText: {
-        color: '#fff',
-        fontWeight: '600',
-    },
-    deliveryInfo: {
-        marginTop: 12,
-        padding: 12,
-        backgroundColor: '#e8f5e9',
-        borderRadius: 8,
-    },
-    deliveryRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: 4,
-    },
-    deliveryLabel: {
-        color: '#666',
+        color: '#0a1f1c',
+        fontWeight: 'bold',
         fontSize: 14,
     },
-    deliveryValue: {
-        color: '#1a4d45',
-        fontWeight: '600',
-        fontSize: 14,
+    summaryCard: {
+        backgroundColor: '#1a4d45',
+        borderRadius: 12,
+        padding: 16,
+        borderWidth: 1,
+        borderColor: 'rgba(111, 223, 196, 0.3)',
     },
     summaryRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginBottom: 8,
+        marginBottom: 10,
     },
     summaryLabel: {
-        color: '#666',
+        color: 'rgba(255,255,255,0.7)',
         fontSize: 14,
     },
     summaryValue: {
-        color: '#333',
+        color: '#fff',
         fontSize: 14,
+        fontWeight: '500',
     },
-    divider: {
-        height: 1,
-        backgroundColor: '#eee',
-        marginVertical: 8,
+    totalRow: {
+        borderTopWidth: 1,
+        borderTopColor: 'rgba(255,255,255,0.2)',
+        paddingTop: 12,
+        marginTop: 8,
+        marginBottom: 0,
     },
     totalLabel: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: '#333',
-    },
-    totalValue: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: '#1a4d45',
-    },
-    devNotice: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#fff8e1',
-        padding: 12,
-        borderRadius: 8,
-        gap: 8,
-        marginBottom: 16,
-    },
-    devNoticeText: {
-        fontSize: 12,
-        color: '#f59e0b',
-        flex: 1,
-    },
-    placeOrderButton: {
-        backgroundColor: '#1a4d45',
-        paddingVertical: 16,
-        borderRadius: 12,
-        alignItems: 'center',
-    },
-    buttonDisabled: {
-        opacity: 0.7,
-    },
-    placeOrderText: {
         color: '#fff',
         fontSize: 16,
         fontWeight: 'bold',
+    },
+    totalValue: {
+        color: '#6fdfc4',
+        fontSize: 20,
+        fontWeight: 'bold',
+    },
+    payButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#6fdfc4',
+        paddingVertical: 16,
+        borderRadius: 15,
+        gap: 10,
+        marginTop: 8,
+        shadowColor: '#6fdfc4',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 4.65,
+        elevation: 8,
+    },
+    payButtonDisabled: {
+        opacity: 0.7,
+    },
+    payButtonText: {
+        color: '#0a1f1c',
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
+    secureText: {
+        color: 'rgba(255,255,255,0.5)',
+        fontSize: 12,
+        textAlign: 'center',
+        marginTop: 12,
     },
 });
