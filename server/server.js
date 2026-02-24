@@ -15,6 +15,9 @@ const notificationsRoute = require('./routes/notifications');
 
 const app = express();
 
+// Stripe webhook needs raw body
+app.use('/api/payments/webhook', express.raw({ type: 'application/json' }));
+
 // Middleware
 app.use(express.json()); // Allows us to parse JSON data
 app.use(cors()); // Allows frontend to communicate with backend

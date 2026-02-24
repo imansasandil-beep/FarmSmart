@@ -1,90 +1,115 @@
 const router = require('express').Router();
 const Notification = require('../models/Notification');
 
-/**
- * Notification Routes
- * Handles creating, fetching, and managing user notifications.
- */
-
-// POST /api/notifications - Create a notification
-router.post('/', async (req, res) => {
+// Create a notification (internal use)
+const createNotification = async (userId, type, title, message, data = {}) => {
     try {
-        const { userId, type, title, message, data } = req.body;
-
         const notification = new Notification({
             userId,
-            type: type || 'system',
+            type,
             title,
             message,
-            data: data || {},
+            data,
         });
-
         await notification.save();
-        res.status(201).json({ message: 'Notification created', notification });
+        return notification;
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        console.error('Create Notification Error:', error);
+        return null;
     }
-});
+};
 
-// GET /api/notifications/:userId - Get all notifications for a user
+// Get user's notifications
 router.get('/:userId', async (req, res) => {
     try {
-        const notifications = await Notification.find({ userId: req.params.userId })
+        const { userId } = req.params;
+        const { limit = 50, unreadOnly = false } = req.query;
+
+        const query = { userId };
+        if (unreadOnly === 'true') {
+            query.read = false;
+        }
+
+        const notifications = await Notification.find(query)
             .sort({ createdAt: -1 })
-            .limit(50); // Only show last 50 notifications
-        res.status(200).json(notifications);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-});
+            .limit(parseInt(limit));
 
-// GET /api/notifications/:userId/unread - Get unread count
-router.get('/:userId/unread', async (req, res) => {
-    try {
-        const count = await Notification.countDocuments({
-            userId: req.params.userId,
-            read: false,
+        const unreadCount = await Notification.countDocuments({ userId, read: false });
+
+        res.status(200).json({
+            notifications,
+            unreadCount,
         });
-        res.status(200).json({ unreadCount: count });
+
     } catch (error) {
+        console.error('Get Notifications Error:', error);
         res.status(500).json({ message: error.message });
     }
 });
 
-// PUT /api/notifications/:id/read - Mark a notification as read
-router.put('/:id/read', async (req, res) => {
+// Mark notification as read
+router.patch('/:id/read', async (req, res) => {
     try {
-        await Notification.findByIdAndUpdate(req.params.id, { read: true });
-        res.status(200).json({ message: 'Notification marked as read' });
+        const { id } = req.params;
+
+        const notification = await Notification.findByIdAndUpdate(
+            id,
+            { read: true },
+            { new: true }
+        );
+
+        if (!notification) {
+            return res.status(404).json({ message: 'Notification not found' });
+        }
+
+        res.status(200).json({ message: 'Marked as read', notification });
+
     } catch (error) {
+        console.error('Mark Read Error:', error);
         res.status(500).json({ message: error.message });
     }
 });
 
-// PUT /api/notifications/:userId/read-all - Mark all notifications as read
-router.put('/:userId/read-all', async (req, res) => {
+// Mark all as read
+router.patch('/read-all/:userId', async (req, res) => {
     try {
+        const { userId } = req.params;
+
         await Notification.updateMany(
-            { userId: req.params.userId, read: false },
+            { userId, read: false },
             { read: true }
         );
+
         res.status(200).json({ message: 'All notifications marked as read' });
+
     } catch (error) {
+        console.error('Mark All Read Error:', error);
         res.status(500).json({ message: error.message });
     }
 });
 
-// DELETE /api/notifications/:userId/clear - Delete old read notifications
-router.delete('/:userId/clear', async (req, res) => {
+// Delete old notifications (cleanup)
+router.delete('/cleanup/:userId', async (req, res) => {
     try {
-        await Notification.deleteMany({
-            userId: req.params.userId,
+        const { userId } = req.params;
+        const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+
+        const result = await Notification.deleteMany({
+            userId,
+            createdAt: { $lt: thirtyDaysAgo },
             read: true,
         });
-        res.status(200).json({ message: 'Read notifications cleared' });
+
+        res.status(200).json({
+            message: `Deleted ${result.deletedCount} old notifications`
+        });
+
     } catch (error) {
+        console.error('Cleanup Error:', error);
         res.status(500).json({ message: error.message });
     }
 });
 
+// Export both router and helper function
 module.exports = router;
+module.exports.createNotification = createNotification;
