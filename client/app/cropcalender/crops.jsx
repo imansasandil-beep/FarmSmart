@@ -88,3 +88,95 @@ export default function CropsScreen() {
         );
     };
 
+    const renderCropCard = ({ item }) => {
+        const isExpanded = expandedCrop === item.id;
+        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const plantingStr = item.plantingMonths.map(m => monthNames[m - 1]).join(', ');
+        const harvestStr = item.harvestMonths.map(m => monthNames[m - 1]).join(', ');
+
+        return (
+            <TouchableOpacity
+                style={styles.cropCard}
+                onPress={() => setExpandedCrop(isExpanded ? null : item.id)}
+                activeOpacity={0.7}
+            >
+                <View style={styles.cropHeader}>
+                    <Text style={styles.cropEmoji}>{item.emoji}</Text>
+                    <View style={styles.cropNameWrap}>
+                        <Text style={styles.cropName}>{item.name}</Text>
+                        <Text style={styles.cropSinhala}>{item.sinhalaName}</Text>
+                    </View>
+                    <Ionicons
+                        name={isExpanded ? 'chevron-up' : 'chevron-down'}
+                        size={22}
+                        color="#6fdfc4"
+                    />
+                </View>
+
+                {isExpanded && (
+                    <View style={styles.cropDetails}>
+                        <View style={styles.detailRow}>
+                            <Ionicons name="leaf" size={16} color="#6fdfc4" />
+                            <Text style={styles.detailLabel}>Plant:</Text>
+                            <Text style={styles.detailValue}>{plantingStr}</Text>
+                        </View>
+                        <View style={styles.detailRow}>
+                            <Ionicons name="basket" size={16} color="#f9a825" />
+                            <Text style={styles.detailLabel}>Harvest:</Text>
+                            <Text style={styles.detailValue}>{harvestStr}</Text>
+                        </View>
+                        <View style={styles.detailRow}>
+                            <Ionicons name="time" size={16} color="#3498db" />
+                            <Text style={styles.detailLabel}>Growth:</Text>
+                            <Text style={styles.detailValue}>{item.growthDays} days</Text>
+                        </View>
+                        <View style={styles.detailRow}>
+                            <Ionicons name="sunny" size={16} color="#f39c12" />
+                            <Text style={styles.detailLabel}>Seasons:</Text>
+                            <Text style={styles.detailValue}>
+                                {item.seasons.map(s => s === 'yala' ? 'Yala (α╢║α╢╜)' : 'Maha (α╢╕α╖ä)').join(', ')}
+                            </Text>
+                        </View>
+
+                        <Text style={styles.tipText}>≡ƒÆí {item.tips}</Text>
+
+                        <TouchableOpacity
+                            style={styles.reminderButton}
+                            onPress={() => handleCreateReminder(item)}
+                        >
+                            <Ionicons name="alarm" size={18} color="#0a1f1c" />
+                            <Text style={styles.reminderButtonText}>Add Planting Reminder</Text>
+                        </TouchableOpacity>
+                    </View>
+                )}
+            </TouchableOpacity>
+        );
+    };
+
+    if (!zone) {
+        return (
+            <View style={styles.container}>
+                <View style={styles.header}>
+                    <TouchableOpacity onPress={() => router.back()}>
+                        <Ionicons name="arrow-back" size={28} color="white" />
+                    </TouchableOpacity>
+                    <Text style={styles.title}>Recommended Crops</Text>
+                    <View style={{ width: 28 }} />
+                </View>
+                <View style={styles.emptyState}>
+                    <Ionicons name="location-outline" size={60} color="#2a5d55" />
+                    <Text style={styles.emptyText}>No zone selected</Text>
+                    <Text style={styles.emptySubtext}>
+                        Please set your agro-ecological zone first to see crop recommendations.
+                    </Text>
+                    <TouchableOpacity
+                        style={styles.setupButton}
+                        onPress={() => router.push('/cropcalender/zone')}
+                    >
+                        <Text style={styles.setupButtonText}>Set Up Zone</Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
+        );
+    }
+
