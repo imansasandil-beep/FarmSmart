@@ -176,4 +176,37 @@ router.delete('/:id', requireClerkAuth, async (req, res) => {
     res.status(500).json({ message: 'Failed to delete post' });
   }
 });
+
+// POST /api/posts/:id/comments - Add a comment to a post
+router.post('/:id/comments', requireClerkAuth, async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    if (!post) {
+      return res.status(404).json({ message: 'Post not found' });
+    }
+
+    const { content, authorName } = req.body;
+    if (!content || content.trim().length === 0) {
+      return res.status(400).json({ message: 'Comment content is required' });
+    }
+
+    const comment = new Comment({
+      postId: req.params.id,
+      author: req.clerkUserId,
+      authorName: authorName || 'Anonymous',
+      content: content.trim(),
+    });
+
+    const savedComment = await comment.save();
+
+    // Update the comment count on the post
+    post.commentsCount = await Comment.countDocuments({ postId: req.params.id });
+    await post.save();
+
+    res.status(201).json(savedComment);
+  } catch (error) {
+    console.error('Add comment error:', error);
+    res.status(500).json({ message: 'Failed to add comment' });
+  }
+});
 module.exports = router;
