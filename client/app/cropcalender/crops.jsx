@@ -180,3 +180,53 @@ export default function CropsScreen() {
         );
     }
 
+    const filteredCrops = getFilteredCrops();
+
+    return (
+        <View style={styles.container}>
+            {/* Header */}
+            <View style={styles.header}>
+                <TouchableOpacity onPress={() => router.back()}>
+                    <Ionicons name="arrow-back" size={28} color="white" />
+                </TouchableOpacity>
+                <Text style={styles.title}>Recommended Crops</Text>
+                <View style={{ width: 28 }} />
+            </View>
+
+            {/* Zone badge */}
+            <View style={[styles.zoneBadge, { borderColor: zone.color }]}>
+                <Text style={styles.zoneBadgeText}>
+                    {zone.emoji} {zone.name} ΓÇö {zone.sinhalaName}
+                </Text>
+            </View>
+
+            {/* Season filter */}
+            <View style={styles.filterRow}>
+                {['all', 'yala', 'maha'].map((f) => (
+                    <TouchableOpacity
+                        key={f}
+                        style={[styles.filterButton, filterSeason === f && styles.filterButtonActive]}
+                        onPress={() => setFilterSeason(f)}
+                    >
+                        <Text style={[styles.filterText, filterSeason === f && styles.filterTextActive]}>
+                            {f === 'all' ? 'All' : f === 'yala' ? 'Yala (α╢║α╢╜)' : 'Maha (α╢╕α╖ä)'}
+                        </Text>
+                    </TouchableOpacity>
+                ))}
+            </View>
+
+            <Text style={styles.cropCount}>
+                {filteredCrops.length} crops recommended for your zone
+            </Text>
+
+            {/* Crop list */}
+            <FlatList
+                data={filteredCrops}
+                keyExtractor={(item) => item.id}
+                renderItem={renderCropCard}
+                contentContainerStyle={styles.listContent}
+                showsVerticalScrollIndicator={false}
+            />
+        </View>
+    );
+}
