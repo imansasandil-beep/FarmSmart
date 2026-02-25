@@ -209,4 +209,44 @@ router.post('/:id/comments', requireClerkAuth, async (req, res) => {
     res.status(500).json({ message: 'Failed to add comment' });
   }
 });
+
+// GET /api/posts/:id/comments - Get all comments for a post
+router.get('/:id/comments', async (req, res) => {
+  try {
+    const comments = await Comment.find({ postId: req.params.id })
+      .sort({ createdAt: -1 })
+      .lean();
+    res.json(comments);
+  } catch (error) {
+    console.error('Get comments error:', error);
+    res.status(500).json({ message: 'Failed to fetch comments' });
+  }
+});
+
+// DELETE /api/posts/:id/comments/:commentId - Delete a comment
+router.delete('/:id/comments/:commentId', requireClerkAuth, async (req, res) => {
+  try {
+    const comment = await Comment.findById(req.params.commentId);
+    if (!comment) {
+      return res.status(404).json({ message: 'Comment not found' });
+    }
+    if (comment.author !== req.clerkUserId) {
+      return res.status(403).json({ message: 'Not authorized to delete this comment' });
+    }
+
+    await Comment.findByIdAndDelete(req.params.commentId);
+
+    // Update comment count
+    const post = await Post.findById(req.params.id);
+    if (post) {
+      post.commentsCount = await Comment.countDocuments({ postId: req.params.id });
+      await post.save();
+    }
+
+    res.json({ message: 'Comment deleted successfully' });
+  } catch (error) {
+    console.error('Delete comment error:', error);
+    res.status(500).json({ message: 'Failed to delete comment' });
+  }
+});
 module.exports = router;
