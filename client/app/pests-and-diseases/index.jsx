@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, TextInput, FlatList, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -10,7 +10,10 @@ export default function PestsAndDiseasesScreen() {
     const [records, setRecords] = useState([]);
     const [filteredRecords, setFilteredRecords] = useState([]);
     const [searchText, setSearchText] = useState('');
+    const [activeFilter, setActiveFilter] = useState('All');
     const [loading, setLoading] = useState(true);
+
+    const filters = ['All', 'Pest', 'Disease'];
 
     useEffect(() => { fetchAllRecords(); }, []);
 
@@ -27,24 +30,31 @@ export default function PestsAndDiseasesScreen() {
         }
     };
 
-    // Search with debounce
+    // Search and filter with debounce
     useEffect(() => {
-        const timeout = setTimeout(async () => {
-            if (searchText.trim()) {
-                try {
-                    const response = await axios.get(
-                        `${API_BASE_URL}/api/pest-diseases/search?q=${encodeURIComponent(searchText.trim())}`
-                    );
-                    setFilteredRecords(response.data);
-                } catch (err) {
-                    console.log('Search error:', err);
-                }
-            } else {
-                setFilteredRecords(records);
-            }
+        const timeout = setTimeout(() => {
+            applyFilters(searchText, activeFilter);
         }, 300);
         return () => clearTimeout(timeout);
-    }, [searchText]);
+    }, [searchText, activeFilter]);
+
+    const applyFilters = useCallback(async (query, typeFilter) => {
+        try {
+            let data = records;
+            if (query.trim()) {
+                const response = await axios.get(
+                    `${API_BASE_URL}/api/pest-diseases/search?q=${encodeURIComponent(query.trim())}`
+                );
+                data = response.data;
+            }
+            if (typeFilter !== 'All') {
+                data = data.filter((item) => item.type === typeFilter);
+            }
+            setFilteredRecords(data);
+        } catch (err) {
+            console.log('Search error:', err);
+        }
+    }, [records]);
 
     if (loading) {
         return (
@@ -65,7 +75,6 @@ export default function PestsAndDiseasesScreen() {
                 <Ionicons name="bug" size={24} color="#6fdfc4" />
             </View>
 
-            {/* Search bar */}
             <View style={styles.searchBar}>
                 <Ionicons name="search" size={20} color="#8aa6a3" style={{ marginRight: 8 }} />
                 <TextInput
@@ -80,6 +89,26 @@ export default function PestsAndDiseasesScreen() {
                         <Ionicons name="close-circle" size={20} color="#8aa6a3" />
                     </TouchableOpacity>
                 )}
+            </View>
+
+            {/* Filter chips */}
+            <View style={styles.filterRow}>
+                {filters.map((f) => (
+                    <TouchableOpacity
+                        key={f}
+                        style={[styles.filterChip, activeFilter === f && styles.filterChipActive]}
+                        onPress={() => setActiveFilter(f)}
+                    >
+                        <Text style={[styles.filterChipText, activeFilter === f && styles.filterChipTextActive]}>
+                            {f}
+                        </Text>
+                    </TouchableOpacity>
+                ))}
+                <View style={styles.resultCount}>
+                    <Text style={styles.resultCountText}>
+                        {filteredRecords.length} result{filteredRecords.length !== 1 ? 's' : ''}
+                    </Text>
+                </View>
             </View>
 
             <FlatList
@@ -104,6 +133,13 @@ const styles = StyleSheet.create({
     title: { fontSize: 22, fontWeight: 'bold', color: 'white' },
     searchBar: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#1a4d45', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 10, marginBottom: 14, borderWidth: 1, borderColor: '#2a5d55' },
     searchInput: { flex: 1, color: 'white', fontSize: 15 },
+    filterRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
+    filterChip: { paddingHorizontal: 16, paddingVertical: 7, borderRadius: 20, backgroundColor: '#1a4d45', marginRight: 10, borderWidth: 1, borderColor: '#2a5d55' },
+    filterChipActive: { backgroundColor: '#6fdfc4', borderColor: '#6fdfc4' },
+    filterChipText: { color: '#8aa6a3', fontSize: 13, fontWeight: '600' },
+    filterChipTextActive: { color: '#0a1f1c' },
+    resultCount: { marginLeft: 'auto' },
+    resultCountText: { color: '#8aa6a3', fontSize: 12 },
     card: { backgroundColor: '#1a4d45', borderRadius: 14, padding: 16, marginBottom: 14, borderWidth: 1, borderColor: '#2a5d55' },
     cardName: { color: 'white', fontSize: 17, fontWeight: 'bold' },
     cardType: { color: '#6fdfc4', fontSize: 12, marginTop: 4 },
