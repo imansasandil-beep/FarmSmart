@@ -54,3 +54,55 @@ export default function SuggestionsScreen() {
         );
     }
 
+    return (
+        <View style={styles.container}>
+            {/* Header */}
+            <View style={styles.header}>
+                <TouchableOpacity onPress={() => router.back()}>
+                    <Ionicons name="arrow-back" size={28} color="white" />
+                </TouchableOpacity>
+                <Text style={styles.title}>Seasonal Advice</Text>
+                <View style={{ width: 28 }} />
+            </View>
+
+            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+                {/* Current Season Card */}
+                <View style={[styles.seasonCard, { borderColor: currentSeason.color }]}>
+                    <View style={styles.seasonHeader}>
+                        <Text style={styles.seasonEmoji}>{currentSeason.emoji}</Text>
+                        <View style={{ flex: 1 }}>
+                            <Text style={styles.seasonName}>{currentSeason.name}</Text>
+                            <Text style={styles.seasonSinhala}>{currentSeason.sinhalaName}</Text>
+                        </View>
+                        <View style={[styles.activeBadge, { backgroundColor: currentSeason.color }]}>
+                            <Text style={styles.activeBadgeText}>ACTIVE</Text>
+                        </View>
+                    </View>
+                    <Text style={styles.seasonMonsoon}>{currentSeason.monsoon}</Text>
+                    <Text style={styles.seasonDesc}>{currentSeason.description}</Text>
+                </View>
+
+                {/* Season Timeline */}
+                <Text style={styles.sectionTitle}>Season Calendar</Text>
+                <View style={styles.timelineCard}>
+                    <View style={styles.timelineRow}>
+                        <View style={[styles.timelineBlock, { backgroundColor: SEASONS.maha.color + '40' }]}>
+                            <Text style={styles.timelineText}>≡ƒîº Maha</Text>
+                            <Text style={styles.timelineMonths}>Oct ΓÇô Feb</Text>
+                        </View>
+                        <View style={[styles.timelineBlock, { backgroundColor: '#95a5a620' }]}>
+                            <Text style={styles.timelineText}>≡ƒöä Inter</Text>
+                            <Text style={styles.timelineMonths}>Mar</Text>
+                        </View>
+                        <View style={[styles.timelineBlock, { backgroundColor: SEASONS.yala.color + '40' }]}>
+                            <Text style={styles.timelineText}>ΓÿÇ∩╕Å Yala</Text>
+                            <Text style={styles.timelineMonths}>Apr ΓÇô Aug</Text>
+                        </View>
+                        <View style={[styles.timelineBlock, { backgroundColor: '#95a5a620' }]}>
+                            <Text style={styles.timelineText}>≡ƒöä Inter</Text>
+                            <Text style={styles.timelineMonths}>Sep</Text>
+                        </View>
+                    </View>
+                </View>
+
+                {/* Monthly Tip Card */}
