@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   View, Text, StyleSheet, FlatList, TouchableOpacity,
-  ActivityIndicator, RefreshControl, StatusBar
+  ActivityIndicator, RefreshControl, StatusBar, TextInput, ScrollView
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -19,11 +19,17 @@ export default function AgriSupHome() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [userRole, setUserRole] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('All');
 
   useEffect(() => {
     loadUserRole();
     fetchQuestions();
   }, []);
+
+  useEffect(() => {
+    fetchQuestions();
+  }, [selectedCategory]);
 
   const loadUserRole = async () => {
     try {
@@ -40,7 +46,11 @@ export default function AgriSupHome() {
   const fetchQuestions = async () => {
     try {
       const token = await getToken();
-      const res = await axios.get(`${API_BASE_URL}/api/agrisup`, {
+      let url = `${API_BASE_URL}/api/agrisup?`;
+      if (selectedCategory !== 'All') url += `category=${selectedCategory}&`;
+      if (searchQuery.trim()) url += `search=${encodeURIComponent(searchQuery.trim())}`;
+
+      const res = await axios.get(url, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setQuestions(res.data.questions || []);
@@ -55,7 +65,12 @@ export default function AgriSupHome() {
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     fetchQuestions();
-  }, []);
+  }, [selectedCategory, searchQuery]);
+
+  const handleSearch = () => {
+    setLoading(true);
+    fetchQuestions();
+  };
 
   const getCategoryColor = (cat) => {
     const colors = {
@@ -126,6 +141,42 @@ export default function AgriSupHome() {
         <View style={{ width: 40 }} />
       </View>
 
+      {/* Search Bar */}
+      <View style={styles.searchContainer}>
+        <View style={styles.searchBar}>
+          <Ionicons name="search" size={18} color="#8aa6a3" />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search questions..."
+            placeholderTextColor="#4a7a70"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            onSubmitEditing={handleSearch}
+            returnKeyType="search"
+          />
+          {searchQuery.length > 0 && (
+            <TouchableOpacity onPress={() => { setSearchQuery(''); setTimeout(fetchQuestions, 100); }}>
+              <Ionicons name="close-circle" size={18} color="#8aa6a3" />
+            </TouchableOpacity>
+          )}
+        </View>
+      </View>
+
+      {/* Category Filter Chips */}
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipScroll} contentContainerStyle={styles.chipContainer}>
+        {CATEGORIES.map((cat) => (
+          <TouchableOpacity
+            key={cat}
+            style={[styles.chip, selectedCategory === cat && styles.chipActive]}
+            onPress={() => setSelectedCategory(cat)}
+          >
+            <Text style={[styles.chipText, selectedCategory === cat && styles.chipTextActive]}>
+              {cat}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+
       <FlatList
         data={questions}
         keyExtractor={(item) => item._id}
@@ -135,8 +186,12 @@ export default function AgriSupHome() {
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Ionicons name="help-circle-outline" size={64} color="#4a7a70" />
-            <Text style={styles.emptyTitle}>No Questions Yet</Text>
-            <Text style={styles.emptyText}>Be the first to ask a question!</Text>
+            <Text style={styles.emptyTitle}>No Questions Found</Text>
+            <Text style={styles.emptyText}>
+              {searchQuery || selectedCategory !== 'All'
+                ? 'Try adjusting your search or filter'
+                : 'Be the first to ask a question!'}
+            </Text>
           </View>
         }
       />
@@ -161,6 +216,21 @@ const styles = StyleSheet.create({
   backBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.08)', alignItems: 'center', justifyContent: 'center' },
   headerTitle: { fontSize: 22, fontWeight: 'bold', color: 'white', textAlign: 'center' },
   headerSub: { fontSize: 12, color: '#8aa6a3', textAlign: 'center' },
+  searchContainer: { paddingHorizontal: 16, paddingTop: 12 },
+  searchBar: {
+    flexDirection: 'row', alignItems: 'center', backgroundColor: '#1a4d45',
+    borderRadius: 12, paddingHorizontal: 14, height: 44, borderWidth: 1, borderColor: '#2a5d55',
+  },
+  searchInput: { flex: 1, color: 'white', fontSize: 14, marginLeft: 10 },
+  chipScroll: { maxHeight: 50, marginTop: 10 },
+  chipContainer: { paddingHorizontal: 16, gap: 8 },
+  chip: {
+    paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20,
+    backgroundColor: '#1a4d45', borderWidth: 1, borderColor: '#2a5d55',
+  },
+  chipActive: { backgroundColor: '#6fdfc4', borderColor: '#6fdfc4' },
+  chipText: { fontSize: 12, color: '#8aa6a3', fontWeight: '600' },
+  chipTextActive: { color: '#0a1f1c' },
   listContent: { padding: 16, paddingBottom: 100 },
   questionCard: {
     backgroundColor: '#1a4d45', borderRadius: 16, padding: 16,
@@ -181,7 +251,7 @@ const styles = StyleSheet.create({
   dateText: { fontSize: 11, color: '#4a7a70' },
   emptyContainer: { alignItems: 'center', paddingTop: 80 },
   emptyTitle: { fontSize: 18, fontWeight: 'bold', color: 'white', marginTop: 16 },
-  emptyText: { fontSize: 14, color: '#8aa6a3', marginTop: 8 },
+  emptyText: { fontSize: 14, color: '#8aa6a3', marginTop: 8, textAlign: 'center' },
   fab: {
     position: 'absolute', bottom: 30, right: 20, width: 56, height: 56,
     borderRadius: 28, backgroundColor: '#6fdfc4', alignItems: 'center',
