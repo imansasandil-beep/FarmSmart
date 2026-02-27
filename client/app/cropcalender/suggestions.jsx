@@ -106,3 +106,66 @@ export default function SuggestionsScreen() {
                 </View>
 
                 {/* Monthly Tip Card */}
+                {monthlyTip && (
+                    <>
+                        <Text style={styles.sectionTitle}>
+                            ≡ƒôà This Month ΓÇö {monthlyTip.month} ({monthlyTip.sinhalaName})
+                        </Text>
+                        <View style={styles.tipCard}>
+                            <View style={styles.tipRow}>
+                                <Ionicons name="globe" size={18} color="#8aa6a3" />
+                                <Text style={styles.tipLabel}>General:</Text>
+                            </View>
+                            <Text style={styles.tipText}>{monthlyTip.general}</Text>
+
+                            <View style={[styles.tipDivider]} />
+
+                            <View style={styles.tipRow}>
+                                <Ionicons name="location" size={18} color="#6fdfc4" />
+                                <Text style={styles.tipLabelZone}>For your zone ({zone.name}):</Text>
+                            </View>
+                            <Text style={styles.tipTextZone}>{monthlyTip.zoneTip}</Text>
+                        </View>
+                    </>
+                )}
+
+                {/* What to Plant Now */}
+                {seasonCrops.length > 0 && (
+                    <>
+                        <Text style={styles.sectionTitle}>≡ƒî▒ What to Grow This Season</Text>
+                        <View style={styles.cropsGrid}>
+                            {seasonCrops.slice(0, 8).map((crop) => (
+                                <View key={crop.id} style={styles.cropChip}>
+                                    <Text style={styles.cropChipEmoji}>{crop.emoji}</Text>
+                                    <Text style={styles.cropChipName}>{crop.name}</Text>
+                                </View>
+                            ))}
+                        </View>
+                        <TouchableOpacity
+                            style={styles.viewAllButton}
+                            onPress={() => router.push('/cropcalender/crops')}
+                        >
+                            <Text style={styles.viewAllText}>View All Crop Details</Text>
+                            <Ionicons name="arrow-forward" size={18} color="#6fdfc4" />
+                        </TouchableOpacity>
+                    </>
+                )}
+
+                {/* Zone Info */}
+                <Text style={styles.sectionTitle}>≡ƒù║∩╕Å Your Zone</Text>
+                <View style={[styles.zoneInfoCard, { borderColor: zone.color }]}>
+                    <Text style={styles.zoneInfoTitle}>{zone.emoji} {zone.name}</Text>
+                    <Text style={styles.zoneInfoSinhala}>{zone.sinhalaName}</Text>
+                    <Text style={styles.zoneInfoDetail}>Rainfall: {zone.rainfall}</Text>
+                    <Text style={styles.zoneInfoDesc}>{zone.description}</Text>
+                    <TouchableOpacity
+                        style={styles.changeZoneButton}
+                        onPress={() => router.push('/cropcalender/zone')}
+                    >
+                        <Text style={styles.changeZoneText}>Change Zone</Text>
+                    </TouchableOpacity>
+                </View>
+            </ScrollView>
+        </View>
+    );
+}
