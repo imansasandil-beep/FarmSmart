@@ -1,5 +1,18 @@
-import React from 'react';
-import { View, Text } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import {
+    View,
+    Text,
+    StyleSheet,
+    ScrollView,
+    ActivityIndicator,
+    RefreshControl,
+    TouchableOpacity,
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import * as Location from 'expo-location';
+import axios from 'axios';
+import { API_BASE_URL } from '../../config';
 
 // ── Farming recommendation engine ──────────────────────
 function getFarmingRecommendation(weather) {
@@ -125,11 +138,177 @@ const severityColors = {
     good: { bg: 'rgba(111, 223, 196, 0.15)', border: '#6fdfc4', text: '#6fdfc4' },
 };
 
-// Placeholder — full screen component coming in next commits
+// ── Main Component ──────────────────────────────────────
 export default function WeatherForecastScreen() {
+    const router = useRouter();
+    const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
+    const [error, setError] = useState(null);
+    const [currentWeather, setCurrentWeather] = useState(null);
+    const [forecast, setForecast] = useState([]);
+    const [locationName, setLocationName] = useState('');
+
+    const fetchWeather = async () => {
+        try {
+            setError(null);
+
+            // 1. Request location permission
+            const { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== 'granted') {
+                setError('Location permission is required to show weather data.');
+                setLoading(false);
+                return;
+            }
+
+            // 2. Get current GPS coordinates
+            const location = await Location.getCurrentPositionAsync({
+                accuracy: Location.Accuracy.Balanced,
+            });
+            const { latitude, longitude } = location.coords;
+
+            // 3. Call our backend proxy
+            const response = await axios.get(`${API_BASE_URL}/api/weather`, {
+                params: { lat: latitude, lon: longitude },
+            });
+
+            // 4. Set current weather
+            setCurrentWeather(response.data.current);
+            setLocationName(response.data.current?.name || 'Your Location');
+
+            // 5. Process 5-day forecast (pick one entry per day — noon)
+            const forecastList = response.data.forecast?.list || [];
+            const dailyMap = {};
+            forecastList.forEach((item) => {
+                const date = new Date(item.dt * 1000).toDateString();
+                const hour = new Date(item.dt * 1000).getHours();
+                // Pick the entry closest to noon for each day
+                if (!dailyMap[date] || Math.abs(hour - 12) < Math.abs(new Date(dailyMap[date].dt * 1000).getHours() - 12)) {
+                    dailyMap[date] = item;
+                }
+            });
+            setForecast(Object.values(dailyMap).slice(0, 5));
+        } catch (err) {
+            console.error('Weather fetch error:', err);
+            setError(err.response?.data?.message || err.message || 'Failed to fetch weather data');
+        } finally {
+            setLoading(false);
+            setRefreshing(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchWeather();
+    }, []);
+
+    const onRefresh = () => {
+        setRefreshing(true);
+        fetchWeather();
+    };
+
+    const recommendation = getFarmingRecommendation(currentWeather);
+    const sevColor = severityColors[recommendation?.severity] || severityColors.info;
+
+    // ── Loading State ──
+    if (loading) {
+        return (
+            <View style={{ flex: 1, backgroundColor: '#0a1f1c', justifyContent: 'center', alignItems: 'center' }}>
+                <ActivityIndicator size="large" color="#6fdfc4" />
+                <Text style={{ color: '#6fdfc4', fontSize: 16, marginTop: 15 }}>Fetching weather data...</Text>
+            </View>
+        );
+    }
+
+    // ── Error State ──
+    if (error) {
+        return (
+            <View style={{ flex: 1, backgroundColor: '#0a1f1c', justifyContent: 'center', alignItems: 'center', paddingHorizontal: 30 }}>
+                <Ionicons name="cloud-offline-outline" size={64} color="#ff6b81" />
+                <Text style={{ color: '#ff6b81', fontSize: 16, textAlign: 'center', marginTop: 15 }}>{error}</Text>
+                <TouchableOpacity style={{ marginTop: 20, backgroundColor: '#1a4d45', paddingVertical: 12, paddingHorizontal: 30, borderRadius: 12, borderWidth: 1, borderColor: '#6fdfc4' }} onPress={() => { setLoading(true); fetchWeather(); }}>
+                    <Text style={{ color: '#6fdfc4', fontSize: 16, fontWeight: '600' }}>Try Again</Text>
+                </TouchableOpacity>
+            </View>
+        );
+    }
+
+    const weather = currentWeather;
+    const conditionMain = weather?.weather?.[0]?.main;
+    const conditionDesc = weather?.weather?.[0]?.description;
+
     return (
-        <View style={{ flex: 1, backgroundColor: '#0a1f1c', justifyContent: 'center', alignItems: 'center' }}>
-            <Text style={{ color: 'white', fontSize: 18 }}>Weather Forecast (Building UI...)</Text>
+        <View style={{ flex: 1, backgroundColor: '#0a1f1c', paddingTop: 55 }}>
+            {/* ── Header ── */}
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingBottom: 15 }}>
+                <TouchableOpacity onPress={() => router.back()} style={{ padding: 5 }}>
+                    <Ionicons name="arrow-back" size={24} color="white" />
+                </TouchableOpacity>
+                <Text style={{ color: 'white', fontSize: 20, fontWeight: 'bold' }}>Weather Forecast</Text>
+                <TouchableOpacity onPress={onRefresh}>
+                    <Ionicons name="refresh" size={22} color="#6fdfc4" />
+                </TouchableOpacity>
+            </View>
+
+            <ScrollView
+                showsVerticalScrollIndicator={false}
+                refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#6fdfc4" />}
+                contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40 }}
+            >
+                {/* ── Current Weather Card ── */}
+                <View style={{ backgroundColor: '#1a4d45', borderRadius: 20, padding: 20, borderWidth: 1, borderColor: 'rgba(111, 223, 196, 0.3)', marginBottom: 15 }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 15 }}>
+                        <Ionicons name="location-outline" size={16} color="#6fdfc4" />
+                        <Text style={{ color: '#6fdfc4', fontSize: 14, marginLeft: 5, fontWeight: '500' }}>{locationName}</Text>
+                    </View>
+
+                    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
+                        <Ionicons name={getWeatherIcon(conditionMain)} size={64} color="#6fdfc4" />
+                        <View style={{ marginLeft: 20 }}>
+                            <Text style={{ color: 'white', fontSize: 52, fontWeight: 'bold', lineHeight: 58 }}>{Math.round(weather?.main?.temp)}°C</Text>
+                            <Text style={{ color: 'rgba(255,255,255,0.7)', fontSize: 16, textTransform: 'capitalize', marginTop: 2 }}>{conditionDesc}</Text>
+                        </View>
+                    </View>
+
+                    <Text style={{ color: 'rgba(255,255,255,0.5)', fontSize: 13, marginBottom: 18, marginLeft: 85 }}>
+                        Feels like {Math.round(weather?.main?.feels_like)}°C
+                    </Text>
+
+                    {/* ── Detail Grid ── */}
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', backgroundColor: 'rgba(0,0,0,0.2)', borderRadius: 12, padding: 15, marginBottom: 15 }}>
+                        <View style={{ alignItems: 'center', flex: 1 }}>
+                            <Ionicons name="water-outline" size={20} color="#74b9ff" />
+                            <Text style={{ color: 'white', fontSize: 14, fontWeight: '600', marginTop: 6 }}>{weather?.main?.humidity}%</Text>
+                            <Text style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11, marginTop: 2 }}>Humidity</Text>
+                        </View>
+                        <View style={{ alignItems: 'center', flex: 1 }}>
+                            <Ionicons name="speedometer-outline" size={20} color="#ffa502" />
+                            <Text style={{ color: 'white', fontSize: 14, fontWeight: '600', marginTop: 6 }}>{weather?.wind?.speed} m/s</Text>
+                            <Text style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11, marginTop: 2 }}>Wind</Text>
+                        </View>
+                        <View style={{ alignItems: 'center', flex: 1 }}>
+                            <Ionicons name="eye-outline" size={20} color="#a29bfe" />
+                            <Text style={{ color: 'white', fontSize: 14, fontWeight: '600', marginTop: 6 }}>{(weather?.visibility / 1000).toFixed(1)} km</Text>
+                            <Text style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11, marginTop: 2 }}>Visibility</Text>
+                        </View>
+                        <View style={{ alignItems: 'center', flex: 1 }}>
+                            <Ionicons name="push-outline" size={20} color="#fd79a8" />
+                            <Text style={{ color: 'white', fontSize: 14, fontWeight: '600', marginTop: 6 }}>{weather?.main?.pressure} hPa</Text>
+                            <Text style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11, marginTop: 2 }}>Pressure</Text>
+                        </View>
+                    </View>
+
+                    {/* ── Sunrise / Sunset ── */}
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <Ionicons name="sunny-outline" size={18} color="#ffa502" />
+                            <Text style={{ color: 'rgba(255,255,255,0.6)', fontSize: 13, marginLeft: 6 }}>Sunrise {formatTime(weather?.sys?.sunrise)}</Text>
+                        </View>
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <Ionicons name="moon-outline" size={18} color="#a29bfe" />
+                            <Text style={{ color: 'rgba(255,255,255,0.6)', fontSize: 13, marginLeft: 6 }}>Sunset {formatTime(weather?.sys?.sunset)}</Text>
+                        </View>
+                    </View>
+                </View>
+            </ScrollView>
         </View>
     );
 }
