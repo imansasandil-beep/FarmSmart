@@ -124,6 +124,8 @@ export default function HomeScreen() {
       router.push('/marketplace');
     } else if (item.route === 'tasks') {
       router.push('/tasks');
+    } else if (item.route === 'recommendations') {
+      router.push('/cropspecific');
     } else {
       Alert.alert(item.title, 'This feature is coming soon!');
     }
