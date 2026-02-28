@@ -12,6 +12,7 @@ const ordersRoute = require('./routes/orders');
 const paymentsRoute = require('./routes/payments');
 const reviewsRoute = require('./routes/reviews');
 const notificationsRoute = require('./routes/notifications');
+const messagesRoute = require('./routes/messages');
 
 const app = express();
 
@@ -31,6 +32,7 @@ app.use('/api/orders', ordersRoute); // Order management
 app.use('/api/payments', paymentsRoute); // Payment processing
 app.use('/api/reviews', reviewsRoute); // Seller reviews
 app.use('/api/notifications', notificationsRoute); // User notifications
+app.use('/api/messages', messagesRoute); // Chat messaging
 
 // 1. Database Connection
 mongoose.connect(process.env.MONGO_URI)

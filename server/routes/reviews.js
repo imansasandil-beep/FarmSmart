@@ -87,4 +87,23 @@ router.get('/check/:orderId', async (req, res) => {
     }
 });
 
+// GET /api/reviews/can-review/:orderId - Check if order can be reviewed
+router.get('/can-review/:orderId', async (req, res) => {
+    try {
+        const order = await Order.findById(req.params.orderId);
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+
+        const existingReview = await Review.findOne({ orderId: req.params.orderId });
+
+        res.status(200).json({
+            canReview: order.status === 'delivered' && !existingReview,
+            alreadyReviewed: !!existingReview,
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
 module.exports = router;
