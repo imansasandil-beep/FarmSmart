@@ -58,3 +58,76 @@ export default function CropCalendarScreen() {
         }, [])
     );
 
+    const handleScheduleNotification = async () => {
+        if (!taskTitle.trim()) {
+            Alert.alert('Error', 'Please enter an activity name!');
+            return;
+        }
+
+        const now = new Date();
+        if (date <= now) {
+            Alert.alert('Error', 'Please select a future date and time!');
+            return;
+        }
+
+        const settings = await Notifications.getPermissionsAsync();
+        if (settings.status !== 'granted') {
+            const { status } = await Notifications.requestPermissionsAsync();
+            if (status !== 'granted') {
+                Alert.alert('Permission Error', 'We need permission to send you reminders!');
+                return;
+            }
+        }
+
+        try {
+            const triggerSeconds = Math.floor((date.getTime() - now.getTime()) / 1000);
+
+            const notificationContent = {
+                title: 'FarmSmart Reminder ≡ƒÜ£',
+                body: `It's time to: ${taskTitle}`,
+                sound: 'default',
+            };
+
+            if (Platform.OS === 'android') {
+                notificationContent.channelId = 'default';
+            }
+
+            const id = await Notifications.scheduleNotificationAsync({
+                content: notificationContent,
+                trigger: { type: 'timeInterval', seconds: triggerSeconds },
+            });
+
+            const newReminder = { id, title: taskTitle, time: date.toLocaleString() };
+            const updatedReminders = [...reminders, newReminder];
+            setReminders(updatedReminders);
+            await AsyncStorage.setItem('farmReminders', JSON.stringify(updatedReminders));
+
+            setTaskTitle('');
+            Alert.alert('Success', 'Reminder set successfully!');
+        } catch (error) {
+            console.log('NOTIFICATION ERROR:', error);
+            Alert.alert('Error Details', error.message || 'Failed to schedule.');
+        }
+    };
+
+    const handleDeleteReminder = async (reminderId) => {
+        try {
+            await Notifications.cancelScheduledNotificationAsync(reminderId);
+            const updatedReminders = reminders.filter((r) => r.id !== reminderId);
+            setReminders(updatedReminders);
+            await AsyncStorage.setItem('farmReminders', JSON.stringify(updatedReminders));
+        } catch (error) {
+            Alert.alert('Error', 'Failed to delete reminder');
+        }
+    };
+
+    const onDateChange = (event, selectedDate) => {
+        const currentDate = selectedDate || date;
+        setDate(currentDate);
+        if (Platform.OS === 'android') {
+            setShowPicker(false);
+        }
+    };
+
+    const monthlyTip = zone ? getMonthlyTips(zone.id) : null;
+
