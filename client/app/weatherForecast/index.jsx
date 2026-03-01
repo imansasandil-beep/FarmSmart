@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import {
     View,
     Text,
-    StyleSheet,
     ScrollView,
     ActivityIndicator,
     RefreshControl,
@@ -308,6 +307,34 @@ export default function WeatherForecastScreen() {
                         </View>
                     </View>
                 </View>
+
+                {/* ── Farming Recommendation ── */}
+                {recommendation && (
+                    <View style={{ borderRadius: 15, padding: 16, borderWidth: 1, marginBottom: 20, backgroundColor: sevColor.bg, borderColor: sevColor.border }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+                            <Ionicons name={recommendation.icon} size={22} color={sevColor.text} />
+                            <Text style={{ fontSize: 15, fontWeight: 'bold', marginLeft: 8, color: sevColor.text }}>Farming Advice</Text>
+                        </View>
+                        <Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: 14, lineHeight: 21 }}>{recommendation.text}</Text>
+                    </View>
+                )}
+
+                {/* ── 5-Day Forecast ── */}
+                <Text style={{ color: 'white', fontSize: 18, fontWeight: 'bold', marginBottom: 12 }}>5-Day Forecast</Text>
+                {forecast.map((day, index) => {
+                    const dayCondition = day.weather?.[0]?.main;
+                    return (
+                        <View key={index} style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#1a4d45', borderRadius: 12, padding: 15, marginBottom: 10, borderWidth: 1, borderColor: 'rgba(111, 223, 196, 0.15)' }}>
+                            <Text style={{ color: 'white', fontSize: 14, fontWeight: '500', width: 100 }}>{getDayName(day.dt)}</Text>
+                            <Ionicons name={getWeatherIcon(dayCondition)} size={24} color="#6fdfc4" />
+                            <Text style={{ color: 'rgba(255,255,255,0.6)', fontSize: 13, flex: 1, marginLeft: 10 }}>{dayCondition}</Text>
+                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                <Text style={{ color: 'white', fontSize: 16, fontWeight: 'bold', marginRight: 8 }}>{Math.round(day.main?.temp_max)}°</Text>
+                                <Text style={{ color: 'rgba(255,255,255,0.4)', fontSize: 14 }}>{Math.round(day.main?.temp_min)}°</Text>
+                            </View>
+                        </View>
+                    );
+                })}
             </ScrollView>
         </View>
     );
