@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import {
     View,
     Text,
+    StyleSheet,
     ScrollView,
     ActivityIndicator,
     RefreshControl,
@@ -210,9 +211,9 @@ export default function WeatherForecastScreen() {
     // ── Loading State ──
     if (loading) {
         return (
-            <View style={{ flex: 1, backgroundColor: '#0a1f1c', justifyContent: 'center', alignItems: 'center' }}>
+            <View style={[styles.container, styles.centered]}>
                 <ActivityIndicator size="large" color="#6fdfc4" />
-                <Text style={{ color: '#6fdfc4', fontSize: 16, marginTop: 15 }}>Fetching weather data...</Text>
+                <Text style={styles.loadingText}>Fetching weather data...</Text>
             </View>
         );
     }
@@ -220,11 +221,11 @@ export default function WeatherForecastScreen() {
     // ── Error State ──
     if (error) {
         return (
-            <View style={{ flex: 1, backgroundColor: '#0a1f1c', justifyContent: 'center', alignItems: 'center', paddingHorizontal: 30 }}>
+            <View style={[styles.container, styles.centered]}>
                 <Ionicons name="cloud-offline-outline" size={64} color="#ff6b81" />
-                <Text style={{ color: '#ff6b81', fontSize: 16, textAlign: 'center', marginTop: 15 }}>{error}</Text>
-                <TouchableOpacity style={{ marginTop: 20, backgroundColor: '#1a4d45', paddingVertical: 12, paddingHorizontal: 30, borderRadius: 12, borderWidth: 1, borderColor: '#6fdfc4' }} onPress={() => { setLoading(true); fetchWeather(); }}>
-                    <Text style={{ color: '#6fdfc4', fontSize: 16, fontWeight: '600' }}>Try Again</Text>
+                <Text style={styles.errorText}>{error}</Text>
+                <TouchableOpacity style={styles.retryButton} onPress={() => { setLoading(true); fetchWeather(); }}>
+                    <Text style={styles.retryText}>Try Again</Text>
                 </TouchableOpacity>
             </View>
         );
@@ -235,13 +236,13 @@ export default function WeatherForecastScreen() {
     const conditionDesc = weather?.weather?.[0]?.description;
 
     return (
-        <View style={{ flex: 1, backgroundColor: '#0a1f1c', paddingTop: 55 }}>
+        <View style={styles.container}>
             {/* ── Header ── */}
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingBottom: 15 }}>
-                <TouchableOpacity onPress={() => router.back()} style={{ padding: 5 }}>
+            <View style={styles.header}>
+                <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
                     <Ionicons name="arrow-back" size={24} color="white" />
                 </TouchableOpacity>
-                <Text style={{ color: 'white', fontSize: 20, fontWeight: 'bold' }}>Weather Forecast</Text>
+                <Text style={styles.headerTitle}>Weather Forecast</Text>
                 <TouchableOpacity onPress={onRefresh}>
                     <Ionicons name="refresh" size={22} color="#6fdfc4" />
                 </TouchableOpacity>
@@ -250,87 +251,87 @@ export default function WeatherForecastScreen() {
             <ScrollView
                 showsVerticalScrollIndicator={false}
                 refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#6fdfc4" />}
-                contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40 }}
+                contentContainerStyle={styles.scrollContent}
             >
                 {/* ── Current Weather Card ── */}
-                <View style={{ backgroundColor: '#1a4d45', borderRadius: 20, padding: 20, borderWidth: 1, borderColor: 'rgba(111, 223, 196, 0.3)', marginBottom: 15 }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 15 }}>
+                <View style={styles.currentCard}>
+                    <View style={styles.locationRow}>
                         <Ionicons name="location-outline" size={16} color="#6fdfc4" />
-                        <Text style={{ color: '#6fdfc4', fontSize: 14, marginLeft: 5, fontWeight: '500' }}>{locationName}</Text>
+                        <Text style={styles.locationText}>{locationName}</Text>
                     </View>
 
-                    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
+                    <View style={styles.tempRow}>
                         <Ionicons name={getWeatherIcon(conditionMain)} size={64} color="#6fdfc4" />
-                        <View style={{ marginLeft: 20 }}>
-                            <Text style={{ color: 'white', fontSize: 52, fontWeight: 'bold', lineHeight: 58 }}>{Math.round(weather?.main?.temp)}°C</Text>
-                            <Text style={{ color: 'rgba(255,255,255,0.7)', fontSize: 16, textTransform: 'capitalize', marginTop: 2 }}>{conditionDesc}</Text>
+                        <View style={styles.tempInfo}>
+                            <Text style={styles.tempText}>{Math.round(weather?.main?.temp)}°C</Text>
+                            <Text style={styles.conditionText}>{conditionDesc}</Text>
                         </View>
                     </View>
 
-                    <Text style={{ color: 'rgba(255,255,255,0.5)', fontSize: 13, marginBottom: 18, marginLeft: 85 }}>
+                    <Text style={styles.feelsLikeText}>
                         Feels like {Math.round(weather?.main?.feels_like)}°C
                     </Text>
 
                     {/* ── Detail Grid ── */}
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', backgroundColor: 'rgba(0,0,0,0.2)', borderRadius: 12, padding: 15, marginBottom: 15 }}>
-                        <View style={{ alignItems: 'center', flex: 1 }}>
+                    <View style={styles.detailGrid}>
+                        <View style={styles.detailItem}>
                             <Ionicons name="water-outline" size={20} color="#74b9ff" />
-                            <Text style={{ color: 'white', fontSize: 14, fontWeight: '600', marginTop: 6 }}>{weather?.main?.humidity}%</Text>
-                            <Text style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11, marginTop: 2 }}>Humidity</Text>
+                            <Text style={styles.detailValue}>{weather?.main?.humidity}%</Text>
+                            <Text style={styles.detailLabel}>Humidity</Text>
                         </View>
-                        <View style={{ alignItems: 'center', flex: 1 }}>
+                        <View style={styles.detailItem}>
                             <Ionicons name="speedometer-outline" size={20} color="#ffa502" />
-                            <Text style={{ color: 'white', fontSize: 14, fontWeight: '600', marginTop: 6 }}>{weather?.wind?.speed} m/s</Text>
-                            <Text style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11, marginTop: 2 }}>Wind</Text>
+                            <Text style={styles.detailValue}>{weather?.wind?.speed} m/s</Text>
+                            <Text style={styles.detailLabel}>Wind</Text>
                         </View>
-                        <View style={{ alignItems: 'center', flex: 1 }}>
+                        <View style={styles.detailItem}>
                             <Ionicons name="eye-outline" size={20} color="#a29bfe" />
-                            <Text style={{ color: 'white', fontSize: 14, fontWeight: '600', marginTop: 6 }}>{(weather?.visibility / 1000).toFixed(1)} km</Text>
-                            <Text style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11, marginTop: 2 }}>Visibility</Text>
+                            <Text style={styles.detailValue}>{(weather?.visibility / 1000).toFixed(1)} km</Text>
+                            <Text style={styles.detailLabel}>Visibility</Text>
                         </View>
-                        <View style={{ alignItems: 'center', flex: 1 }}>
+                        <View style={styles.detailItem}>
                             <Ionicons name="push-outline" size={20} color="#fd79a8" />
-                            <Text style={{ color: 'white', fontSize: 14, fontWeight: '600', marginTop: 6 }}>{weather?.main?.pressure} hPa</Text>
-                            <Text style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11, marginTop: 2 }}>Pressure</Text>
+                            <Text style={styles.detailValue}>{weather?.main?.pressure} hPa</Text>
+                            <Text style={styles.detailLabel}>Pressure</Text>
                         </View>
                     </View>
 
                     {/* ── Sunrise / Sunset ── */}
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <View style={styles.sunRow}>
+                        <View style={styles.sunItem}>
                             <Ionicons name="sunny-outline" size={18} color="#ffa502" />
-                            <Text style={{ color: 'rgba(255,255,255,0.6)', fontSize: 13, marginLeft: 6 }}>Sunrise {formatTime(weather?.sys?.sunrise)}</Text>
+                            <Text style={styles.sunText}>Sunrise {formatTime(weather?.sys?.sunrise)}</Text>
                         </View>
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <View style={styles.sunItem}>
                             <Ionicons name="moon-outline" size={18} color="#a29bfe" />
-                            <Text style={{ color: 'rgba(255,255,255,0.6)', fontSize: 13, marginLeft: 6 }}>Sunset {formatTime(weather?.sys?.sunset)}</Text>
+                            <Text style={styles.sunText}>Sunset {formatTime(weather?.sys?.sunset)}</Text>
                         </View>
                     </View>
                 </View>
 
                 {/* ── Farming Recommendation ── */}
                 {recommendation && (
-                    <View style={{ borderRadius: 15, padding: 16, borderWidth: 1, marginBottom: 20, backgroundColor: sevColor.bg, borderColor: sevColor.border }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+                    <View style={[styles.recommendationCard, { backgroundColor: sevColor.bg, borderColor: sevColor.border }]}>
+                        <View style={styles.recHeader}>
                             <Ionicons name={recommendation.icon} size={22} color={sevColor.text} />
-                            <Text style={{ fontSize: 15, fontWeight: 'bold', marginLeft: 8, color: sevColor.text }}>Farming Advice</Text>
+                            <Text style={[styles.recTitle, { color: sevColor.text }]}>Farming Advice</Text>
                         </View>
-                        <Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: 14, lineHeight: 21 }}>{recommendation.text}</Text>
+                        <Text style={styles.recText}>{recommendation.text}</Text>
                     </View>
                 )}
 
                 {/* ── 5-Day Forecast ── */}
-                <Text style={{ color: 'white', fontSize: 18, fontWeight: 'bold', marginBottom: 12 }}>5-Day Forecast</Text>
+                <Text style={styles.sectionTitle}>5-Day Forecast</Text>
                 {forecast.map((day, index) => {
                     const dayCondition = day.weather?.[0]?.main;
                     return (
-                        <View key={index} style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#1a4d45', borderRadius: 12, padding: 15, marginBottom: 10, borderWidth: 1, borderColor: 'rgba(111, 223, 196, 0.15)' }}>
-                            <Text style={{ color: 'white', fontSize: 14, fontWeight: '500', width: 100 }}>{getDayName(day.dt)}</Text>
+                        <View key={index} style={styles.forecastRow}>
+                            <Text style={styles.forecastDay}>{getDayName(day.dt)}</Text>
                             <Ionicons name={getWeatherIcon(dayCondition)} size={24} color="#6fdfc4" />
-                            <Text style={{ color: 'rgba(255,255,255,0.6)', fontSize: 13, flex: 1, marginLeft: 10 }}>{dayCondition}</Text>
-                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                <Text style={{ color: 'white', fontSize: 16, fontWeight: 'bold', marginRight: 8 }}>{Math.round(day.main?.temp_max)}°</Text>
-                                <Text style={{ color: 'rgba(255,255,255,0.4)', fontSize: 14 }}>{Math.round(day.main?.temp_min)}°</Text>
+                            <Text style={styles.forecastCondition}>{dayCondition}</Text>
+                            <View style={styles.forecastTemps}>
+                                <Text style={styles.forecastHigh}>{Math.round(day.main?.temp_max)}°</Text>
+                                <Text style={styles.forecastLow}>{Math.round(day.main?.temp_min)}°</Text>
                             </View>
                         </View>
                     );
@@ -339,3 +340,218 @@ export default function WeatherForecastScreen() {
         </View>
     );
 }
+
+// ── Styles ──────────────────────────────────────────────
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#0a1f1c',
+        paddingTop: 55,
+    },
+    centered: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingHorizontal: 30,
+    },
+    loadingText: {
+        color: '#6fdfc4',
+        fontSize: 16,
+        marginTop: 15,
+    },
+    errorText: {
+        color: '#ff6b81',
+        fontSize: 16,
+        textAlign: 'center',
+        marginTop: 15,
+        lineHeight: 24,
+    },
+    retryButton: {
+        marginTop: 20,
+        backgroundColor: '#1a4d45',
+        paddingVertical: 12,
+        paddingHorizontal: 30,
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: '#6fdfc4',
+    },
+    retryText: {
+        color: '#6fdfc4',
+        fontSize: 16,
+        fontWeight: '600',
+    },
+
+    // ── Header ──
+    header: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingHorizontal: 20,
+        paddingBottom: 15,
+    },
+    backButton: {
+        padding: 5,
+    },
+    headerTitle: {
+        color: 'white',
+        fontSize: 20,
+        fontWeight: 'bold',
+    },
+    scrollContent: {
+        paddingHorizontal: 20,
+        paddingBottom: 40,
+    },
+
+    // ── Current Weather Card ──
+    currentCard: {
+        backgroundColor: '#1a4d45',
+        borderRadius: 20,
+        padding: 20,
+        borderWidth: 1,
+        borderColor: 'rgba(111, 223, 196, 0.3)',
+        marginBottom: 15,
+    },
+    locationRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 15,
+    },
+    locationText: {
+        color: '#6fdfc4',
+        fontSize: 14,
+        marginLeft: 5,
+        fontWeight: '500',
+    },
+    tempRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 5,
+    },
+    tempInfo: {
+        marginLeft: 20,
+    },
+    tempText: {
+        color: 'white',
+        fontSize: 52,
+        fontWeight: 'bold',
+        lineHeight: 58,
+    },
+    conditionText: {
+        color: 'rgba(255,255,255,0.7)',
+        fontSize: 16,
+        textTransform: 'capitalize',
+        marginTop: 2,
+    },
+    feelsLikeText: {
+        color: 'rgba(255,255,255,0.5)',
+        fontSize: 13,
+        marginBottom: 18,
+        marginLeft: 85,
+    },
+
+    // ── Detail Grid ──
+    detailGrid: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        backgroundColor: 'rgba(0,0,0,0.2)',
+        borderRadius: 12,
+        padding: 15,
+        marginBottom: 15,
+    },
+    detailItem: {
+        alignItems: 'center',
+        flex: 1,
+    },
+    detailValue: {
+        color: 'white',
+        fontSize: 14,
+        fontWeight: '600',
+        marginTop: 6,
+    },
+    detailLabel: {
+        color: 'rgba(255,255,255,0.5)',
+        fontSize: 11,
+        marginTop: 2,
+    },
+
+    // ── Sunrise / Sunset ──
+    sunRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+    },
+    sunItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    sunText: {
+        color: 'rgba(255,255,255,0.6)',
+        fontSize: 13,
+        marginLeft: 6,
+    },
+
+    // ── Recommendation Card ──
+    recommendationCard: {
+        borderRadius: 15,
+        padding: 16,
+        borderWidth: 1,
+        marginBottom: 20,
+    },
+    recHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 8,
+    },
+    recTitle: {
+        fontSize: 15,
+        fontWeight: 'bold',
+        marginLeft: 8,
+    },
+    recText: {
+        color: 'rgba(255,255,255,0.85)',
+        fontSize: 14,
+        lineHeight: 21,
+    },
+
+    // ── 5-Day Forecast ──
+    sectionTitle: {
+        color: 'white',
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 12,
+    },
+    forecastRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#1a4d45',
+        borderRadius: 12,
+        padding: 15,
+        marginBottom: 10,
+        borderWidth: 1,
+        borderColor: 'rgba(111, 223, 196, 0.15)',
+    },
+    forecastDay: {
+        color: 'white',
+        fontSize: 14,
+        fontWeight: '500',
+        width: 100,
+    },
+    forecastCondition: {
+        color: 'rgba(255,255,255,0.6)',
+        fontSize: 13,
+        flex: 1,
+        marginLeft: 10,
+    },
+    forecastTemps: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    forecastHigh: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: 'bold',
+        marginRight: 8,
+    },
+    forecastLow: {
+        color: 'rgba(255,255,255,0.4)',
+        fontSize: 14,
+    },
+});
