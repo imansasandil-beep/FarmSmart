@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  ActivityIndicator, StatusBar
+  ActivityIndicator, StatusBar, TextInput, Alert,
+  KeyboardAvoidingView, Platform
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@clerk/expo';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { API_BASE_URL } from '../../config';
 
@@ -15,10 +17,26 @@ export default function QuestionDetail() {
   const { getToken } = useAuth();
   const [question, setQuestion] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [userRole, setUserRole] = useState('');
+  const [answerText, setAnswerText] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
+    loadUserRole();
     fetchQuestion();
   }, [id]);
+
+  const loadUserRole = async () => {
+    try {
+      const stored = await AsyncStorage.getItem('user');
+      if (stored) {
+        const userData = JSON.parse(stored);
+        setUserRole(userData.role || '');
+      }
+    } catch (e) {
+      console.log('Error loading user role:', e);
+    }
+  };
 
   const fetchQuestion = async () => {
     try {
@@ -31,6 +49,32 @@ export default function QuestionDetail() {
       console.error('Fetch question error:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSubmitAnswer = async () => {
+    if (!answerText.trim()) {
+      Alert.alert('Error', 'Please write your answer');
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const token = await getToken();
+      const res = await axios.post(
+        `${API_BASE_URL}/api/agrisup/${id}/answer`,
+        { body: answerText.trim() },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setQuestion(res.data.question);
+      setAnswerText('');
+      Alert.alert('Success', 'Your answer has been posted!');
+    } catch (err) {
+      console.error('Submit answer error:', err);
+      const msg = err.response?.data?.message || 'Failed to submit answer';
+      Alert.alert('Error', msg);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -81,79 +125,117 @@ export default function QuestionDetail() {
         <View style={{ width: 40 }} />
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Question Card */}
-        <View style={styles.questionCard}>
-          <View style={styles.qMeta}>
-            <View style={[styles.categoryBadge, { backgroundColor: getCategoryColor(question.category) + '25' }]}>
-              <Text style={[styles.categoryText, { color: getCategoryColor(question.category) }]}>
-                {question.category}
-              </Text>
-            </View>
-            <View style={[styles.statusBadge, {
-              backgroundColor: question.status === 'answered' ? '#2ecc7125' : '#e67e2225'
-            }]}>
-              <Text style={[styles.statusText, {
-                color: question.status === 'answered' ? '#2ecc71' : '#e67e22'
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          {/* Question Card */}
+          <View style={styles.questionCard}>
+            <View style={styles.qMeta}>
+              <View style={[styles.categoryBadge, { backgroundColor: getCategoryColor(question.category) + '25' }]}>
+                <Text style={[styles.categoryText, { color: getCategoryColor(question.category) }]}>
+                  {question.category}
+                </Text>
+              </View>
+              <View style={[styles.statusBadge, {
+                backgroundColor: question.status === 'answered' ? '#2ecc7125' : '#e67e2225'
               }]}>
-                {question.status === 'answered' ? 'Answered' : 'Open'}
-              </Text>
-            </View>
-          </View>
-
-          <Text style={styles.qTitle}>{question.title}</Text>
-          <Text style={styles.qBody}>{question.body}</Text>
-
-          <View style={styles.qFooter}>
-            <View style={styles.authorRow}>
-              <View style={styles.avatarCircle}>
-                <Ionicons name="person" size={14} color="#6fdfc4" />
-              </View>
-              <View>
-                <Text style={styles.authorName}>{question.authorName}</Text>
-                <Text style={styles.authorRole}>Farmer</Text>
+                <Text style={[styles.statusText, {
+                  color: question.status === 'answered' ? '#2ecc71' : '#e67e22'
+                }]}>
+                  {question.status === 'answered' ? 'Answered' : 'Open'}
+                </Text>
               </View>
             </View>
-            <Text style={styles.qDate}>{formatDate(question.createdAt)}</Text>
-          </View>
-        </View>
 
-        {/* Answers Section */}
-        <View style={styles.answersHeader}>
-          <Ionicons name="chatbubbles" size={20} color="#6fdfc4" />
-          <Text style={styles.answersTitle}>
-            Answers ({question.answers?.length || 0})
-          </Text>
-        </View>
+            <Text style={styles.qTitle}>{question.title}</Text>
+            <Text style={styles.qBody}>{question.body}</Text>
 
-        {question.answers && question.answers.length > 0 ? (
-          question.answers.map((answer, index) => (
-            <View key={index} style={styles.answerCard}>
-              <View style={styles.answerHeader}>
-                <View style={styles.expertRow}>
-                  <View style={styles.expertAvatar}>
-                    <Ionicons name="shield-checkmark" size={14} color="#6fdfc4" />
-                  </View>
-                  <View>
-                    <Text style={styles.expertName}>{answer.expertName}</Text>
-                    <Text style={styles.expertLabel}>Agricultural Expert</Text>
-                  </View>
+            <View style={styles.qFooter}>
+              <View style={styles.authorRow}>
+                <View style={styles.avatarCircle}>
+                  <Ionicons name="person" size={14} color="#6fdfc4" />
                 </View>
-                <Text style={styles.answerDate}>{formatDate(answer.createdAt)}</Text>
+                <View>
+                  <Text style={styles.authorName}>{question.authorName}</Text>
+                  <Text style={styles.authorRole}>Farmer</Text>
+                </View>
               </View>
-              <Text style={styles.answerBody}>{answer.body}</Text>
+              <Text style={styles.qDate}>{formatDate(question.createdAt)}</Text>
             </View>
-          ))
-        ) : (
-          <View style={styles.noAnswers}>
-            <Ionicons name="time-outline" size={40} color="#4a7a70" />
-            <Text style={styles.noAnswersTitle}>No Answers Yet</Text>
-            <Text style={styles.noAnswersText}>
-              An agricultural expert will respond soon.
+          </View>
+
+          {/* Answers Section */}
+          <View style={styles.answersHeader}>
+            <Ionicons name="chatbubbles" size={20} color="#6fdfc4" />
+            <Text style={styles.answersTitle}>
+              Answers ({question.answers?.length || 0})
             </Text>
           </View>
-        )}
-      </ScrollView>
+
+          {question.answers && question.answers.length > 0 ? (
+            question.answers.map((answer, index) => (
+              <View key={index} style={styles.answerCard}>
+                <View style={styles.answerHeader}>
+                  <View style={styles.expertRow}>
+                    <View style={styles.expertAvatar}>
+                      <Ionicons name="shield-checkmark" size={14} color="#6fdfc4" />
+                    </View>
+                    <View>
+                      <Text style={styles.expertName}>{answer.expertName}</Text>
+                      <Text style={styles.expertLabel}>Agricultural Expert</Text>
+                    </View>
+                  </View>
+                  <Text style={styles.answerDate}>{formatDate(answer.createdAt)}</Text>
+                </View>
+                <Text style={styles.answerBody}>{answer.body}</Text>
+              </View>
+            ))
+          ) : (
+            <View style={styles.noAnswers}>
+              <Ionicons name="time-outline" size={40} color="#4a7a70" />
+              <Text style={styles.noAnswersTitle}>No Answers Yet</Text>
+              <Text style={styles.noAnswersText}>
+                An agricultural expert will respond soon.
+              </Text>
+            </View>
+          )}
+
+          {/* Expert Answer Form */}
+          {userRole === 'expert' && (
+            <View style={styles.answerFormCard}>
+              <View style={styles.answerFormHeader}>
+                <Ionicons name="create-outline" size={18} color="#6fdfc4" />
+                <Text style={styles.answerFormTitle}>Write Your Expert Answer</Text>
+              </View>
+              <TextInput
+                style={styles.answerInput}
+                placeholder="Share your expertise to help this farmer..."
+                placeholderTextColor="#4a7a70"
+                value={answerText}
+                onChangeText={setAnswerText}
+                multiline
+                maxLength={3000}
+              />
+              <View style={styles.answerFormFooter}>
+                <Text style={styles.charCount}>{answerText.length}/3000</Text>
+                <TouchableOpacity
+                  style={[styles.submitAnswerBtn, submitting && { opacity: 0.6 }]}
+                  onPress={handleSubmitAnswer}
+                  disabled={submitting}
+                >
+                  {submitting ? (
+                    <ActivityIndicator color="#0a1f1c" size="small" />
+                  ) : (
+                    <>
+                      <Ionicons name="send" size={16} color="#0a1f1c" />
+                      <Text style={styles.submitAnswerText}>Submit Answer</Text>
+                    </>
+                  )}
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
+        </ScrollView>
+      </KeyboardAvoidingView>
     </View>
   );
 }
@@ -206,4 +288,21 @@ const styles = StyleSheet.create({
   noAnswers: { alignItems: 'center', paddingVertical: 40 },
   noAnswersTitle: { fontSize: 16, fontWeight: 'bold', color: 'white', marginTop: 12 },
   noAnswersText: { fontSize: 13, color: '#8aa6a3', marginTop: 6, textAlign: 'center' },
+  answerFormCard: {
+    backgroundColor: '#1a4d45', borderRadius: 16, padding: 16,
+    marginTop: 20, borderWidth: 1, borderColor: '#6fdfc4',
+  },
+  answerFormHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 },
+  answerFormTitle: { fontSize: 14, fontWeight: 'bold', color: '#6fdfc4' },
+  answerInput: {
+    backgroundColor: 'rgba(0,0,0,0.2)', borderRadius: 12, padding: 14,
+    color: 'white', fontSize: 14, minHeight: 120, textAlignVertical: 'top',
+  },
+  answerFormFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 12 },
+  charCount: { fontSize: 11, color: '#4a7a70' },
+  submitAnswerBtn: {
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+    backgroundColor: '#6fdfc4', paddingHorizontal: 18, paddingVertical: 10, borderRadius: 20,
+  },
+  submitAnswerText: { color: '#0a1f1c', fontSize: 13, fontWeight: 'bold' },
 });
