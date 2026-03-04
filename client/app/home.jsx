@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -11,7 +11,7 @@ export default function HomeScreen() {
 
   // List of Menu Options matching your screenshot
   const menuItems = [
-    { title: 'Crop calendar', route: 'tasks' },
+    { title: 'Crop calendar', route: 'cropcalender' },
     { title: 'Crop-specific recommendations', route: 'recommendations' },
     { title: 'Personal insights', route: 'insights' },
     { title: 'Chat platform', route: 'chat' },
@@ -58,8 +58,8 @@ const handleMenuPress = async (item) => {
       );
     } 
     // 2. Check for Crop Calendar (which now goes to Tasks)
-    else if (item.route === 'tasks') {
-      router.push('/tasks'); 
+    else if (item.route === 'cropcalender') {
+      router.push('/cropcalender'); 
     } 
     // 3. Everything else
     else {
