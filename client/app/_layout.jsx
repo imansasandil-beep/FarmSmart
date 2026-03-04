@@ -1,4 +1,4 @@
-import { Stack } from 'expo-router';
+﻿import { Stack } from 'expo-router';
 
 export default function RootLayout() {
   return (
@@ -7,8 +7,10 @@ export default function RootLayout() {
       <Stack.Screen name="register" />
       <Stack.Screen name="success" /> 
       <Stack.Screen name="home" /> 
-      <Stack.Screen name="tasks" /> 
+      <Stack.Screen name="tasks" />
+      <Stack.Screen name="cropcalender" /> 
     </Stack>
   );
 }
+
 
