@@ -73,9 +73,36 @@ router.post('/login', async (req, res) => {
     // 6. Success! Remove the password from the data we send back
     const userObject = user.toObject();
     const { password: _, ...userWithoutPassword } = userObject;
-    
+
     res.status(200).json({ message: 'Login successful', user: userWithoutPassword });
 
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// REQUEST VERIFICATION - Sellers submit their ID to get verified
+router.post('/request-verification', async (req, res) => {
+  try {
+    const { userId, idNumber, address } = req.body;
+
+    if (!userId || !idNumber || !address) {
+      return res.status(400).json({ message: 'All fields are required' });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    if (user.verificationStatus === 'pending') {
+      return res.status(400).json({ message: 'Verification already pending' });
+    }
+
+    user.verificationStatus = 'pending';
+    await user.save();
+
+    res.status(200).json({ message: 'Verification request submitted' });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
