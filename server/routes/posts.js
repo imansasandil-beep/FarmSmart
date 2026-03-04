@@ -48,7 +48,8 @@ const uploadToCloudinary = (buffer) => {
   });
 };
 
-// POST /api/posts - Create a new post
+// POST /api/posts - Create a new community post
+console.log('Posts route loaded successfully');
 router.post('/', requireClerkAuth, upload.single('image'), async (req, res) => {
   try {
     const { content, authorName } = req.body;
