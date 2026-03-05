@@ -6,6 +6,7 @@ import * as Notifications from 'expo-notifications';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getCurrentSeason, getMonthlyTips } from './_data/seasons';
+import { ZONES } from './_data/zones';
 
 // Configure Notification Handler
 Notifications.setNotificationHandler({
@@ -46,7 +47,11 @@ export default function CropCalendarScreen() {
                     if (storedReminders) setReminders(JSON.parse(storedReminders));
 
                     const savedZone = await AsyncStorage.getItem('selectedZone');
-                    if (savedZone) setZone(JSON.parse(savedZone));
+                    if (savedZone) {
+                        const parsed = JSON.parse(savedZone);
+                        const freshZone = ZONES.find(z => z.id === parsed.id) || parsed;
+                        setZone(freshZone);
+                    }
 
                     const savedDistrict = await AsyncStorage.getItem('selectedDistrict');
                     if (savedDistrict) setDistrict(savedDistrict);

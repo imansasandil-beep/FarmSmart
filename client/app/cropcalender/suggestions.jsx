@@ -5,6 +5,7 @@ import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getCurrentSeason, getMonthlyTips, SEASONS } from './_data/seasons';
 import { getCropsByZoneAndSeason } from './_data/crops';
+import { ZONES } from './_data/zones';
 
 export default function SuggestionsScreen() {
     const router = useRouter();
@@ -16,7 +17,11 @@ export default function SuggestionsScreen() {
         const loadZone = async () => {
             try {
                 const saved = await AsyncStorage.getItem('selectedZone');
-                if (saved) setZone(JSON.parse(saved));
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    const freshZone = ZONES.find(z => z.id === parsed.id) || parsed;
+                    setZone(freshZone);
+                }
             } catch (e) {
                 console.log('Error loading zone:', e);
             }
