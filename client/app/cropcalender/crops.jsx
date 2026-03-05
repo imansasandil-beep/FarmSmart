@@ -69,7 +69,7 @@ export default function CropsScreen() {
 
                             const newReminder = {
                                 id: `crop_${crop.id}_${Date.now()}`,
-                                title: `≡ƒî▒ Plant ${crop.name} (${crop.sinhalaName})`,
+                                title: `🌱 Plant ${crop.name} (${crop.sinhalaName})`,
                                 time: plantDate.toLocaleString(),
                                 category: 'planting',
                                 cropId: crop.id,
@@ -78,7 +78,7 @@ export default function CropsScreen() {
                             const updatedReminders = [...reminders, newReminder];
                             await AsyncStorage.setItem('farmReminders', JSON.stringify(updatedReminders));
 
-                            Alert.alert('Γ£à Reminder Created!', `Planting reminder for ${crop.name} added to your calendar.`);
+                            Alert.alert('✅ Reminder Created!', `Planting reminder for ${crop.name} added to your calendar.`);
                         } catch (e) {
                             Alert.alert('Error', 'Failed to create reminder.');
                         }
@@ -134,11 +134,11 @@ export default function CropsScreen() {
                             <Ionicons name="sunny" size={16} color="#f39c12" />
                             <Text style={styles.detailLabel}>Seasons:</Text>
                             <Text style={styles.detailValue}>
-                                {item.seasons.map(s => s === 'yala' ? 'Yala (α╢║α╢╜)' : 'Maha (α╢╕α╖ä)').join(', ')}
+                                {item.seasons.map(s => s === 'yala' ? 'Yala (යල)' : 'Maha (මහ)').join(', ')}
                             </Text>
                         </View>
 
-                        <Text style={styles.tipText}>≡ƒÆí {item.tips}</Text>
+                        <Text style={styles.tipText}>💡 {item.tips}</Text>
 
                         <TouchableOpacity
                             style={styles.reminderButton}
@@ -196,7 +196,7 @@ export default function CropsScreen() {
             {/* Zone badge */}
             <View style={[styles.zoneBadge, { borderColor: zone.color }]}>
                 <Text style={styles.zoneBadgeText}>
-                    {zone.emoji} {zone.name} ΓÇö {zone.sinhalaName}
+                    {zone.emoji} {zone.name} — {zone.sinhalaName}
                 </Text>
             </View>
 
@@ -209,7 +209,7 @@ export default function CropsScreen() {
                         onPress={() => setFilterSeason(f)}
                     >
                         <Text style={[styles.filterText, filterSeason === f && styles.filterTextActive]}>
-                            {f === 'all' ? 'All' : f === 'yala' ? 'Yala (α╢║α╢╜)' : 'Maha (α╢╕α╖ä)'}
+                            {f === 'all' ? 'All' : f === 'yala' ? 'Yala (යල)' : 'Maha (මහ)'}
                         </Text>
                     </TouchableOpacity>
                 ))}

@@ -87,19 +87,19 @@ export default function SuggestionsScreen() {
                 <View style={styles.timelineCard}>
                     <View style={styles.timelineRow}>
                         <View style={[styles.timelineBlock, { backgroundColor: SEASONS.maha.color + '40' }]}>
-                            <Text style={styles.timelineText}>≡ƒîº Maha</Text>
-                            <Text style={styles.timelineMonths}>Oct ΓÇô Feb</Text>
+                            <Text style={styles.timelineText}>🌧 Maha</Text>
+                            <Text style={styles.timelineMonths}>Oct – Feb</Text>
                         </View>
                         <View style={[styles.timelineBlock, { backgroundColor: '#95a5a620' }]}>
-                            <Text style={styles.timelineText}>≡ƒöä Inter</Text>
+                            <Text style={styles.timelineText}>🔄 Inter</Text>
                             <Text style={styles.timelineMonths}>Mar</Text>
                         </View>
                         <View style={[styles.timelineBlock, { backgroundColor: SEASONS.yala.color + '40' }]}>
-                            <Text style={styles.timelineText}>ΓÿÇ∩╕Å Yala</Text>
-                            <Text style={styles.timelineMonths}>Apr ΓÇô Aug</Text>
+                            <Text style={styles.timelineText}>☀️ Yala</Text>
+                            <Text style={styles.timelineMonths}>Apr – Aug</Text>
                         </View>
                         <View style={[styles.timelineBlock, { backgroundColor: '#95a5a620' }]}>
-                            <Text style={styles.timelineText}>≡ƒöä Inter</Text>
+                            <Text style={styles.timelineText}>🔄 Inter</Text>
                             <Text style={styles.timelineMonths}>Sep</Text>
                         </View>
                     </View>
@@ -109,7 +109,7 @@ export default function SuggestionsScreen() {
                 {monthlyTip && (
                     <>
                         <Text style={styles.sectionTitle}>
-                            ≡ƒôà This Month ΓÇö {monthlyTip.month} ({monthlyTip.sinhalaName})
+                            📅 This Month — {monthlyTip.month} ({monthlyTip.sinhalaName})
                         </Text>
                         <View style={styles.tipCard}>
                             <View style={styles.tipRow}>
@@ -132,7 +132,7 @@ export default function SuggestionsScreen() {
                 {/* What to Plant Now */}
                 {seasonCrops.length > 0 && (
                     <>
-                        <Text style={styles.sectionTitle}>≡ƒî▒ What to Grow This Season</Text>
+                        <Text style={styles.sectionTitle}>🌱 What to Grow This Season</Text>
                         <View style={styles.cropsGrid}>
                             {seasonCrops.slice(0, 8).map((crop) => (
                                 <View key={crop.id} style={styles.cropChip}>
@@ -152,7 +152,7 @@ export default function SuggestionsScreen() {
                 )}
 
                 {/* Zone Info */}
-                <Text style={styles.sectionTitle}>≡ƒù║∩╕Å Your Zone</Text>
+                <Text style={styles.sectionTitle}>🗺️ Your Zone</Text>
                 <View style={[styles.zoneInfoCard, { borderColor: zone.color }]}>
                     <Text style={styles.zoneInfoTitle}>{zone.emoji} {zone.name}</Text>
                     <Text style={styles.zoneInfoSinhala}>{zone.sinhalaName}</Text>

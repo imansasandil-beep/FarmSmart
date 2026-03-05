@@ -83,7 +83,7 @@ export default function CropCalendarScreen() {
             const triggerSeconds = Math.floor((date.getTime() - now.getTime()) / 1000);
 
             const notificationContent = {
-                title: 'FarmSmart Reminder ≡ƒÜ£',
+                title: 'FarmSmart Reminder 🚜',
                 body: `It's time to: ${taskTitle}`,
                 sound: 'default',
             };
@@ -153,7 +153,7 @@ export default function CropCalendarScreen() {
                         <View style={styles.zoneCardRow}>
                             <View style={{ flex: 1 }}>
                                 <Text style={styles.zoneCardTitle}>{zone.emoji} {zone.name}</Text>
-                                <Text style={styles.zoneCardDistrict}>≡ƒôì {district || 'Tap to select district'}</Text>
+                                <Text style={styles.zoneCardDistrict}>📍 {district || 'Tap to select district'}</Text>
                             </View>
                             <View style={[styles.seasonBadge, { backgroundColor: currentSeason.color }]}>
                                 <Text style={styles.seasonBadgeText}>
@@ -163,7 +163,7 @@ export default function CropCalendarScreen() {
                         </View>
                         {monthlyTip && (
                             <Text style={styles.quickTip} numberOfLines={2}>
-                                ≡ƒÆí {monthlyTip.zoneTip}
+                                💡 {monthlyTip.zoneTip}
                             </Text>
                         )}
                     </TouchableOpacity>
