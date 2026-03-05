@@ -8,6 +8,8 @@ export default function RootLayout() {
       <Stack.Screen name="success" />
       <Stack.Screen name="home" />
       <Stack.Screen name="tasks" />
+      <Stack.Screen name="weatherForecast" />
     </Stack>
   );
 }
+

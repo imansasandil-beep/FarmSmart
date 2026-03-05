@@ -12,6 +12,7 @@ export default function HomeScreen() {
   // List of Menu Options matching your screenshot
   const menuItems = [
     { title: 'Crop calendar', route: 'tasks' },
+    { title: 'Weather Forecast', route: 'weatherForecast' },
     { title: 'Crop-specific recommendations', route: 'recommendations' },
     { title: 'Personal insights', route: 'insights' },
     { title: 'Chat platform', route: 'chat' },
@@ -61,7 +62,11 @@ export default function HomeScreen() {
     else if (item.route === 'tasks') {
       router.push('/tasks');
     }
-    // 3. Everything else
+    // 3. Weather Forecast
+    else if (item.route === 'weatherForecast') {
+      router.push('/weatherForecast');
+    }
+    // 4. Everything else
     else {
       Alert.alert(item.title, "This feature is coming soon!");
     }
