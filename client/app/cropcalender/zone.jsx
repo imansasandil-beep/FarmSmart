@@ -38,8 +38,8 @@ export default function ZoneSelectionScreen() {
             await AsyncStorage.setItem('selectedZone', JSON.stringify(selectedZone));
             await AsyncStorage.setItem('selectedDistrict', district);
             Alert.alert(
-                'Zone Set! Γ£à',
-                `${selectedZone.name} ΓÇö ${district}\nYour crop calendar will now show personalized advice.`,
+                'Zone Set! ✅',
+                `${selectedZone.name} — ${district}\nYour crop calendar will now show personalized advice.`,
                 [{ text: 'OK', onPress: () => router.back() }]
             );
         } catch (e) {
@@ -128,7 +128,7 @@ export default function ZoneSelectionScreen() {
                 <>
                     <View style={[styles.selectedZoneBanner, { backgroundColor: selectedZone?.color + '30' }]}>
                         <Text style={styles.selectedZoneText}>
-                            {selectedZone?.emoji} {selectedZone?.name} ΓÇö {selectedZone?.sinhalaName}
+                            {selectedZone?.emoji} {selectedZone?.name} — {selectedZone?.sinhalaName}
                         </Text>
                     </View>
                     <Text style={styles.subtitle}>Select your district</Text>

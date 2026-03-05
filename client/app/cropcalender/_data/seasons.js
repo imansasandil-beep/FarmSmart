@@ -8,8 +8,8 @@ export const SEASONS = {
     yala: {
         id: 'yala',
         name: 'Yala Season',
-        sinhalaName: 'α╢║α╢╜ α╢Üα╢▒α╖èα╢▒α╢║',
-        emoji: 'ΓÿÇ∩╕Å',
+        sinhalaName: 'යල කන්නය',
+        emoji: '☀️',
         monsoon: 'Southwest Monsoon',
         startMonth: 4,  // April
         endMonth: 8,    // August
@@ -19,8 +19,8 @@ export const SEASONS = {
     maha: {
         id: 'maha',
         name: 'Maha Season',
-        sinhalaName: 'α╢╕α╖ä α╢Üα╢▒α╖èα╢▒α╢║',
-        emoji: '≡ƒîº∩╕Å',
+        sinhalaName: 'මහ කන්නය',
+        emoji: '🌧️',
         monsoon: 'Northeast Monsoon',
         startMonth: 10, // October
         endMonth: 2,    // February (next year)
@@ -35,7 +35,7 @@ export const MONTHLY_TIPS = [
     {
         month: 1, // January
         name: 'January',
-        sinhalaName: 'α╢»α╖öα╢╗α╖öα╢¡α╖ö / α╢▒α╖Çα╢╕α╖è',
+        sinhalaName: 'දුරුතු / නවම්',
         general: 'Maha season crops are in growth stage. Monitor for pests and diseases.',
         tips: {
             wet: 'Continue harvesting tea. Monitor paddy fields for water levels. Apply fertilizer for rubber plantations.',
@@ -46,7 +46,7 @@ export const MONTHLY_TIPS = [
     {
         month: 2, // February
         name: 'February',
-        sinhalaName: 'α╢▒α╖Çα╢╕α╖è / α╢╕α╖Éα╢»α╖Æα╢▒α╖è',
+        sinhalaName: 'නවම් / මැදින්',
         general: 'Maha harvest begins. Start planning for Yala season land preparation.',
         tips: {
             wet: 'Harvest Maha paddy. Begin cinnamon peeling season. Prepare nurseries for Yala planting.',
@@ -57,7 +57,7 @@ export const MONTHLY_TIPS = [
     {
         month: 3, // March
         name: 'March',
-        sinhalaName: 'α╢╕α╖Éα╢»α╖Æα╢▒α╖è / α╢╢α╢Üα╖è',
+        sinhalaName: 'මැදින් / බක්',
         general: 'Inter-season period. Focus on land preparation for Yala season.',
         tips: {
             wet: 'Prepare paddy fields for Yala sowing. Prune and maintain tea bushes. Plant cover crops in rubber plantations.',
@@ -68,7 +68,7 @@ export const MONTHLY_TIPS = [
     {
         month: 4, // April
         name: 'April',
-        sinhalaName: 'α╢╢α╢Üα╖è / α╖Çα╖Öα╖âα╢Üα╖è',
+        sinhalaName: 'බක් / වෙසක්',
         general: 'Yala season begins! Southwest monsoon rains start. Begin sowing.',
         tips: {
             wet: 'Start Yala paddy sowing. Plant pepper vines. Apply first fertilizer dose to tea.',
@@ -79,7 +79,7 @@ export const MONTHLY_TIPS = [
     {
         month: 5, // May
         name: 'May',
-        sinhalaName: 'α╖Çα╖Öα╖âα╢Üα╖è / α╢┤α╖£α╖âα╖£α╢▒α╖è',
+        sinhalaName: 'වෙසක් / පොසොන්',
         general: 'Peak of Southwest monsoon. Heavy rains in the wet zone.',
         tips: {
             wet: 'Ensure paddy field drainage during heavy rains. Good month for planting cinnamon and rubber seedlings.',
@@ -90,7 +90,7 @@ export const MONTHLY_TIPS = [
     {
         month: 6, // June
         name: 'June',
-        sinhalaName: 'α╢┤α╖£α╖âα╖£α╢▒α╖è / α╢çα╖âα╖à',
+        sinhalaName: 'පොසොන් / ඇසළ',
         general: 'Yala crops are in active growth. Weed management is critical.',
         tips: {
             wet: 'Weed control in paddy and tea plantations. Monitor rubber for leaf disease.',
@@ -101,7 +101,7 @@ export const MONTHLY_TIPS = [
     {
         month: 7, // July
         name: 'July',
-        sinhalaName: 'α╢çα╖âα╖à / α╢▒α╖Æα╢Üα╖Æα╢½α╖Æ',
+        sinhalaName: 'ඇසළ / නිකිණි',
         general: 'Yala crops maturing. Begin harvest preparations.',
         tips: {
             wet: 'Tea plucking continues. Monitor paddy for grain formation. Begin harvesting early vegetables.',
@@ -112,7 +112,7 @@ export const MONTHLY_TIPS = [
     {
         month: 8, // August
         name: 'August',
-        sinhalaName: 'α╢▒α╖Æα╢Üα╖Æα╢½α╖Æ / α╢╢α╖Æα╢▒α╢╗',
+        sinhalaName: 'නිකිණි / බිනර',
         general: 'Yala harvest season. Plan seed storage for Maha season.',
         tips: {
             wet: 'Harvest Yala paddy. Process and store seeds. Maintain tea and rubber plantations.',
@@ -123,7 +123,7 @@ export const MONTHLY_TIPS = [
     {
         month: 9, // September
         name: 'September',
-        sinhalaName: 'α╢╢α╖Æα╢▒α╢╗ / α╖Çα╢┤α╖è',
+        sinhalaName: 'බිනර / වප්',
         general: 'Inter-season. Prepare for Maha season. Second inter-monsoon rains begin.',
         tips: {
             wet: 'Prepare paddy fields for Maha sowing. Prune tea bushes. Repair drainage systems.',
@@ -134,7 +134,7 @@ export const MONTHLY_TIPS = [
     {
         month: 10, // October
         name: 'October',
-        sinhalaName: 'α╖Çα╢┤α╖è / α╢ëα╢╜α╖è',
+        sinhalaName: 'වප් / ඉල්',
         general: 'Maha season begins! Northeast monsoon rains start. Major planting month.',
         tips: {
             wet: 'Begin Maha paddy sowing. Plant spice crops. Tea flush season begins.',
@@ -145,7 +145,7 @@ export const MONTHLY_TIPS = [
     {
         month: 11, // November
         name: 'November',
-        sinhalaName: 'α╢ëα╢╜α╖è / α╢ïα╢│α╖öα╖Çα╢┤α╖è',
+        sinhalaName: 'ඉල් / උඳුවප්',
         general: 'Peak of Northeast monsoon. Heavy rainfall across the island.',
         tips: {
             wet: 'Monitor paddy water levels. Watch for blast disease in rice. Continue tea harvesting.',
@@ -156,7 +156,7 @@ export const MONTHLY_TIPS = [
     {
         month: 12, // December
         name: 'December',
-        sinhalaName: 'α╢ïα╢│α╖öα╖Çα╢┤α╖è / α╢»α╖öα╢╗α╖öα╢¡α╖ö',
+        sinhalaName: 'උඳුවප් / දුරුතු',
         general: 'Maha crops in active growth. Pest and disease monitoring essential.',
         tips: {
             wet: 'Fertilize paddy fields. Monitor for pests in spice crops. Harvest black pepper.',
@@ -179,8 +179,8 @@ export const getCurrentSeason = (date = new Date()) => {
         return {
             id: 'inter',
             name: 'Inter-Season',
-            sinhalaName: 'α╢àα╢¡α╢╗α╢╕α╖Éα╢»α╖Æ α╢Üα╖Åα╢╜α╢║',
-            emoji: '≡ƒöä',
+            sinhalaName: 'අතරමැදි කාලය',
+            emoji: '🔄',
             monsoon: 'Inter-Monsoon',
             startMonth: month,
             endMonth: month,

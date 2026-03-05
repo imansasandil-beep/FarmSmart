@@ -8,8 +8,8 @@ export const ZONES = [
     {
         id: 'wet',
         name: 'Wet Zone',
-        sinhalaName: 'α╢¡α╖Öα╢¡α╖è α╢Üα╢╜α╖Åα╢┤α╢║',
-        emoji: '≡ƒîº∩╕Å',
+        sinhalaName: 'තෙත් කලාපය',
+        emoji: '🌧️',
         rainfall: '> 2,500 mm/year',
         color: '#2ecc71',
         description: 'The south-western region and central highlands. Receives consistent rainfall year-round with no prolonged dry periods.',
@@ -28,8 +28,8 @@ export const ZONES = [
     {
         id: 'dry',
         name: 'Dry Zone',
-        sinhalaName: 'α╖Çα╖Æα╢║α╖àα╖Æ α╢Üα╢╜α╖Åα╢┤α╢║',
-        emoji: 'ΓÿÇ∩╕Å',
+        sinhalaName: 'වියළි කලාපය',
+        emoji: '☀️',
         rainfall: '< 1,750 mm/year',
         color: '#e67e22',
         description: 'The northern, eastern, and south-eastern lowlands. Marked by a distinct dry season from May to September.',
@@ -51,9 +51,9 @@ export const ZONES = [
     {
         id: 'intermediate',
         name: 'Intermediate Zone',
-        sinhalaName: 'α╢àα╢¡α╢╗α╢╕α╖Éα╢»α╖Æ α╢Üα╢╜α╖Åα╢┤α╢║',
-        emoji: '≡ƒîñ∩╕Å',
-        rainfall: '1,750 ΓÇô 2,500 mm/year',
+        sinhalaName: 'අතරමැදි කලාපය',
+        emoji: '🌤️',
+        rainfall: '1,750 – 2,500 mm/year',
         color: '#3498db',
         description: 'A transitional belt between Wet and Dry zones. Shorter dry season, suitable for diverse multi-crop farming.',
         districts: [
