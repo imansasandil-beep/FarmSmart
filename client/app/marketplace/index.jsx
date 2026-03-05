@@ -234,9 +234,6 @@ export default function MarketplaceScreen() {
                     <View style={{ flex: 1, marginRight: 10 }}>
                         <Text style={styles.cardTitle} numberOfLines={1}>{item.title}</Text>
                         <View style={styles.sellerRow}>
-                            {item.sellerId?.isVerified && (
-                                <Ionicons name="checkmark-circle" size={14} color="#6fdfc4" style={{ marginRight: 4 }} />
-                            )}
                             <Text style={styles.sellerName} numberOfLines={1}>
                                 {item.sellerId?.fullName || 'Seller'}
                             </Text>
