@@ -312,37 +312,6 @@ export default function OrdersScreen() {
         );
     };
 
-    const renderVerificationCard = () => {
-        if (!currentUser || currentUser.isVerified) return null;
-
-        if (currentUser.verificationStatus === 'pending') {
-            return (
-                <View style={[styles.verificationCard, styles.pendingCard]}>
-                    <Ionicons name="time" size={24} color="#0a1f1c" />
-                    <View style={styles.verificationTextContainer}>
-                        <Text style={styles.verificationTitle}>Verification Pending</Text>
-                        <Text style={styles.verificationSubtitle}>We are reviewing your details</Text>
-                    </View>
-                </View>
-            );
-        }
-
-        return (
-            <TouchableOpacity
-                style={styles.verificationCard}
-                onPress={() => router.push('/marketplace/verification')}
-            >
-                <View style={styles.verificationContent}>
-                    <Ionicons name="shield-checkmark" size={24} color="#0a1f1c" />
-                    <View style={styles.verificationTextContainer}>
-                        <Text style={styles.verificationTitle}>Become a Verified Seller</Text>
-                        <Text style={styles.verificationSubtitle}>Get a badge and build trust</Text>
-                    </View>
-                </View>
-                <Ionicons name="chevron-forward" size={20} color="#0a1f1c" />
-            </TouchableOpacity>
-        );
-    };
 
     const renderEmptyList = () => (
         <View style={styles.emptyContainer}>
@@ -411,7 +380,7 @@ export default function OrdersScreen() {
                 data={orders}
                 keyExtractor={(item) => item._id}
                 renderItem={renderOrder}
-                ListHeaderComponent={activeTab === 'seller' ? renderVerificationCard : null}
+
                 ListEmptyComponent={renderEmptyList}
                 contentContainerStyle={orders.length === 0 ? styles.emptyList : styles.listContent}
                 refreshControl={
@@ -685,36 +654,5 @@ const styles = StyleSheet.create({
         marginTop: 15,
         fontSize: 16,
     },
-    verificationCard: {
-        backgroundColor: '#6fdfc4',
-        marginHorizontal: 20,
-        marginTop: 20,
-        marginBottom: 10,
-        borderRadius: 12,
-        padding: 15,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-    },
-    pendingCard: {
-        backgroundColor: 'rgba(111, 223, 196, 0.5)',
-    },
-    verificationContent: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 12,
-    },
-    verificationTextContainer: {
-        marginLeft: 10,
-    },
-    verificationTitle: {
-        color: '#0a1f1c',
-        fontWeight: 'bold',
-        fontSize: 16,
-    },
-    verificationSubtitle: {
-        color: '#0a1f1c',
-        fontSize: 12,
-        opacity: 0.8,
-    },
+
 });
