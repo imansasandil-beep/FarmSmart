@@ -5,6 +5,7 @@ import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getCropsByZone, getCropsByZoneAndSeason } from './_data/crops';
 import { getCurrentSeason } from './_data/seasons';
+import { ZONES } from './_data/zones';
 
 export default function CropsScreen() {
     const router = useRouter();
@@ -21,8 +22,10 @@ export default function CropsScreen() {
                 const savedZone = await AsyncStorage.getItem('selectedZone');
                 if (savedZone) {
                     const parsed = JSON.parse(savedZone);
-                    setZone(parsed);
-                    setCrops(getCropsByZone(parsed.id));
+                    // Look up fresh zone data from source to avoid encoding issues
+                    const freshZone = ZONES.find(z => z.id === parsed.id) || parsed;
+                    setZone(freshZone);
+                    setCrops(getCropsByZone(freshZone.id));
                 }
             } catch (e) {
                 console.log('Error loading zone:', e);
