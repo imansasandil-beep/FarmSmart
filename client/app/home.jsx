@@ -148,6 +148,14 @@ export default function HomeScreen() {
       route: 'weatherForecast',
     },
     {
+      title: 'AgriSup Q&A',
+      subtitle: 'Ask questions & get expert answers',
+      icon: 'help-circle',
+      iconColor: '#e67e22',
+      route: 'agrisup',
+      badge: 'NEW',
+    },
+    {
       title: 'Profile',
       subtitle: 'Manage your account',
       icon: 'person-circle',
@@ -169,6 +177,8 @@ export default function HomeScreen() {
       router.push('/cropspecific');
     } else if (item.route === 'weatherForecast') {
       router.push('/weatherForecast');
+    } else if (item.route === 'agrisup') {
+      router.push('/agrisup');
     } else {
       Alert.alert(item.title, 'This feature is coming soon!');
     }
