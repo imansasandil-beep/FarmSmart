@@ -46,6 +46,7 @@ export default function RootLayout() {
           <Stack.Screen name="tasks" />
           <Stack.Screen name="marketplace" />
           <Stack.Screen name="cropcalender" />
+          <Stack.Screen name="pests-and-diseases" />
         </Stack>
       </AuthGate>
     </ClerkProvider>

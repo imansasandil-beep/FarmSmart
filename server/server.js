@@ -14,6 +14,7 @@ const paymentsRoute = require('./routes/payments');
 const reviewsRoute = require('./routes/reviews');
 const notificationsRoute = require('./routes/notifications');
 const messagesRoute = require('./routes/messages');
+const pestDiseaseRoute = require('./routes/pestDiseases');
 
 const app = express();
 
@@ -35,6 +36,7 @@ app.use('/api/payments', paymentsRoute); // Payment processing
 app.use('/api/reviews', reviewsRoute); // Seller reviews
 app.use('/api/notifications', notificationsRoute); // User notifications
 app.use('/api/messages', messagesRoute); // Chat messaging
+app.use('/api/pest-diseases', pestDiseaseRoute); // Pest & diseases
 
 // 1. Database Connection
 mongoose.connect(process.env.MONGO_URI)
