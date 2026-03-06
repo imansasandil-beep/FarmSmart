@@ -172,6 +172,8 @@ export default function HomeScreen() {
       router.push('/tasks');
     } else if (item.route === 'pests-and-diseases') {
       router.push('/pests-and-diseases');
+    } else if (item.route === 'recommendations') {
+      router.push('/cropspecific');
     } else {
       Alert.alert(item.title, 'This feature is coming soon!');
     }
