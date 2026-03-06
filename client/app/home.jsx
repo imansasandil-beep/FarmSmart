@@ -155,6 +155,13 @@ export default function HomeScreen() {
       route: 'seller',
     },
     {
+      title: 'Weather Forecast',
+      subtitle: 'Check local weather conditions',
+      icon: 'cloud',
+      iconColor: '#3498db',
+      route: 'weatherForecast',
+    },
+    {
       title: 'Profile',
       subtitle: 'Manage your account',
       icon: 'person-circle',
@@ -174,6 +181,8 @@ export default function HomeScreen() {
       router.push('/pests-and-diseases');
     } else if (item.route === 'recommendations') {
       router.push('/cropspecific');
+    } else if (item.route === 'weatherForecast') {
+      router.push('/weatherForecast');
     } else {
       Alert.alert(item.title, 'This feature is coming soon!');
     }
