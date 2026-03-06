@@ -129,7 +129,7 @@ export default function CheckoutScreen() {
 
         setLoading(true);
         try {
-            const userStr = await AsyncStorage.getItem('userData');
+            const userStr = await AsyncStorage.getItem('user');
             if (!userStr) {
                 Alert.alert('Error', 'Please login to continue');
                 router.push('/login');
@@ -137,16 +137,64 @@ export default function CheckoutScreen() {
             }
             const user = JSON.parse(userStr);
 
-            // Step 1: Create payment intent on our backend
+            // Step 1: Fetch listing to get sellerId
+            const listingRes = await fetch(`${API_BASE_URL}/api/marketplace/${listingId}`);
+            const listing = await listingRes.json();
+            if (!listingRes.ok) {
+                Alert.alert('Error', 'Could not find listing');
+                return;
+            }
+            const sellerId = listing.sellerId?._id || listing.sellerId;
+
+            // Don't let users buy their own stuff
+            if (sellerId === (user._id || user.id)) {
+                Alert.alert('Oops!', "You can't buy your own listing");
+                return;
+            }
+
+            // Step 2: Create the order first (with pending payment status)
+            const orderRes = await fetch(`${API_BASE_URL}/api/orders`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    buyerId: user._id || user.id,
+                    sellerId,
+                    listingId,
+                    quantity: parseInt(quantity),
+                    unitPrice,
+                    subtotal,
+                    platformFeePercent: PLATFORM_FEE_PERCENT,
+                    platformFee,
+                    deliveryFee,
+                    totalAmount: total,
+                    sellerPayout: subtotal - platformFee,
+                    deliveryAddress: {
+                        street: deliveryAddress.street,
+                        city: deliveryAddress.city,
+                        state: deliveryAddress.state,
+                        zipCode: deliveryAddress.zipCode,
+                        country: 'Sri Lanka',
+                    },
+                    paymentStatus: 'pending',
+                    status: 'pending',
+                }),
+            });
+
+            const orderData = await orderRes.json();
+            if (!orderRes.ok) {
+                Alert.alert('Error', orderData.message || 'Failed to create order');
+                return;
+            }
+
+            const orderId = orderData.order._id;
+
+            // Step 3: Create payment intent on our backend
             const response = await fetch(`${API_BASE_URL}/api/payments/create-intent`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    listingId,
-                    quantity: parseInt(quantity),
+                    orderId,
                     amount: total,
-                    deliveryFee,
-                    buyerId: user._id || user.id,
                 }),
             });
 
@@ -186,7 +234,7 @@ export default function CheckoutScreen() {
                 await fetch(`${API_BASE_URL}/api/payments/confirm`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ orderId: data.orderId }),
+                    body: JSON.stringify({ orderId }),
                 });
             } catch (confirmError) {
                 // Even if confirm fails here, the webhook will handle it
