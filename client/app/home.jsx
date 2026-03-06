@@ -145,7 +145,7 @@ export default function HomeScreen() {
       subtitle: 'Identify and treat crop issues',
       icon: 'bug',
       iconColor: '#e74c3c',
-      route: 'pests',
+      route: 'pests-and-diseases',
     },
     {
       title: 'Seller Contact',
@@ -170,6 +170,8 @@ export default function HomeScreen() {
       router.push('/marketplace');
     } else if (item.route === 'tasks') {
       router.push('/tasks');
+    } else if (item.route === 'pests-and-diseases') {
+      router.push('/pests-and-diseases');
     } else {
       Alert.alert(item.title, 'This feature is coming soon!');
     }
