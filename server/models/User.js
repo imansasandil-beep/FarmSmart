@@ -44,6 +44,11 @@ const UserSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  // Stripe Connect - Uncomment when switching to real money mode
+  // stripeAccountId: {
+  //   type: String,
+  //   default: null,
+  // },
   createdAt: {
     type: Date,
     default: Date.now,
