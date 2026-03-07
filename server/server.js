@@ -2,6 +2,7 @@ require('dotenv').config(); // Load environment variables
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const { clerkMiddleware } = require('@clerk/express');
 
 // IMPORT ROUTES
 const authRoute = require('./routes/auth');
@@ -22,6 +23,7 @@ app.use('/api/payments/webhook', express.raw({ type: 'application/json' }));
 // Middleware
 app.use(express.json()); // Allows us to parse JSON data
 app.use(cors()); // Allows frontend to communicate with backend
+app.use(clerkMiddleware()); // Clerk auth - inspects requests for session tokens
 
 // Route Middlewares
 app.use('/api/user', authRoute);
