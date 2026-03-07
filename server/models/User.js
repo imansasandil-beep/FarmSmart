@@ -1,6 +1,12 @@
 const mongoose = require('mongoose');
 
 const UserSchema = new mongoose.Schema({
+  // Clerk user ID - links this MongoDB doc to the Clerk user
+  clerkId: {
+    type: String,
+    required: true,
+    unique: true,
+  },
   fullName: {
     type: String,
     required: true,
@@ -8,11 +14,7 @@ const UserSchema = new mongoose.Schema({
   email: {
     type: String,
     required: true,
-    unique: true, // No two users can have the same email
-  },
-  password: {
-    type: String,
-    required: true,
+    unique: true,
   },
   phone: {
     type: String,
@@ -20,7 +22,7 @@ const UserSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['farmer', 'buyer', 'expert'], // Only these values are allowed
+    enum: ['farmer', 'buyer', 'expert'],
     default: 'farmer',
   },
   // Seller verification
