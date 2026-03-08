@@ -85,6 +85,13 @@ export default function AgriSupHome() {
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   };
 
+  const getStats = () => {
+    const total = questions.length;
+    const answered = questions.filter(q => q.status === 'answered').length;
+    const open = total - answered;
+    return { total, answered, open };
+  };
+
   const renderQuestion = ({ item }) => (
     <TouchableOpacity
       style={styles.questionCard}
@@ -123,9 +130,12 @@ export default function AgriSupHome() {
     return (
       <View style={[styles.container, styles.center]}>
         <ActivityIndicator size="large" color="#6fdfc4" />
+        <Text style={{ color: '#8aa6a3', marginTop: 12, fontSize: 14 }}>Loading questions...</Text>
       </View>
     );
   }
+
+  const stats = getStats();
 
   return (
     <View style={styles.container}>
@@ -139,6 +149,22 @@ export default function AgriSupHome() {
           <Text style={styles.headerSub}>Community Q&A</Text>
         </View>
         <View style={{ width: 40 }} />
+      </View>
+
+      {/* Stats Banner */}
+      <View style={styles.statsRow}>
+        <View style={styles.statBox}>
+          <Text style={styles.statNum}>{stats.total}</Text>
+          <Text style={styles.statLabel}>Total</Text>
+        </View>
+        <View style={[styles.statBox, { borderLeftWidth: 1, borderRightWidth: 1, borderColor: '#2a5d55' }]}>
+          <Text style={[styles.statNum, { color: '#2ecc71' }]}>{stats.answered}</Text>
+          <Text style={styles.statLabel}>Answered</Text>
+        </View>
+        <View style={styles.statBox}>
+          <Text style={[styles.statNum, { color: '#e67e22' }]}>{stats.open}</Text>
+          <Text style={styles.statLabel}>Open</Text>
+        </View>
       </View>
 
       {/* Search Bar */}
@@ -185,12 +211,14 @@ export default function AgriSupHome() {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#6fdfc4" />}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <Ionicons name="help-circle-outline" size={64} color="#4a7a70" />
+            <View style={styles.emptyIconWrap}>
+              <Ionicons name="help-circle-outline" size={48} color="#6fdfc4" />
+            </View>
             <Text style={styles.emptyTitle}>No Questions Found</Text>
             <Text style={styles.emptyText}>
               {searchQuery || selectedCategory !== 'All'
                 ? 'Try adjusting your search or filter'
-                : 'Be the first to ask a question!'}
+                : 'Be the first to ask a question!\nTap the + button below to get started.'}
             </Text>
           </View>
         }
@@ -216,6 +244,13 @@ const styles = StyleSheet.create({
   backBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.08)', alignItems: 'center', justifyContent: 'center' },
   headerTitle: { fontSize: 22, fontWeight: 'bold', color: 'white', textAlign: 'center' },
   headerSub: { fontSize: 12, color: '#8aa6a3', textAlign: 'center' },
+  statsRow: {
+    flexDirection: 'row', backgroundColor: '#1a4d45', marginHorizontal: 16,
+    marginTop: 12, borderRadius: 12, borderWidth: 1, borderColor: '#2a5d55',
+  },
+  statBox: { flex: 1, alignItems: 'center', paddingVertical: 12 },
+  statNum: { fontSize: 20, fontWeight: 'bold', color: '#6fdfc4' },
+  statLabel: { fontSize: 11, color: '#8aa6a3', marginTop: 2 },
   searchContainer: { paddingHorizontal: 16, paddingTop: 12 },
   searchBar: {
     flexDirection: 'row', alignItems: 'center', backgroundColor: '#1a4d45',
@@ -249,9 +284,13 @@ const styles = StyleSheet.create({
   metaRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   metaText: { fontSize: 12, color: '#8aa6a3' },
   dateText: { fontSize: 11, color: '#4a7a70' },
-  emptyContainer: { alignItems: 'center', paddingTop: 80 },
+  emptyContainer: { alignItems: 'center', paddingTop: 60 },
+  emptyIconWrap: {
+    width: 80, height: 80, borderRadius: 40,
+    backgroundColor: 'rgba(111,223,196,0.1)', alignItems: 'center', justifyContent: 'center',
+  },
   emptyTitle: { fontSize: 18, fontWeight: 'bold', color: 'white', marginTop: 16 },
-  emptyText: { fontSize: 14, color: '#8aa6a3', marginTop: 8, textAlign: 'center' },
+  emptyText: { fontSize: 14, color: '#8aa6a3', marginTop: 8, textAlign: 'center', lineHeight: 20 },
   fab: {
     position: 'absolute', bottom: 30, right: 20, width: 56, height: 56,
     borderRadius: 28, backgroundColor: '#6fdfc4', alignItems: 'center',
