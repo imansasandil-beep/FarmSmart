@@ -254,7 +254,7 @@ export default function PostDetailScreen() {
         <View style={styles.commentInputRow}>
           <TextInput
             style={styles.commentInput}
-            placeholder="Write a comment..."
+            placeholder="Add your thoughts..."
             placeholderTextColor="#5a8a80"
             value={commentText}
             onChangeText={setCommentText}
