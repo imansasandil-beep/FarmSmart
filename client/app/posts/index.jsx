@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
   actionText: { color: '#8aa6a3', fontSize: 13, fontWeight: '500' },
   emptyState: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingTop: 100 },
   emptyTitle: { color: '#8aa6a3', fontSize: 18, fontWeight: '600', marginTop: 14 },
-  emptySubtitle: { color: '#5a8a80', fontSize: 13, marginTop: 6, textAlign: 'center' },
+  emptySubtitle: { color: '#5a8a80', fontSize: 13, marginTop: 6, textAlign: 'center', paddingHorizontal: 40 },
   fab: {
     position: 'absolute', bottom: 24, right: 20, width: 56, height: 56,
     borderRadius: 28, backgroundColor: '#6fdfc4', alignItems: 'center',
