@@ -1,83 +1,67 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityIndicator } from 'react-native';
-import { Ionicons } from '@expo/vector-icons'; // Built-in icons in Expo
+import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { API_BASE_URL } from '../config';
+import { useSignIn, useAuth } from '@clerk/expo';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
+  const { signIn, errors, fetchStatus } = useSignIn();
+  const { isSignedIn } = useAuth();
 
-  // 1. Add Loading State
-  const [loading, setLoading] = useState(false);
+  // If already signed in, redirect (in useEffect to avoid render-time state update)
+  useEffect(() => {
+    if (isSignedIn) {
+      router.replace('/home');
+    }
+  }, [isSignedIn]);
 
-  // 2. The Login Function
+  if (isSignedIn) return null;
+
+  // ---- SIGN-IN HANDLER (Clerk v3 API) ----
   const handleLogin = async () => {
-    // Basic Validation
     const trimmedEmail = email.trim();
     if (!trimmedEmail || !password) {
       Alert.alert("Error", "Please enter both email and password");
       return;
     }
 
-    // Email format validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(trimmedEmail)) {
-      Alert.alert("Error", "Please enter a valid email address");
-      return;
-    }
-
-    setLoading(true);
-
     try {
-      // Send Data to Backend
-      const response = await axios.post(`${API_BASE_URL}/api/user/login`, {
-        email: trimmedEmail,
-        password: password
+      // Step 1: Sign in with email and password
+      const { error } = await signIn.password({
+        emailAddress: trimmedEmail,
+        password: password,
       });
 
-      // Success! Save user data to AsyncStorage
-      if (response.data.user) {
-        try {
-          await AsyncStorage.setItem('user', JSON.stringify(response.data.user));
-        } catch (storageError) {
-          console.error('Error saving user data:', storageError);
-          // Still navigate even if storage fails, but log the error
-        }
-      } else {
-        Alert.alert("Error", "Login successful but user data not received");
-        setLoading(false);
+      if (error) {
+        console.error('SignIn error:', JSON.stringify(error, null, 2));
+        Alert.alert("Login Failed", error.message || "Something went wrong.");
         return;
       }
 
-      setLoading(false);
-      // Navigate to Home
-      router.replace('/home');
-
-    } catch (error) {
-      setLoading(false);
-
-      if (error.response) {
-        // Server error (e.g., "Invalid credentials")
-        Alert.alert("Login Failed", error.response.data.message);
-      } else if (error.request) {
-        // Network error
-        Alert.alert("Network Error", "Could not connect to server. Check your IP.");
+      // Step 2: Check status and finalize
+      if (signIn.status === 'complete') {
+        await signIn.finalize({
+          navigate: ({ session }) => {
+            router.replace('/home');
+          },
+        });
       } else {
-        Alert.alert("Error", "Something went wrong.");
+        console.log('Sign-in status:', signIn.status);
+        Alert.alert("Info", "Sign-in status: " + signIn.status);
       }
+    } catch (error) {
+      const msg = error?.errors?.[0]?.message || error?.message || "Something went wrong.";
+      Alert.alert("Login Failed", msg);
     }
   };
 
   return (
-    // Replaces the cloud background image. 
-    // Once you have the image file, use: source={require('../../assets/clouds.png')}
     <View style={styles.container}>
 
-      {/* Top Right Logo Placeholder */}
+      {/* Top Right Logo */}
       <View style={styles.logoContainer}>
         <Ionicons name="leaf" size={32} color="white" />
       </View>
@@ -97,8 +81,14 @@ export default function LoginScreen() {
             placeholderTextColor="#ddd"
             value={email}
             onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
           />
         </View>
+
+        {errors?.fields?.identifier && (
+          <Text style={styles.errorText}>{errors.fields.identifier.message}</Text>
+        )}
 
         {/* Password Input */}
         <View style={styles.inputContainer}>
@@ -115,14 +105,18 @@ export default function LoginScreen() {
           />
         </View>
 
+        {errors?.fields?.password && (
+          <Text style={styles.errorText}>{errors.fields.password.message}</Text>
+        )}
+
         {/* Login Button */}
         <TouchableOpacity
-          style={styles.loginButton}
-          onPress={handleLogin}   // <--- Connects the click
-          disabled={loading}      // <--- Stops double-clicks
+          style={[styles.loginButton, fetchStatus === 'fetching' && { opacity: 0.6 }]}
+          onPress={handleLogin}
+          disabled={fetchStatus === 'fetching'}
         >
-          {loading ? (
-            <ActivityIndicator color="white" /> // <--- Shows spinner
+          {fetchStatus === 'fetching' ? (
+            <ActivityIndicator color="white" />
           ) : (
             <Text style={styles.loginButtonText}>Log in</Text>
           )}
@@ -159,7 +153,7 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0a1f1c', // Deep Dark Green background (matches prototype)
+    backgroundColor: '#0a1f1c',
     paddingHorizontal: 20,
     justifyContent: 'center',
   },
@@ -186,13 +180,13 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 18,
-    color: '#8aa6a3', // Muted bluish-green text
+    color: '#8aa6a3',
     marginBottom: 40,
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(111, 223, 196, 0.3)', // Semi-transparent Mint Green
+    backgroundColor: 'rgba(111, 223, 196, 0.3)',
     borderRadius: 10,
     marginBottom: 20,
     height: 55,
@@ -201,7 +195,7 @@ const styles = StyleSheet.create({
   iconBox: {
     width: 50,
     height: '100%',
-    backgroundColor: '#357a6e', // Darker shade for icon box
+    backgroundColor: '#357a6e',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -212,13 +206,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   loginButton: {
-    backgroundColor: '#0f4c3a', // Dark Green Button
+    backgroundColor: '#0f4c3a',
     paddingVertical: 15,
     borderRadius: 25,
     alignItems: 'center',
     marginTop: 10,
     borderWidth: 1,
-    borderColor: '#6fdfc4', // Thin mint border
+    borderColor: '#6fdfc4',
   },
   loginButtonText: {
     color: 'white',
@@ -226,7 +220,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   forgotText: {
-    color: '#00bfff', // Bright blue
+    color: '#00bfff',
     textAlign: 'center',
     marginTop: 15,
   },
@@ -245,7 +239,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
   socialText: {
-    color: '#00e5ff', // Cyan color
+    color: '#00e5ff',
     textAlign: 'center',
     marginBottom: 15,
   },
@@ -269,5 +263,11 @@ const styles = StyleSheet.create({
     color: '#00e5ff',
     fontWeight: 'bold',
   },
+  errorText: {
+    color: '#ff6b6b',
+    fontSize: 12,
+    marginTop: -15,
+    marginBottom: 10,
+    marginLeft: 10,
+  },
 });
-
