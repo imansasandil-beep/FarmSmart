@@ -12,6 +12,7 @@ import { API_BASE_URL } from '../../config';
 export default function PostFeedScreen() {
   const router = useRouter();
   const { getToken } = useAuth();
+  const [deletingId, setDeletingId] = useState(null);
   const { user } = useUser();
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
