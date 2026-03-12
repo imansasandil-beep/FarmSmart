@@ -25,9 +25,12 @@ function AuthGate({ children }) {
       segments[0] === 'register' ||
       segments[0] === 'success';
 
+    // Allow signed-in users to access onboarding without being redirected to /home
+    const onOnboardingScreen = segments[0] === 'onboarding';
+
     if (isSignedIn && onAuthScreen) {
       router.replace('/home');
-    } else if (!isSignedIn && !onAuthScreen) {
+    } else if (!isSignedIn && !onAuthScreen && !onOnboardingScreen) {
       router.replace('/');
     }
   }, [isSignedIn, isLoaded, segments]);
@@ -44,6 +47,7 @@ export default function RootLayout() {
           <Stack.Screen name="index" />
           <Stack.Screen name="register" />
           <Stack.Screen name="success" />
+          <Stack.Screen name="onboarding" />
           <Stack.Screen name="home" />
           <Stack.Screen name="tasks" />
           <Stack.Screen name="marketplace" />

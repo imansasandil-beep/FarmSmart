@@ -42,25 +42,11 @@ export default function HomeScreen() {
               setUserName(response.data.user.fullName);
             }
           } catch (profileError) {
-            // Profile might not exist yet (first login after registration)
-            // Try to sync it
+            // Profile might not exist yet (first OAuth login)
             if (profileError.response && profileError.response.status === 404 && clerkUser) {
-              try {
-                const syncResponse = await axios.post(`${API_BASE_URL}/api/user/sync-profile`, {
-                  fullName: clerkUser.firstName + (clerkUser.lastName ? ' ' + clerkUser.lastName : ''),
-                  email: clerkUser.emailAddresses[0]?.emailAddress || '',
-                  phone: clerkUser.phoneNumbers[0]?.phoneNumber || '',
-                  role: 'farmer', // Default role
-                }, {
-                  headers: { Authorization: `Bearer ${token}` },
-                });
-                if (syncResponse.data.user) {
-                  await AsyncStorage.setItem('user', JSON.stringify(syncResponse.data.user));
-                  setUserName(syncResponse.data.user.fullName);
-                }
-              } catch (syncError) {
-                console.log('Profile sync failed:', syncError.message);
-              }
+              console.log('No backend profile found, redirecting to onboarding...');
+              router.replace('/onboarding');
+              return; // Stop execution
             }
           }
         }
