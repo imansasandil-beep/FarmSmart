@@ -5,23 +5,69 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useAuth, useUser } from '@clerk/expo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import { API_BASE_URL } from '../config';
 
 const { width } = Dimensions.get('window');
 
 export default function HomeScreen() {
   const router = useRouter();
+  const { signOut, getToken } = useAuth();
+  const { user: clerkUser } = useUser();
   const [userName, setUserName] = useState('');
   const [loading, setLoading] = useState(true);
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
-    const getUser = async () => {
+    const loadProfile = async () => {
       try {
+        // First check if we have a cached profile in AsyncStorage
         const storedUser = await AsyncStorage.getItem('user');
         if (storedUser) {
           const user = JSON.parse(storedUser);
           setUserName(user.fullName);
+        }
+
+        // Try to fetch/sync profile from backend
+        const token = await getToken();
+        if (token) {
+          try {
+            const response = await axios.get(`${API_BASE_URL}/api/user/profile`, {
+              headers: { Authorization: `Bearer ${token}` },
+            });
+            if (response.data.user) {
+              await AsyncStorage.setItem('user', JSON.stringify(response.data.user));
+              setUserName(response.data.user.fullName);
+            }
+          } catch (profileError) {
+            // Profile might not exist yet (first login after registration)
+            // Try to sync it
+            if (profileError.response && profileError.response.status === 404 && clerkUser) {
+              try {
+                const syncResponse = await axios.post(`${API_BASE_URL}/api/user/sync-profile`, {
+                  fullName: clerkUser.firstName + (clerkUser.lastName ? ' ' + clerkUser.lastName : ''),
+                  email: clerkUser.emailAddresses[0]?.emailAddress || '',
+                  phone: clerkUser.phoneNumbers[0]?.phoneNumber || '',
+                  role: 'farmer', // Default role
+                }, {
+                  headers: { Authorization: `Bearer ${token}` },
+                });
+                if (syncResponse.data.user) {
+                  await AsyncStorage.setItem('user', JSON.stringify(syncResponse.data.user));
+                  setUserName(syncResponse.data.user.fullName);
+                }
+              } catch (syncError) {
+                console.log('Profile sync failed:', syncError.message);
+              }
+            }
+          }
+        }
+
+        // Fallback: use Clerk user name if we still don't have a name
+        if (!userName && clerkUser) {
+          setUserName(clerkUser.firstName || clerkUser.emailAddresses[0]?.emailAddress || 'User');
         }
       } catch (error) {
         console.log("Error loading user", error);
@@ -29,7 +75,7 @@ export default function HomeScreen() {
         setLoading(false);
       }
     };
-    getUser();
+    loadProfile();
 
     // Update time every minute
     const timer = setInterval(() => setCurrentTime(new Date()), 60000);
@@ -140,7 +186,8 @@ export default function HomeScreen() {
           style: 'destructive',
           onPress: async () => {
             await AsyncStorage.removeItem('user');
-            router.replace('/');
+            await signOut();
+            // AuthGate in _layout.jsx will redirect to login
           },
         },
       ]
