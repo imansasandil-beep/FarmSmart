@@ -1,6 +1,5 @@
 {
   "recommendations": [
-    "expo.vscode-expo-tools",
     "github.copilot",
     "github.copilot-chat"
   ]
