@@ -54,6 +54,7 @@ export default function RootLayout() {
           <Stack.Screen name="cropspecific" />
           <Stack.Screen name="weatherForecast" />
           <Stack.Screen name="agrisup" />
+          <Stack.Screen name="posts" />
         </Stack>
       </AuthGate>
     </ClerkProvider>
