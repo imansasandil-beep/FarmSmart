@@ -17,13 +17,21 @@ router.post('/sync-profile', requireClerkAuth, async (req, res) => {
       return res.status(400).json({ message: 'fullName and email are required' });
     }
 
-    // Check if user profile already exists
-    let user = await User.findOne({ clerkId });
+    // Check if user profile already exists by clerkId OR email (for older accounts)
+    let user = await User.findOne({
+      $or: [{ clerkId }, { email: email.trim().toLowerCase() }]
+    });
 
     if (user) {
+      // If found by email but clerkId is missing/different, link them
+      if (user.clerkId !== clerkId) {
+        user.clerkId = clerkId;
+        await user.save();
+      }
+
       // User already exists, return their profile
       return res.status(200).json({
-        message: 'Profile already exists',
+        message: 'Profile already exists/linked',
         user: user.toObject(),
       });
     }
