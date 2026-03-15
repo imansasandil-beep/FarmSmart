@@ -2,8 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { useSignIn, useAuth } from '@clerk/expo';
+import { useSignIn, useAuth, useOAuth } from '@clerk/expo';
+import * as WebBrowser from 'expo-web-browser';
+import * as Linking from 'expo-linking';
 
+// Ensure WebBrowser is warmed up for OAuth flow on some platforms
+WebBrowser.maybeCompleteAuthSession();
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -11,6 +15,8 @@ export default function LoginScreen() {
   const { signIn, errors, fetchStatus } = useSignIn();
   const { isSignedIn } = useAuth();
 
+  // Setup Google OAuth
+  const { startOAuthFlow } = useOAuth({ strategy: 'oauth_google' });
   // If already signed in, redirect (in useEffect to avoid render-time state update)
   useEffect(() => {
     if (isSignedIn) {
@@ -55,6 +61,25 @@ export default function LoginScreen() {
     } catch (error) {
       const msg = error?.errors?.[0]?.message || error?.message || "Something went wrong.";
       Alert.alert("Login Failed", msg);
+    }
+  };
+
+  // ---- GOOGLE OAUTH HANDLER ----
+  const handleGoogleLogin = async () => {
+    try {
+      const { createdSessionId, signIn, signUp, setActive } = await startOAuthFlow({
+        redirectUrl: Linking.createURL('/home', { scheme: 'myapp' }),
+      });
+
+      if (createdSessionId) {
+        setActive({ session: createdSessionId });
+        router.replace('/home');
+      } else {
+        // Use signIn or signUp for next steps such as MFA
+      }
+    } catch (err) {
+      console.error('OAuth error', err);
+      Alert.alert("Google Login Failed", err.message || "Could not authenticate with Google");
     }
   };
 
@@ -134,9 +159,9 @@ export default function LoginScreen() {
 
         {/* Social Icons */}
         <View style={styles.socialIconsContainer}>
-          <Ionicons name="logo-apple" size={30} color="white" style={styles.socialIcon} />
-          <Ionicons name="logo-facebook" size={30} color="white" style={styles.socialIcon} />
-          <Ionicons name="logo-google" size={30} color="white" style={styles.socialIcon} />
+          <TouchableOpacity onPress={handleGoogleLogin}>
+            <Ionicons name="logo-google" size={30} color="white" style={styles.socialIcon} />
+          </TouchableOpacity>
         </View>
 
         <View style={styles.footer}>
