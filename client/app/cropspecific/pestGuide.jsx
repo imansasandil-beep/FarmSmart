@@ -18,10 +18,10 @@ export default function PestGuideScreen() {
                     <TouchableOpacity onPress={() => router.back()}>
                         <Ionicons name="arrow-back" size={28} color="white" />
                     </TouchableOpacity>
-                    <Text style={styles.headerTitle}>Pest & Disease Guide</Text>
+                    <Text style={styles.headerTitle}>පළිබෝධ සහ රෝග මාර්ගෝපදේශය</Text>
                     <View style={{ width: 28 }} />
                 </View>
-                <Text style={styles.noDataText}>Pest & disease guide not available.</Text>
+                <Text style={styles.noDataText}>පළිබෝධ සහ රෝග මාර්ගෝපදේශය නොමැත.</Text>
             </View>
         );
     }
@@ -32,66 +32,66 @@ export default function PestGuideScreen() {
                 <TouchableOpacity onPress={() => router.back()}>
                     <Ionicons name="arrow-back" size={28} color="white" />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>{crop.emoji} Pest & Disease Guide</Text>
+                <Text style={styles.headerTitle}>{crop.emoji} පළිබෝධ සහ රෝග මාර්ගෝපදේශය</Text>
                 <View style={{ width: 28 }} />
             </View>
 
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
                 {/* Summary Card */}
                 <View style={styles.summaryCard}>
-                    <Text style={styles.summaryTitle}>{crop.name} Protection Guide</Text>
+                    <Text style={styles.summaryTitle}>{crop.name} ආරක්ෂණ මාර්ගෝපදේශය</Text>
                     <View style={styles.summaryStats}>
                         <View style={styles.statItem}>
                             <Text style={styles.statNum}>{pestData.pests.length}</Text>
-                            <Text style={styles.statLabel}>Pests</Text>
+                            <Text style={styles.statLabel}>පළිබෝධ</Text>
                         </View>
                         <View style={styles.statDivider} />
                         <View style={styles.statItem}>
                             <Text style={styles.statNum}>{pestData.diseases.length}</Text>
-                            <Text style={styles.statLabel}>Diseases</Text>
+                            <Text style={styles.statLabel}>රෝග</Text>
                         </View>
                         <View style={styles.statDivider} />
                         <View style={styles.statItem}>
                             <Text style={styles.statNum}>{pestData.prevention.length}</Text>
-                            <Text style={styles.statLabel}>Tips</Text>
+                            <Text style={styles.statLabel}>උපදෙස්</Text>
                         </View>
                     </View>
                 </View>
 
                 {/* IPM Approach */}
                 <View style={styles.ipmCard}>
-                    <Text style={styles.ipmTitle}>🧪 Integrated Pest Management (IPM)</Text>
-                    <Text style={styles.ipmText}>Follow this priority order:</Text>
+                    <Text style={styles.ipmTitle}>🧪 ඒකාබද්ධ පළිබෝධ කළමනාකරණය (IPM)</Text>
+                    <Text style={styles.ipmText}>මෙම ප්‍රමුඛතා අනුපිළිවෙල අනුගමනය කරන්න:</Text>
                     <View style={styles.ipmSteps}>
-                        <Text style={styles.ipmStep}><Text style={styles.ipmNum}>1.</Text> Cultural Practices (prevention)</Text>
-                        <Text style={styles.ipmStep}><Text style={styles.ipmNum}>2.</Text> Biological Control (natural enemies)</Text>
-                        <Text style={styles.ipmStep}><Text style={styles.ipmNum}>3.</Text> Botanical (neem, garlic extracts)</Text>
-                        <Text style={styles.ipmStep}><Text style={styles.ipmNum}>4.</Text> Chemical (last resort, DOA recommended)</Text>
+                        <Text style={styles.ipmStep}><Text style={styles.ipmNum}>1.</Text> කෘෂි විද්‍යාත්මක පිළිවෙත් (වළක්වා ගැනීම)</Text>
+                        <Text style={styles.ipmStep}><Text style={styles.ipmNum}>2.</Text> ජීව විද්‍යාත්මක පාලනය (ස්වාභාවික සතුරන්)</Text>
+                        <Text style={styles.ipmStep}><Text style={styles.ipmNum}>3.</Text> ශාකසාර (කොහොඹ, සුදුළූණු නිස්සාරණය)</Text>
+                        <Text style={styles.ipmStep}><Text style={styles.ipmNum}>4.</Text> රසායනික (අවසන් විකල්පය, කෘෂිකර්ම දෙපාර්තමේන්තුවේ නිර්දේශිත)</Text>
                     </View>
                 </View>
 
                 {/* Pests Section */}
-                <Text style={styles.sectionTitle}>🐛 Pest Threats</Text>
+                <Text style={styles.sectionTitle}>🐛 පළිබෝධ තර්ජන</Text>
                 {pestData.pests.map((pest, i) => (
                     <View key={i} style={styles.threatCard}>
                         <View style={styles.threatHeader}>
                             <View style={[styles.threatBadge, { backgroundColor: '#e74c3c30' }]}>
-                                <Text style={styles.threatBadgeText}>PEST</Text>
+                                <Text style={styles.threatBadgeText}>පළිබෝධ</Text>
                             </View>
                             <Text style={styles.threatName}>{pest.name}</Text>
                         </View>
                         <Text style={styles.sinhalaText}>{pest.sinhalaName}</Text>
 
                         <View style={styles.detailBlock}>
-                            <Text style={styles.detailLabel}>🔍 Symptoms</Text>
+                            <Text style={styles.detailLabel}>🔍 රෝග ලක්ෂණ</Text>
                             <Text style={styles.detailText}>{pest.symptoms}</Text>
                         </View>
                         <View style={styles.detailBlock}>
-                            <Text style={styles.detailLabel}>🎯 Affected Parts</Text>
+                            <Text style={styles.detailLabel}>🎯 බලපෑමට ලක්වන කොටස්</Text>
                             <Text style={styles.detailText}>{pest.affectedParts}</Text>
                         </View>
                         <View style={styles.detailBlock}>
-                            <Text style={styles.detailLabel}>🛡️ Control Measures</Text>
+                            <Text style={styles.detailLabel}>🛡️ පාලන පියවර</Text>
                             {pest.control.map((c, j) => (
                                 <View key={j} style={styles.controlRow}>
                                     <View style={[styles.controlDot, { backgroundColor: j === pest.control.length - 1 ? '#e67e22' : '#2ecc71' }]} />
@@ -103,31 +103,31 @@ export default function PestGuideScreen() {
                 ))}
 
                 {/* Diseases Section */}
-                <Text style={styles.sectionTitle}>🦠 Disease Threats</Text>
+                <Text style={styles.sectionTitle}>🦠 රෝග තර්ජන</Text>
                 {pestData.diseases.map((disease, i) => (
                     <View key={i} style={styles.threatCard}>
                         <View style={styles.threatHeader}>
                             <View style={[styles.threatBadge, { backgroundColor: '#9b59b630' }]}>
-                                <Text style={[styles.threatBadgeText, { color: '#9b59b6' }]}>DISEASE</Text>
+                                <Text style={[styles.threatBadgeText, { color: '#9b59b6' }]}>රෝගය</Text>
                             </View>
                             <Text style={styles.threatName}>{disease.name}</Text>
                         </View>
                         <Text style={styles.sinhalaText}>{disease.sinhalaName}</Text>
 
                         <View style={styles.detailBlock}>
-                            <Text style={styles.detailLabel}>🧬 Cause</Text>
+                            <Text style={styles.detailLabel}>🧬 හේතුව</Text>
                             <Text style={styles.detailText}>{disease.cause}</Text>
                         </View>
                         <View style={styles.detailBlock}>
-                            <Text style={styles.detailLabel}>🔍 Symptoms</Text>
+                            <Text style={styles.detailLabel}>🔍 රෝග ලක්ෂණ</Text>
                             <Text style={styles.detailText}>{disease.symptoms}</Text>
                         </View>
                         <View style={styles.detailBlock}>
-                            <Text style={styles.detailLabel}>🌡️ Favorable Conditions</Text>
+                            <Text style={styles.detailLabel}>🌡️ හිතකර තත්වයන්</Text>
                             <Text style={styles.detailText}>{disease.conditions}</Text>
                         </View>
                         <View style={styles.detailBlock}>
-                            <Text style={styles.detailLabel}>🛡️ Control Measures</Text>
+                            <Text style={styles.detailLabel}>🛡️ පාලන පියවර</Text>
                             {disease.control.map((c, j) => (
                                 <View key={j} style={styles.controlRow}>
                                     <View style={[styles.controlDot, { backgroundColor: j === disease.control.length - 1 ? '#e67e22' : '#2ecc71' }]} />
@@ -140,8 +140,8 @@ export default function PestGuideScreen() {
 
                 {/* Prevention Tips */}
                 <View style={styles.preventionSection}>
-                    <Text style={styles.sectionTitle}>✅ Prevention Best Practices</Text>
-                    <Text style={styles.preventionSubtext}>Follow these practices to minimize pest and disease pressure:</Text>
+                    <Text style={styles.sectionTitle}>✅ වළක්වා ගැනීමේ හොඳම පිළිවෙත්</Text>
+                    <Text style={styles.preventionSubtext}>පළිබෝධ සහ රෝග පීඩනය අවම කිරීම සඳහා මෙම පිළිවෙත් අනුගමනය කරන්න:</Text>
                     {pestData.prevention.map((tip, i) => (
                         <View key={i} style={styles.preventionRow}>
                             <View style={styles.preventionNum}>
@@ -156,7 +156,7 @@ export default function PestGuideScreen() {
                 <View style={styles.disclaimer}>
                     <Ionicons name="information-circle" size={18} color="#6a9a90" />
                     <Text style={styles.disclaimerText}>
-                        Always consult your local DOA extension officer before applying any chemical pesticide. Follow safety precautions on product labels.
+                        ඕනෑම රසායනික කෘමිනාශකයක් යෙදීමට පෙර සෑම විටම ඔබේ ප්‍රාදේශීය කෘෂිකර්ම උපදේශකගෙන් උපදෙස් ලබාගන්න. නිෂ්පාදන ලේබලවල ඇති ආරක්ෂිත පූර්වාරක්ෂාවන් අනුගමනය කරන්න.
                     </Text>
                 </View>
             </ScrollView>
