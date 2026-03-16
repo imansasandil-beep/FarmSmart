@@ -2,28 +2,7 @@ const router = require('express').Router();
 const Order = require('../models/Order');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
-/**
- * Payment Routes
- * Handles Stripe payment integration for the marketplace.
- *
- * CURRENT MODE: Test mode (all payments go to platform account)
- * 
- * To switch to REAL MONEY MODE (Stripe Connect):
- *   1. Uncomment the Stripe Connect create-intent route below
- *   2. Comment out the test mode create-intent route
- *   3. Add STRIPE_CONNECT_CLIENT_ID to your .env file
- *
- * Flow:
- * 1. Client requests a payment intent
- * 2. Stripe returns a client secret
- * 3. Client confirms payment using Stripe SDK
- * 4. Webhook confirms payment and we update the order
- */
 
-// ============================================
-// STRIPE CHECKOUT SESSION (works in Expo Go)
-// Opens a Stripe-hosted payment page in the browser
-// ============================================
 
 // POST /api/payments/create-checkout-session
 router.post('/create-checkout-session', async (req, res) => {
@@ -71,8 +50,7 @@ router.post('/create-checkout-session', async (req, res) => {
     }
 });
 
-// NOTE: checkout-success and checkout-cancel routes are defined in server.js
-// (before Clerk middleware) so the browser can access them without auth
+
 
 // GET /api/payments/check-status/:orderId - Client polls this after browser closes
 router.get('/check-status/:orderId', async (req, res) => {
