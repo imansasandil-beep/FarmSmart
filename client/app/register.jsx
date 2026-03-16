@@ -6,14 +6,22 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { useSignUp, useAuth } from '@clerk/expo';
+import { useSignUp, useAuth, useOAuth } from '@clerk/expo';
+import * as WebBrowser from 'expo-web-browser';
+import * as Linking from 'expo-linking';
 import axios from 'axios';
+
+// Ensure WebBrowser is warmed up for OAuth flow on some platforms
+WebBrowser.maybeCompleteAuthSession();
 import { API_BASE_URL } from '../config';
 
 export default function RegisterScreen() {
   const router = useRouter();
   const { signUp, errors, fetchStatus } = useSignUp();
   const { isSignedIn } = useAuth();
+  
+  // Setup Google OAuth
+  const { startOAuthFlow } = useOAuth({ strategy: 'oauth_google' });
 
   // STATE variables
   const [name, setName] = useState('');
@@ -73,6 +81,25 @@ export default function RegisterScreen() {
       console.error('Register error:', JSON.stringify(error, null, 2));
       const msg = error?.errors?.[0]?.message || error?.message || "Something went wrong.";
       Alert.alert("Error", msg);
+    }
+  };
+
+  // ---- GOOGLE OAUTH HANDLER ----
+  const handleGoogleLogin = async () => {
+    try {
+      const { createdSessionId, signIn, signUp, setActive } = await startOAuthFlow({
+        redirectUrl: Linking.createURL('/home', { scheme: 'myapp' }),
+      });
+
+      if (createdSessionId) {
+        setActive({ session: createdSessionId });
+        router.replace('/home');
+      } else {
+        // Use signIn or signUp for next steps such as MFA
+      }
+    } catch (err) {
+      console.error('OAuth error', err);
+      Alert.alert("Google Login Failed", err.message || "Could not authenticate with Google");
     }
   };
 
@@ -374,6 +401,19 @@ export default function RegisterScreen() {
             </TouchableOpacity>
           </View>
 
+          <View style={styles.dividerContainer}>
+            <View style={styles.line} />
+            <Text style={styles.orText}>or sign up with</Text>
+            <View style={styles.line} />
+          </View>
+
+          {/* Google Icon */}
+          <View style={styles.socialIconsContainer}>
+            <TouchableOpacity onPress={handleGoogleLogin}>
+              <Ionicons name="logo-google" size={30} color="white" style={styles.socialIcon} />
+            </TouchableOpacity>
+          </View>
+
           {/* Required for Clerk's bot protection */}
           <View nativeID="clerk-captcha" />
         </View>
@@ -501,5 +541,28 @@ const styles = StyleSheet.create({
     marginTop: -10,
     marginBottom: 10,
     marginLeft: 10,
+  },
+  dividerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 15,
+  },
+  line: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#2a5d55',
+  },
+  orText: {
+    color: '#8aa6a3',
+    marginHorizontal: 10,
+  },
+  socialIconsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: 20,
+    gap: 20,
+  },
+  socialIcon: {
+    marginHorizontal: 10,
   },
 });
