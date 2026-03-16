@@ -21,37 +21,72 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
  */
 
 // ============================================
-// TEST MODE - Payment goes to platform account
+// STRIPE CHECKOUT SESSION (works in Expo Go)
+// Opens a Stripe-hosted payment page in the browser
 // ============================================
 
-// POST /api/payments/create-intent - Create a Stripe payment intent (TEST MODE)
-router.post('/create-intent', async (req, res) => {
+// POST /api/payments/create-checkout-session
+router.post('/create-checkout-session', async (req, res) => {
     try {
-        const { orderId, amount } = req.body;
+        const { orderId, amount, productName } = req.body;
 
         if (!orderId || !amount) {
             return res.status(400).json({ message: 'Order ID and amount are required' });
         }
 
-        // Create Stripe payment intent - money goes to YOUR platform account
-        const paymentIntent = await stripe.paymentIntents.create({
-            amount: Math.round(amount * 100), // Stripe uses cents
-            currency: 'lkr', // Sri Lankan Rupees
+        // Build the base URL for success/cancel redirects
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+
+        // Create a Stripe Checkout Session (hosted payment page)
+        const session = await stripe.checkout.sessions.create({
+            payment_method_types: ['card'],
+            line_items: [{
+                price_data: {
+                    currency: 'lkr',
+                    product_data: {
+                        name: productName || 'FarmSmart Order',
+                    },
+                    unit_amount: Math.round(amount * 100), // Stripe uses cents
+                },
+                quantity: 1,
+            }],
+            mode: 'payment',
+            success_url: `${baseUrl}/api/payments/checkout-success?orderId=${orderId}&session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${baseUrl}/api/payments/checkout-cancel?orderId=${orderId}`,
             metadata: { orderId },
         });
 
-        // Save the payment intent ID to the order
+        // Save the session ID to the order
         await Order.findByIdAndUpdate(orderId, {
-            stripePaymentIntentId: paymentIntent.id,
+            stripePaymentIntentId: session.id,
         });
 
         res.status(200).json({
-            clientSecret: paymentIntent.client_secret,
-            paymentIntentId: paymentIntent.id,
+            checkoutUrl: session.url,
+            sessionId: session.id,
         });
     } catch (error) {
-        console.error('Payment intent error:', error);
-        res.status(500).json({ message: 'Failed to create payment intent' });
+        console.error('Checkout session error:', error.message || error);
+        res.status(500).json({ message: error.message || 'Failed to create checkout session' });
+    }
+});
+
+// NOTE: checkout-success and checkout-cancel routes are defined in server.js
+// (before Clerk middleware) so the browser can access them without auth
+
+// GET /api/payments/check-status/:orderId - Client polls this after browser closes
+router.get('/check-status/:orderId', async (req, res) => {
+    try {
+        const order = await Order.findById(req.params.orderId);
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+        res.status(200).json({
+            paymentStatus: order.paymentStatus,
+            status: order.status,
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Failed to check payment status' });
     }
 });
 

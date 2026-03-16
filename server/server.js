@@ -22,6 +22,32 @@ const app = express();
 // Stripe webhook needs raw body
 app.use('/api/payments/webhook', express.raw({ type: 'application/json' }));
 
+// Stripe checkout browser redirects (no auth needed, must be before Clerk middleware)
+app.get('/api/payments/checkout-success', async (req, res) => {
+    try {
+        const { orderId } = req.query;
+        if (orderId) {
+            const Order = require('./models/Order');
+            await Order.findByIdAndUpdate(orderId, { paymentStatus: 'paid', status: 'confirmed' });
+        }
+        res.send(`
+            <html><head><meta name="viewport" content="width=device-width, initial-scale=1">
+            <style>body{font-family:-apple-system,sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh;margin:0;background:#0a1f1c;color:white}.c{text-align:center;padding:40px}.i{font-size:64px;margin-bottom:20px}h1{color:#6fdfc4}p{color:rgba(255,255,255,0.7);font-size:16px}</style>
+            </head><body><div class="c"><div class="i">✅</div><h1>Payment Successful!</h1><p>Your order has been confirmed.</p><p>You can close this window and return to the FarmSmart app.</p></div></body></html>
+        `);
+    } catch (error) {
+        res.status(500).send('Error processing payment');
+    }
+});
+
+app.get('/api/payments/checkout-cancel', (req, res) => {
+    res.send(`
+        <html><head><meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>body{font-family:-apple-system,sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh;margin:0;background:#0a1f1c;color:white}.c{text-align:center;padding:40px}.i{font-size:64px;margin-bottom:20px}h1{color:#ff6b6b}p{color:rgba(255,255,255,0.7);font-size:16px}</style>
+        </head><body><div class="c"><div class="i">❌</div><h1>Payment Cancelled</h1><p>You can close this window and return to the app.</p></div></body></html>
+    `);
+});
+
 // Middleware
 app.use(express.json()); // Allows us to parse JSON data
 app.use(cors()); // Allows frontend to communicate with backend

@@ -15,7 +15,7 @@ import {
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useStripe } from '@stripe/stripe-react-native';
+import * as WebBrowser from 'expo-web-browser';
 import { API_BASE_URL } from '../../config';
 
 // Platform takes a 2% commission on each sale
@@ -30,9 +30,6 @@ export default function CheckoutScreen() {
     const router = useRouter();
     const params = useLocalSearchParams();
     const { listingId, title, price, availableQuantity, unit, imageUrl, location } = params;
-
-    // Stripe hooks - handles the payment sheet UI
-    const { initPaymentSheet, presentPaymentSheet } = useStripe();
 
     // Form state
     const [loading, setLoading] = useState(false);
@@ -188,73 +185,63 @@ export default function CheckoutScreen() {
 
             const orderId = orderData.order._id;
 
-            // Step 3: Create payment intent on our backend
-            const response = await fetch(`${API_BASE_URL}/api/payments/create-intent`, {
+            // Step 3: Create a Stripe Checkout Session on our backend
+            const response = await fetch(`${API_BASE_URL}/api/payments/create-checkout-session`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     orderId,
                     amount: total,
+                    productName: title,
                 }),
             });
 
             const data = await response.json();
+            console.log('Checkout session response:', JSON.stringify(data));
             if (!response.ok) {
-                Alert.alert('Error', data.message || 'Failed to create payment');
+                Alert.alert('Error', data.message || 'Failed to create payment session');
                 return;
             }
 
-            // Step 2: Initialize the Stripe PaymentSheet
-            const { error: initError } = await initPaymentSheet({
-                paymentIntentClientSecret: data.clientSecret,
-                merchantDisplayName: 'FarmSmart',
-                returnURL: 'farmsmart://stripe-redirect',
-                defaultBillingDetails: {
-                    name: user.fullName,
-                },
-            });
-
-            if (initError) {
-                Alert.alert('Error', initError.message);
+            if (!data.checkoutUrl) {
+                Alert.alert('Error', 'No checkout URL received from server');
                 return;
             }
 
-            // Step 3: Present the PaymentSheet to the user
-            const { error: paymentError } = await presentPaymentSheet();
+            console.log('Opening Stripe checkout:', data.checkoutUrl);
 
-            if (paymentError) {
-                // User just cancelled - don't show error
-                if (paymentError.code === 'Canceled') return;
-                Alert.alert('Payment Failed', paymentError.message);
-                return;
+            // Step 4: Open Stripe's hosted checkout page in the browser
+            // This works in Expo Go — no native SDK needed!
+            const result = await WebBrowser.openBrowserAsync(data.checkoutUrl);
+
+            // Step 5: After browser closes, check if payment went through
+            const checkRes = await fetch(`${API_BASE_URL}/api/payments/check-status/${orderId}`);
+            const checkData = await checkRes.json();
+
+            if (checkData.paymentStatus === 'paid') {
+                Alert.alert(
+                    'Payment Successful! 🎉',
+                    `Your order for ${quantity} ${unit} of ${title} has been placed.\n\nTotal: Rs. ${total}`,
+                    [
+                        {
+                            text: 'View Orders',
+                            onPress: () => router.replace('/marketplace/orders'),
+                        },
+                    ]
+                );
+            } else {
+                Alert.alert(
+                    'Payment Pending',
+                    'Your payment may still be processing. Check your orders for the latest status.',
+                    [
+                        { text: 'View Orders', onPress: () => router.replace('/marketplace/orders') },
+                        { text: 'OK' },
+                    ]
+                );
             }
-
-            // Step 4: Payment successful - confirm with our backend
-            try {
-                await fetch(`${API_BASE_URL}/api/payments/confirm`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ orderId }),
-                });
-            } catch (confirmError) {
-                // Even if confirm fails here, the webhook will handle it
-                console.log('Could not confirm payment, webhook will process:', confirmError);
-            }
-
-            // Show success
-            Alert.alert(
-                'Payment Successful! 🎉',
-                `Your order for ${quantity} ${unit} of ${title} has been placed.\n\nTotal: Rs. ${total}`,
-                [
-                    {
-                        text: 'View Orders',
-                        onPress: () => router.replace('/marketplace/orders'),
-                    },
-                ]
-            );
         } catch (error) {
             console.error('Checkout error:', error);
-            Alert.alert('Error', 'Could not process payment. Please try again.');
+            Alert.alert('Error', error.message || 'Could not process payment. Please try again.');
         } finally {
             setLoading(false);
         }
