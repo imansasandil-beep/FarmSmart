@@ -105,4 +105,34 @@ router.post('/request-verification', requireClerkAuth, async (req, res) => {
   }
 });
 
+// ============================================
+// UPDATE PROFILE - Update the authenticated user's profile
+// ============================================
+router.put('/update-profile', requireClerkAuth, async (req, res) => {
+  try {
+    const clerkId = req.clerkUserId;
+    const { fullName, phone, role } = req.body;
+
+    const user = await User.findOne({ clerkId });
+    if (!user) {
+      return res.status(404).json({ message: 'User profile not found' });
+    }
+
+    // Update allowed fields
+    if (fullName) user.fullName = fullName.trim();
+    if (phone !== undefined) user.phone = phone;
+    if (role && ['farmer', 'buyer', 'expert'].includes(role)) user.role = role;
+
+    await user.save();
+
+    res.status(200).json({
+      message: 'Profile updated successfully',
+      user: user.toObject(),
+    });
+  } catch (err) {
+    console.error('Update profile error:', err);
+    res.status(500).json({ message: err.message });
+  }
+});
+
 module.exports = router;
