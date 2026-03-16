@@ -25,6 +25,28 @@ const UserSchema = new mongoose.Schema({
     enum: ['farmer', 'buyer', 'expert'],
     default: 'farmer',
   },
+  // Farm details
+  district: {
+    type: String,
+    default: '',
+  },
+  farmLocation: {
+    type: String,
+    default: '',
+  },
+  farmSize: {
+    type: Number,
+    default: 0,
+  },
+  primaryCrops: {
+    type: [String],
+    default: [],
+  },
+  farmingZone: {
+    type: String,
+    enum: ['', 'Wet Zone', 'Dry Zone', 'Intermediate Zone'],
+    default: '',
+  },
   // Seller verification
   isVerified: {
     type: Boolean,
