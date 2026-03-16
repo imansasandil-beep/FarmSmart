@@ -135,4 +135,35 @@ router.put('/update-profile', requireClerkAuth, async (req, res) => {
   }
 });
 
+// ============================================
+// UPDATE FARM DETAILS - Update the user's farm information
+// ============================================
+router.put('/update-farm-details', requireClerkAuth, async (req, res) => {
+  try {
+    const clerkId = req.clerkUserId;
+    const { district, farmLocation, farmSize, primaryCrops, farmingZone } = req.body;
+
+    const user = await User.findOne({ clerkId });
+    if (!user) {
+      return res.status(404).json({ message: 'User profile not found' });
+    }
+
+    if (district !== undefined) user.district = district;
+    if (farmLocation !== undefined) user.farmLocation = farmLocation;
+    if (farmSize !== undefined) user.farmSize = Number(farmSize) || 0;
+    if (primaryCrops !== undefined) user.primaryCrops = primaryCrops;
+    if (farmingZone !== undefined) user.farmingZone = farmingZone;
+
+    await user.save();
+
+    res.status(200).json({
+      message: 'Farm details updated successfully',
+      user: user.toObject(),
+    });
+  } catch (err) {
+    console.error('Update farm details error:', err);
+    res.status(500).json({ message: err.message });
+  }
+});
+
 module.exports = router;
