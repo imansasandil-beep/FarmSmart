@@ -5,7 +5,14 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 /**
  * Payment Routes
  * Handles Stripe payment integration for the marketplace.
+ *
+ * CURRENT MODE: Test mode (all payments go to platform account)
  * 
+ * To switch to REAL MONEY MODE (Stripe Connect):
+ *   1. Uncomment the Stripe Connect create-intent route below
+ *   2. Comment out the test mode create-intent route
+ *   3. Add STRIPE_CONNECT_CLIENT_ID to your .env file
+ *
  * Flow:
  * 1. Client requests a payment intent
  * 2. Stripe returns a client secret
@@ -13,7 +20,11 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
  * 4. Webhook confirms payment and we update the order
  */
 
-// POST /api/payments/create-intent - Create a Stripe payment intent
+// ============================================
+// TEST MODE - Payment goes to platform account
+// ============================================
+
+// POST /api/payments/create-intent - Create a Stripe payment intent (TEST MODE)
 router.post('/create-intent', async (req, res) => {
     try {
         const { orderId, amount } = req.body;
@@ -22,7 +33,7 @@ router.post('/create-intent', async (req, res) => {
             return res.status(400).json({ message: 'Order ID and amount are required' });
         }
 
-        // Create Stripe payment intent
+        // Create Stripe payment intent - money goes to YOUR platform account
         const paymentIntent = await stripe.paymentIntents.create({
             amount: Math.round(amount * 100), // Stripe uses cents
             currency: 'lkr', // Sri Lankan Rupees

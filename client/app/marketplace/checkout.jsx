@@ -15,6 +15,7 @@ import {
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useStripe } from '@stripe/stripe-react-native';
 import { API_BASE_URL } from '../../config';
 
 // Platform takes a 2% commission on each sale
@@ -24,21 +25,14 @@ const PLATFORM_FEE_PERCENT = 2;
  * Checkout Screen
  * Shows order summary, calculates delivery fees,
  * and handles payment through Stripe's PaymentSheet.
- * NOTE: Stripe payments require a development build (not Expo Go)
  */
 export default function CheckoutScreen() {
     const router = useRouter();
     const params = useLocalSearchParams();
     const { listingId, title, price, availableQuantity, unit, imageUrl, location } = params;
 
-    // Stripe stubs - Stripe native SDK requires a development build
-    const initPaymentSheet = async (opts) => {
-        Alert.alert('Stripe Not Available', 'Stripe payments require a development build (not Expo Go). Run: npx expo prebuild && npx expo run:android');
-        return { error: { message: 'Stripe not available in Expo Go' } };
-    };
-    const presentPaymentSheet = async () => {
-        return { error: { message: 'Stripe not available in Expo Go' } };
-    };
+    // Stripe hooks - handles the payment sheet UI
+    const { initPaymentSheet, presentPaymentSheet } = useStripe();
 
     // Form state
     const [loading, setLoading] = useState(false);
