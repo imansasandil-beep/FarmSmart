@@ -90,8 +90,13 @@ export default function ProfileScreen() {
   };
 
   const handleSaveProfile = async () => {
+    Keyboard.dismiss();
     if (!editName.trim()) {
       Alert.alert('Error', 'Name is required');
+      return;
+    }
+    if (editPhone && editPhone.length > 0 && editPhone.length < 9) {
+      Alert.alert('Error', 'Please enter a valid phone number');
       return;
     }
     setSaving(true);
