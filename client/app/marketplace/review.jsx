@@ -24,6 +24,8 @@ export default function ReviewScreen() {
     const [submitting, setSubmitting] = useState(false);
     const [loading, setLoading] = useState(true);
     const [canReview, setCanReview] = useState(false);
+    const [sellerId, setSellerId] = useState(null);
+    const [listingId, setListingId] = useState(null);
 
     useEffect(() => {
         const checkEligibility = async () => {
@@ -32,6 +34,14 @@ export default function ReviewScreen() {
                 if (!userStr) {
                     router.replace('/');
                     return;
+                }
+
+                // Fetch the order to get sellerId and listingId
+                const orderRes = await fetch(`${API_BASE_URL}/api/orders/${orderId}`);
+                if (orderRes.ok) {
+                    const orderData = await orderRes.json();
+                    setSellerId(orderData.sellerId?._id || orderData.sellerId);
+                    setListingId(orderData.listingId?._id || orderData.listingId);
                 }
 
                 const response = await fetch(`${API_BASE_URL}/api/reviews/can-review/${orderId}`);
@@ -82,6 +92,8 @@ export default function ReviewScreen() {
                 body: JSON.stringify({
                     orderId,
                     reviewerId: user._id,
+                    sellerId,
+                    listingId,
                     rating,
                     comment: comment.trim(),
                 }),
