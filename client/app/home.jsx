@@ -96,7 +96,6 @@ export default function HomeScreen() {
       icon: 'leaf',
       iconColor: '#2ecc71',
       route: 'cropcalender',
-      badge: 'NEW',
     },
     {
       title: 'Marketplace',
@@ -113,32 +112,11 @@ export default function HomeScreen() {
       route: 'recommendations',
     },
     {
-      title: 'Personal Insights',
-      subtitle: 'Track your farming progress',
-      icon: 'bar-chart',
-      iconColor: '#e67e22',
-      route: 'insights',
-    },
-    {
-      title: 'Chat Platform',
-      subtitle: 'Connect with farmers & experts',
-      icon: 'chatbubbles',
-      iconColor: '#1abc9c',
-      route: 'chat',
-    },
-    {
       title: 'Pest & Diseases',
       subtitle: 'Identify and treat crop issues',
       icon: 'bug',
       iconColor: '#e74c3c',
       route: 'pests-and-diseases',
-    },
-    {
-      title: 'Seller Contact',
-      subtitle: 'Find suppliers near you',
-      icon: 'call',
-      iconColor: '#2980b9',
-      route: 'seller',
     },
     {
       title: 'Weather Forecast',
@@ -153,7 +131,6 @@ export default function HomeScreen() {
       icon: 'help-circle',
       iconColor: '#e67e22',
       route: 'agrisup',
-      badge: 'NEW',
     },
     {
       title: 'Community Posts',
@@ -161,7 +138,6 @@ export default function HomeScreen() {
       icon: 'people',
       iconColor: '#e74c3c',
       route: 'posts',
-      badge: 'NEW',
     },
     {
       title: 'Profile',
