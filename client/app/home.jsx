@@ -156,6 +156,14 @@ export default function HomeScreen() {
       badge: 'NEW',
     },
     {
+      title: 'Community Posts',
+      subtitle: 'Share updates & connect with farmers',
+      icon: 'people',
+      iconColor: '#e74c3c',
+      route: 'posts',
+      badge: 'NEW',
+    },
+    {
       title: 'Profile',
       subtitle: 'Manage your account',
       icon: 'person-circle',
@@ -179,6 +187,8 @@ export default function HomeScreen() {
       router.push('/weatherForecast');
     } else if (item.route === 'agrisup') {
       router.push('/agrisup');
+    } else if (item.route === 'posts') {
+      router.push('/posts');
     } else {
       Alert.alert(item.title, 'This feature is coming soon!');
     }
