@@ -3,14 +3,13 @@ const mongoose = require('mongoose');
 // Notification schema - keeps users informed about order updates, reviews, etc.
 const NotificationSchema = new mongoose.Schema({
     userId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+        type: String,
         required: true,
         index: true,
     },
     type: {
         type: String,
-        enum: ['order', 'payment', 'delivery', 'review', 'message', 'new_message', 'system'],
+        enum: ['order', 'payment', 'delivery', 'review', 'message', 'new_message', 'agrisup', 'crop_calendar', 'system'],
         default: 'system',
     },
     title: {
