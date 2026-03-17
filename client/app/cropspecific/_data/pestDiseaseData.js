@@ -8,159 +8,159 @@
 export const PEST_DISEASE_DATA = {
     rice: {
         pests: [
-            { name: 'Brown Planthopper (BPH)', sinhalaName: 'දුඹුරු පැල මකුණා', symptoms: 'Yellowing and drying of plants ("hopper burn"). Honeydew secretion on leaves.', affectedParts: 'Stem base, tillers', control: ['Use resistant varieties (Bg 379, At 362)', 'Avoid excess nitrogen fertilizer', 'Encourage natural enemies (spiders, dragonflies)', 'Spray Buprofezin or Pymetrozine as last resort'] },
-            { name: 'Stem Borer', sinhalaName: 'කඳ මැදියා', symptoms: 'Dead hearts in vegetative stage. White heads (empty panicles) in reproductive stage.', affectedParts: 'Stem', control: ['Remove and destroy stubble after harvest', 'Light traps to attract and kill moths', 'Apply Chlorantraniliprole granules at 2 and 5 weeks', 'Release Trichogramma egg parasitoids'] },
-            { name: 'Rice Bug', sinhalaName: 'වී මලදුව', symptoms: 'Discolored, partially filled or empty grains. Foul odor in field.', affectedParts: 'Developing grains', control: ['Keep field and bunds weed-free', 'Harvest at proper maturity', 'Spray Malathion if severe'] },
+            { name: 'දුඹුරු පැල මකුණා (BPH)', sinhalaName: 'දුඹුරු පැල මකුණා', symptoms: 'ශාක කහ පැහැ වී වේලී යාම ("හොපර් බර්න්"). පත්‍ර මත පැණිරස ශ්‍රාවයක් නිකුත් වීම.', affectedParts: 'කඳේ පාදම, පඳුරු', control: ['ප්‍රතිරෝධී ප්‍රභේද භාවිතා කරන්න (Bg 379, At 362)', 'අතිරික්ත නයිට්‍රජන් පොහොර දීමෙන් වළකින්න', 'ස්වාභාවික සතුරන් දිරිමත් කරන්න (මකුළුවන්, බත්කූරන්)', 'අවසන් විකල්පය ලෙස බියුප්‍රොෆෙසින් හෝ පයිමෙට්‍රොසින් ඉසින්න'] },
+            { name: 'කඳ මැදියා', sinhalaName: 'කඳ මැදියා', symptoms: 'වර්ධක අවධියේදී මැරුණු ගොබ. ප්‍රජනක අවධියේදී සුදු කරල් (හිස් කරල්).', affectedParts: 'කඳ', control: ['අස්වැන්න නෙලීමෙන් පසු ඉපනැලි ඉවත් කර විනාශ කරන්න', 'සලබයන් ආකර්ෂණය කර විනාශ කිරීමට ආලෝක උගුල් භාවිතා කරන්න', 'සති 2 සහ 5 දී ක්ලෝරන්ත්‍රනිලිප්‍රෝල් කැට යොදන්න', 'ට්‍රයිකොග්‍රැමා බිත්තර පරපෝෂිතයන් මුදා හරින්න'] },
+            { name: 'වී මලදුව', sinhalaName: 'වී මලදුව', symptoms: 'වර්ණ විපර්යාස වූ, අර්ධ වශයෙන් පිරුණු හෝ හිස් ධාන්‍ය. කුඹුරේ දුගඳක් ඇති වීම.', affectedParts: 'වර්ධනය වන ධාන්‍ය', control: ['කුඹුර සහ නියරවල් වල් පැලෑටි වලින් තොරව තබා ගන්න', 'නිසි මේරීමේදී අස්වැන්න නෙළන්න', 'දරුණු නම් මැලතියන් ඉසින්න'] },
         ],
         diseases: [
-            { name: 'Blast Disease', sinhalaName: 'බ්ලාස්ට් රෝගය', cause: 'Fungus (Magnaporthe oryzae)', symptoms: 'Diamond-shaped spots on leaves. Neck rot causes panicle breakage.', conditions: 'Cool nights, high humidity, excess N fertilizer', control: ['Use resistant varieties', 'Avoid excess nitrogen', 'Spray Tricyclazole or Isoprothiolane preventively', 'Ensure proper spacing for air circulation'] },
-            { name: 'Bacterial Leaf Blight', sinhalaName: 'බැක්ටීරියා පත්‍ර පිළිස්සීම', cause: 'Xanthomonas oryzae', symptoms: 'Wavy yellow-white lesions from leaf tips. Leaves dry up.', conditions: 'Warm humid weather, wounds from storms', control: ['Use certified clean seed', 'Avoid excess nitrogen', 'Apply copper-based bactericides', 'Drain and dry fields if severe'] },
-            { name: 'Sheath Blight', sinhalaName: 'කොපු දිලීර රෝගය', cause: 'Rhizoctonia solani', symptoms: 'Irregularly shaped gray-green lesions on leaf sheaths.', conditions: 'Dense planting, excess nitrogen, high humidity', control: ['Reduce planting density', 'Balance nitrogen application', 'Spray Hexaconazole or Propiconazole'] },
+            { name: 'බ්ලාස්ට් රෝගය', sinhalaName: 'බ්ලාස්ට් රෝගය', cause: 'දිලීර (Magnaporthe oryzae)', symptoms: 'පත්‍ර මත දියමන්ති හැඩයේ ලප. ගෙල කුණුවීම නිසා කරල් කැඩී යාම.', conditions: 'සිසිල් රාත්‍රී, ඉහළ ආර්ද්‍රතාවය, අතිරික්ත නයිට්‍රජන් පොහොර', control: ['ප්‍රතිරෝධී ප්‍රභේද භාවිතා කරන්න', 'අතිරික්ත නයිට්‍රජන් වළකින්න', 'කල්තියා ට්‍රයිසයික්ලසෝල් හෝ අයිසොප්‍රොතියෝලේන් ඉසින්න', 'වාතය සංසරණය සඳහා නිසි පරතරය සහතික කරන්න'] },
+            { name: 'බැක්ටීරියා පත්‍ර පිළිස්සීම', sinhalaName: 'බැක්ටීරියා පත්‍ර පිළිස්සීම', cause: 'Xanthomonas oryzae', symptoms: 'පත්‍ර අග සිට රැලි සහිත කහ-සුදු ලප. පත්‍ර වියළී යයි.', conditions: 'උණුසුම් තෙතමනය සහිත කාලගුණය, කුණාටු වලින් සිදුවන තුවාල', control: ['සහතික කළ පිරිසිදු බීජ භාවිතා කරන්න', 'අතිරික්ත නයිට්‍රජන් වළකින්න', 'තඹ අඩංගු බැක්ටීරියා නාශක යොදන්න', 'රෝගය දරුණු නම් කුඹුරු ජලය ඉවත් කර වියළන්න'] },
+            { name: 'කොපු දිලීර රෝගය', sinhalaName: 'කොපු දිලීර රෝගය', cause: 'Rhizoctonia solani', symptoms: 'පත්‍ර කොපු මත අක්‍රමවත් හැඩයේ අළු-කොළ ලප.', conditions: 'ඝන සිටුවීම, අතිරික්ත නයිට්‍රජන්, ඉහළ ආර්ද්‍රතාවය', control: ['සිටුවීමේ ඝනත්වය අඩු කරන්න', 'නයිට්‍රජන් භාවිතය තුලනය කරන්න', 'හෙක්සකොනසෝල් හෝ ප්‍රොපිකොනසෝල් ඉසින්න'] },
         ],
-        prevention: ['Use certified seed from DOA', 'Maintain recommended spacing', 'Balance NPK fertilizer application', 'Practice crop rotation where possible', 'Clean cultivation - remove stubble and weeds'],
+        prevention: ['කෘෂිකර්ම දෙපාර්තමේන්තුවේ සහතික කළ බීජ භාවිතා කරන්න', 'නිර්දේශිත පරතරය පවත්වා ගන්න', 'NPK පොහොර යෙදීම තුලනය කරන්න', 'හැකි සෑම විටම බෝග මාරුව සිදු කරන්න', 'පිරිසිදු වගාව - ඉපනැලි සහ වල් පැලෑටි ඉවත් කරන්න'],
     },
     tea: {
         pests: [
-            { name: 'Tea Tortrix', sinhalaName: 'තේ ටෝට්‍රික්ස්', symptoms: 'Leaves rolled and webbed together. Caterpillars feed inside rolled leaves.', affectedParts: 'Young leaves, buds', control: ['Maintain good plucking practices', 'Biological control with parasitoid wasps', 'Apply Bacillus thuringiensis (Bt) spray', 'Light traps for adult moths'] },
-            { name: 'Shot Hole Borer', sinhalaName: 'සිදුරු කරන මැදියා', symptoms: 'Small round holes in stems. Sawdust-like frass near holes. Branch dieback.', affectedParts: 'Stems, branches', control: ['Prune and destroy affected branches', 'Apply Chlorpyrifos to holes', 'Maintain bush vigor through proper fertilization'] },
+            { name: 'තේ ටෝට්‍රික්ස්', sinhalaName: 'තේ ටෝට්‍රික්ස්', symptoms: 'පත්‍ර එකට ගුලි වී දැල් බැඳීම. දළඹුවන් ගුලි වූ පත්‍ර තුළ ආහාරයට ගැනීම.', affectedParts: 'ළපටි පත්‍ර, දළු', control: ['හොඳ දළු නෙළීමේ පිළිවෙත් පවත්වා ගන්න', 'පරපෝෂිත බඹරුන් සමඟ ජීව විද්‍යාත්මක පාලනය', 'Bt (Bacillus thuringiensis) ඉසින්න', 'වැඩිහිටි සලබයන් සඳහා ආලෝක උගුල්'] },
+            { name: 'සිදුරු කරන මැදියා (Shot Hole Borer)', sinhalaName: 'සිදුරු කරන මැදියා', symptoms: 'කඳන්වල කුඩා රවුම් සිදුරු. සිදුරු අසල ලී කුඩු වැනි අපද්‍රව්‍ය. අතු වියළී යාම.', affectedParts: 'කඳන්, අතු', control: ['රෝගී අතු කපා විනාශ කරන්න', 'සිදුරු වලට ක්ලෝරපයිරිෆොස් යොදන්න', 'නිසි පොහොර යෙදීමෙන් පඳුරුවල ශක්තිය පවත්වා ගන්න'] },
         ],
         diseases: [
-            { name: 'Blister Blight', sinhalaName: 'බිබිලි රෝගය', cause: 'Fungus (Exobasidium vexans)', symptoms: 'Translucent pale spots on young leaves that develop into white blisters.', conditions: 'Cool wet weather, misty conditions at high elevations', control: ['Spray Copper Hydroxide preventively', 'Pluck regularly to remove infected leaves', 'Ensure proper bush spacing for air flow'] },
-            { name: 'Root Disease', sinhalaName: 'මූල රෝගය', cause: 'Various fungi (Poria, Fomes)', symptoms: 'Gradual yellowing and death of bush. White fungal growth on roots.', conditions: 'Poor drainage, old tea lands', control: ['Remove and destroy affected bushes and roots', 'Treat soil with Trichoderma', 'Improve drainage', 'Do not replant in infected spots for 2 years'] },
+            { name: 'බිබිලි රෝගය (Blister Blight)', sinhalaName: 'බිබිලි රෝගය', cause: 'දිලීර (Exobasidium vexans)', symptoms: 'ළපටි පත්‍ර මත පාරභාසක ළා පැහැති ලප සුදු බිබිලි බවට පත් වේ.', conditions: 'සිසිල් තෙත කාලගුණය, ඉහළ උන්නතාංශවල මීදුම් තත්ත්වයන්', control: ['කල්තියා කොපර් හයිඩ්‍රොක්සයිඩ් ඉසින්න', 'ආසාදිත පත්‍ර ඉවත් කිරීමට නිතිපතා දළු නෙළන්න', 'වාතය ගලා යාමට නිසි පඳුරු පරතරයක් සහතික කරන්න'] },
+            { name: 'මූල රෝගය (Root Disease)', sinhalaName: 'මූල රෝගය', cause: 'විවිධ දිලීර (Poria, Fomes)', symptoms: 'ක්‍රමයෙන් කහ වී පඳුර මැරී යාම. මුල් මත සුදු දිලීර වර්ධනය.', conditions: 'දුර්වල ජලවහනය, පැරණි තේ ඉඩම්', control: ['ආසාදිත පඳුරු සහ මුල් ඉවත් කර විනාශ කරන්න', 'පසට ට්‍රයිකොඩර්මා යොදන්න', 'ජලවහනය වැඩි දියුණු කරන්න', 'ආසාදිත ස්ථානවල වසර 2ක් ගතවන තුරු නැවත සිටුවන්න එපා'] },
         ],
-        prevention: ['Regular plucking removes susceptible young tissue', 'Maintain shade trees for microclimate', 'Proper drainage to prevent root diseases', 'Balanced nutrition for bush vigor'],
+        prevention: ['නිතිපතා දළු නෙළීම මගින් රෝගයට ගොදුරු වන ළපටි පටක ඉවත් කරයි', 'ක්ෂුද්‍ර දේශගුණය සඳහා සෙවන ගස් පවත්වා ගන්න', 'මුල් රෝග වළක්වා ගැනීමට නිසි ජලවහනය', 'පඳුරුවල ශක්තිය සඳහා සමබර පෝෂණය'],
     },
     coconut: {
         pests: [
-            { name: 'Rhinoceros Beetle', sinhalaName: 'ගේන්දගොයි කුරුමිණියා', symptoms: 'V-shaped cuts on young leaves. Bore holes in crown. Reduced frond production.', affectedParts: 'Crown, growing point', control: ['Remove and destroy decaying coconut logs (breeding sites)', 'Apply Metarhizium anisopliae biological agent to compost heaps', 'Pheromone traps', 'Hook out beetles from bore holes'] },
-            { name: 'Coconut Mite', sinhalaName: 'පොල් මයිටා', symptoms: 'Triangular brown scars on nut surface. Reduced nut size and copra quality.', affectedParts: 'Developing nuts', control: ['Spray Sulphur (wettable) on bunches', 'Release predatory mites', 'Remove heavily infested bunches'] },
-            { name: 'Red Weevil', sinhalaName: 'රතු කුරුමිණියා', symptoms: 'Crown wilting, fermented smell from trunk. Eventually palm death.', affectedParts: 'Trunk, crown', control: ['Prevent wounds on trunk', 'Pheromone traps', 'Inject Chlorpyrifos into trunk if early detection', 'Remove and destroy dead palms'] },
+            { name: 'ගේන්දගොයි කුරුමිණියා', sinhalaName: 'ගේන්දගොයි කුරුමිණියා', symptoms: 'ළපටි පත්‍රවල V හැඩයේ කැපුම්. ගොබයේ සිදුරු. අතු හටගැනීම අඩුවීම.', affectedParts: 'ගොබය, වර්ධන අග්‍රය', control: ['දිරාපත් වන පොල් කොට ඉවත් කර විනාශ කරන්න (බෝවන ස්ථාන)', 'කොම්පෝස්ට් ගොඩවල්වලට මෙටාරයිසීනියම් ඇනිසොප්ලියේ (Metarhizium) ජීව විද්‍යාත්මක කාරකය යොදන්න', 'ෆෙරමෝන් උගුල්', 'සිදුරුවලින් කුරුමිණියන් ඉවතට ගන්න'] },
+            { name: 'පොල් මයිටා', sinhalaName: 'පොල් මයිටා', symptoms: 'ගෙඩි මතුපිට ත්‍රිකෝණාකාර දුඹුරු කැළැල්. ගෙඩි වල ප්‍රමාණය සහ කොප්පරා ගුණාත්මකභාවය අඩුවීම.', affectedParts: 'වර්ධනය වන ගෙඩි', control: ['පොකුරු මත සල්ෆර් (තෙත් කළ හැකි) ඉසින්න', 'විලෝපික මයිටාවන් මුදා හරින්න', 'දැඩි ලෙස ආසාදිත පොකුරු ඉවත් කරන්න'] },
+            { name: 'රතු කුරුමිණියා', sinhalaName: 'රතු කුරුමිණියා', symptoms: 'ගොබය මැලවීම, කඳෙන් පැසුණු සුවඳක් වහනය වීම. අවසානයේ තල් ගස මිය යාම.', affectedParts: 'කඳ, ගොබය', control: ['කඳේ තුවාල වීම වළක්වන්න', 'ෆෙරමෝන් උගුල්', 'කල්තියා හඳුනාගත්තේ නම් කඳට ක්ලෝරපයිරිෆොස් එන්නත් කරන්න', 'මැරුණු ගස් ඉවත් කර විනාශ කරන්න'] },
         ],
         diseases: [
-            { name: 'Leaf Blight', sinhalaName: 'පත්‍ර පිළිස්සීම', cause: 'Pestalotiopsis palmarum', symptoms: 'Gray leaf spots with dark margins. Progressive drying of leaflets.', conditions: 'Nutritional deficiency, drought stress', control: ['Improve palm nutrition with balanced fertilizer', 'Apply Mancozeb spray', 'Remove severely affected leaves'] },
+            { name: 'පත්‍ර පිළිස්සීම', sinhalaName: 'පත්‍ර පිළිස්සීම', cause: 'Pestalotiopsis palmarum', symptoms: 'අඳුරු මායිම් සහිත අළු පැහැති පත්‍ර ලප. පත්‍රිකා ක්‍රමයෙන් වියළී යාම.', conditions: 'පෝෂණ ඌනතාවය, නියඟ ආතතිය', control: ['සමබර පොහොර සමඟ ගසේ පෝෂණය වැඩි දියුණු කරන්න', 'මැන්කොසෙබ් ඉසින්න', 'දැඩි ලෙස බලපෑමට ලක්වූ පත්‍ර ඉවත් කරන්න'] },
         ],
-        prevention: ['Maintain palm nutrition with CRI-recommended fertilizer', 'Remove dead palms and decaying logs', 'Regular inspection of crown area', 'Keep palm base clean and mulched'],
+        prevention: ['CRI-නිර්දේශිත පොහොර සමඟ ගසේ පෝෂණය පවත්වා ගන්න', 'මැරුණු ගස් සහ දිරාපත් වන කොට ඉවත් කරන්න', 'ගොබය ප්‍රදේශය නිතිපතා පරීක්ෂා කරන්න', 'ගස වටා පිරිසිදුව හා වසුන් යොදා තබා ගන්න'],
     },
     chili: {
         pests: [
-            { name: 'Thrips', sinhalaName: 'තුරිප්ස්', symptoms: 'Leaf curl and upward rolling. Silver streaks on leaves. Stunted growth.', affectedParts: 'Leaves, flowers', control: ['Use yellow and blue sticky traps', 'Spray Neem seed extract (5%)', 'Apply Thiamethoxam seed treatment', 'Use windbreaks (maize/finger millet border rows)'] },
-            { name: 'Mites', sinhalaName: 'මයිටා', symptoms: 'Downward curling of leaves (distinguishes from thrips). Thickened, leathery leaves.', affectedParts: 'Leaves', control: ['Spray water at high pressure', 'Apply Sulphur 80 WP', 'Remove and destroy heavily infested plants'] },
-            { name: 'Fruit Borer', sinhalaName: 'ගෙඩි මැදියා', symptoms: 'Holes in fruits with frass inside. Premature fruit drop.', affectedParts: 'Fruits', control: ['Collect and destroy fallen infected fruits', 'Pheromone traps for adult moths', 'Spray Chlorantraniliprole at fruit set'] },
+            { name: 'තුරිප්ස්', sinhalaName: 'තුරිප්ස්', symptoms: 'පත්‍ර කැරලි ගැසීම සහ ඉහළට පෙරළීම. පත්‍ර මත රිදී පැහැති ඉරි. වර්ධනය බාල වීම.', affectedParts: 'පත්‍ර, මල්', control: ['කහ සහ නිල් ඇලෙන සුළු උගුල් භාවිතා කරන්න', 'කොහොඹ ඇට නිස්සාරණය (5%) ඉසින්න', 'තයමෙතොක්සෑම් බීජ ප්‍රතිකාරය යොදන්න', 'සුළං බාධක භාවිතා කරන්න (බඩඉරිඟු/කුරක්කන් මායිම් පේළි)'] },
+            { name: 'මයිටා', sinhalaName: 'මයිටා', symptoms: 'පත්‍ර පහළට පෙරළීම (තුරිප්ස් වලින් වෙනස් වේ). ඝන වූ, සම් වැනි පත්‍ර.', affectedParts: 'පත්‍ර', control: ['අධික පීඩනයෙන් ජලය ඉසින්න', 'සල්ෆර් 80 WP යොදන්න', 'දැඩි ලෙස ආසාදිත ශාක ඉවත් කර විනාශ කරන්න'] },
+            { name: 'ගෙඩි මැදියා', sinhalaName: 'ගෙඩි මැදියා', symptoms: 'ඇතුළත අපද්‍රව්‍ය සහිත ගෙඩි වල සිදුරු. නොමේරූ ගෙඩි වැටීම.', affectedParts: 'ගෙඩි', control: ['වැටුණු ආසාදිත ගෙඩි එකතු කර විනාශ කරන්න', 'වැඩිහිටි සලබයන් සඳහා ෆෙරමෝන් උගුල්', 'ගෙඩි හටගන්නා විට ක්ලෝරන්ත්‍රනිලිප්‍රෝල් ඉසින්න'] },
         ],
         diseases: [
-            { name: 'Leaf Curl Complex (LCC)', sinhalaName: 'පත්‍ර රෝල් සංකීර්ණය', cause: 'Combined effect of thrips, mites and begomovirus (transmitted by whitefly)', symptoms: 'Severe upward curling, yellowing, and stunting. Drastically reduced yield.', conditions: 'Hot dry weather, Yala season, excessive monoculture', control: ['Use tolerant varieties (KA-2, Varaniya)', 'Treat seeds with Thiamethoxam/Imidacloprid', 'Plant nursery in March, transplant early April', 'Use mulching and windbreaks'] },
-            { name: 'Anthracnose (Die-back)', sinhalaName: 'ඇන්ත්‍රක්නෝස්', cause: 'Colletotrichum spp.', symptoms: 'Dark sunken spots on fruits. Branch tips die back. Premature fruit drop.', conditions: 'Warm humid conditions, rain during fruiting', control: ['Use disease-free seeds', 'Spray Mancozeb + Carbendazim preventively', 'Remove infected plant parts', 'Improve air circulation'] },
+            { name: 'පත්‍ර රෝල් සංකීර්ණය', sinhalaName: 'පත්‍ර රෝල් සංකීර්ණය', cause: 'තුරිප්ස්, මයිටාවන් සහ බෙගොමොවයිරස් (සුදු මැස්සන් මගින් සම්ප්‍රේෂණය වන) එකතුව', symptoms: 'දැඩි ලෙස ඉහළට කැරලි ගැසීම, කහ වීම සහ වර්ධනය බාල වීම. අස්වැන්න දැඩි ලෙස අඩුවීම.', conditions: 'උණුසුම් වියළි කාලගුණය, යල කන්නය, අධික තනි බෝග වගාව', control: ['ඔරොත්තු දෙන ප්‍රභේද භාවිතා කරන්න (KA-2, වරණීය)', 'තයමෙතොක්සෑම්/ඉමිඩක්ලෝප්‍රිඩ් සමඟ බීජ ප්‍රතිකාර කරන්න', 'මාර්තු මාසයේ තවාන් දමා අප්‍රේල් මස මුලදී සිටුවන්න', 'වසුන් සහ සුළං බාධක භාවිතා කරන්න'] },
+            { name: 'ඇන්ත්‍රක්නෝස් (Die-back)', sinhalaName: 'ඇන්ත්‍රක්නෝස්', cause: 'Colletotrichum spp.', symptoms: 'ගෙඩි මත අඳුරු ගිලුණු ලප. අතු අග මැරී යාම. නොමේරූ ගෙඩි වැටීම.', conditions: 'උණුසුම් තෙතමන තත්වයන්, පල දරන විට වර්ෂාව', control: ['රෝග-මුක්ත බීජ භාවිතා කරන්න', 'කල්තියා මැන්කොසෙබ් + කාබන්ඩසිම් ඉසින්න', 'ආසාදිත ශාක කොටස් ඉවත් කරන්න', 'වාතය සංසරණය වැඩි දියුණු කරන්න'] },
         ],
-        prevention: ['Crop rotation (avoid Solanaceae for 2-3 seasons)', 'Use disease-free certified seed', 'Maintain proper spacing (60×45cm)', 'Mulch with straw or white polythene', 'Install windbreaks around field'],
+        prevention: ['බෝග මාරුව (කන්න 2-3ක් සඳහා සොලනේසියේ බෝග වලින් වළකින්න)', 'රෝග-මුක්ත සහතික කළ බීජ භාවිතා කරන්න', 'නිසි පරතරය පවත්වා ගන්න (60×45cm)', 'පිදුරු හෝ සුදු පොලිතීන් වලින් වසුන් යොදන්න', 'කුඹුර වටා සුළං බාධක සවි කරන්න'],
     },
     cinnamon: {
         pests: [
-            { name: 'Cinnamon Butterfly', sinhalaName: 'කුරුඳු සමනලයා', symptoms: 'larvae feed on young leaves and shoot tips, causing defoliation.', affectedParts: 'Young leaves, shoots', control: ['Hand-pick larvae and egg masses', 'Encourage natural predators (birds, parasitoid wasps)', 'Spray Bt (Bacillus thuringiensis) for severe infestations'] },
+            { name: 'කුරුඳු සමනලයා', sinhalaName: 'කුරුඳු සමනලයා', symptoms: 'දළඹුවන් ළපටි පත්‍ර සහ රිකිලි අග ආහාරයට ගනිමින් පත්‍ර විනාශ කරයි.', affectedParts: 'ළපටි පත්‍ර, රිකිලි', control: ['දළඹුවන් සහ බිත්තර ගොනු අතින් අහුලා ගන්න', 'ස්වාභාවික විලෝපිකයන් දිරිමත් කරන්න (කුරුල්ලන්, පරපෝෂිත බඹරුන්)', 'දැඩි ආසාදන සඳහා Bt ඉසින්න'] },
         ],
         diseases: [
-            { name: 'Rough Bark Disease', sinhalaName: 'රළු පොතු රෝගය', cause: 'Phytophthora cinnamomi', symptoms: 'Bark becomes rough, cracked. Reduced bark quality for peeling. Cankers on stem.', conditions: 'Waterlogged soils, poor drainage', control: ['Ensure good drainage', 'Remove and burn affected stems', 'Apply copper-based fungicides', 'Avoid over-watering'] },
-            { name: 'Leaf Spot', sinhalaName: 'පත්‍ර ලප රෝගය', cause: 'Colletotrichum spp.', symptoms: 'Brown spots on leaves, premature leaf drop.', conditions: 'High humidity, dense planting', control: ['Maintain proper spacing', 'Spray Mancozeb preventively', 'Remove fallen infected leaves'] },
+            { name: 'රළු පොතු රෝගය', sinhalaName: 'රළු පොතු රෝගය', cause: 'Phytophthora cinnamomi', symptoms: 'පොත්ත රළු, ඉරිතලා යයි. ගැලවීම සඳහා පොත්තේ තත්ත්වය අඩුවේ. කඳේ පිළිකා.', conditions: 'ජලයෙන් යටවූ පස්, දුර්වල ජලවහනය', control: ['හොඳ ජලවහනයක් සහතික කරන්න', 'ආසාදිත කඳන් ඉවත් කර පුළුස්සා දමන්න', 'තඹ අඩංගු දිලීර නාශක යොදන්න', 'අධික ලෙස ජලය දැමීමෙන් වළකින්න'] },
+            { name: 'පත්‍ර ලප රෝගය', sinhalaName: 'පත්‍ර ලප රෝගය', cause: 'Colletotrichum spp.', symptoms: 'පත්‍ර මත දුඹුරු ලප, නොමේරූ පත්‍ර වැටීම.', conditions: 'ඉහළ ආර්ද්‍රතාවය, ඝන සිටුවීම', control: ['නිසි පරතරය පවත්වා ගන්න', 'කල්තියා මැන්කොසෙබ් ඉසින්න', 'වැටුණු ආසාදිත පත්‍ර ඉවත් කරන්න'] },
         ],
-        prevention: ['Maintain proper spacing for air circulation', 'Ensure good soil drainage', 'Apply balanced fertilizer for plant vigor', 'Regular inspection and removal of infected parts'],
+        prevention: ['වාතය සංසරණය සඳහා නිසි පරතරය පවත්වා ගන්න', 'හොඳ පාංශු ජලවහනයක් සහතික කරන්න', 'ශාකයේ ශක්තිය සඳහා සමබර පොහොර යොදන්න', 'නිතිපතා පරීක්ෂා කර ආසාදිත කොටස් ඉවත් කරන්න'],
     },
     maize: {
         pests: [
-            { name: 'Fall Armyworm', sinhalaName: 'සේනා පණුවා', symptoms: 'Irregular leaf feeding. Larvae bore into whorls. Severe defoliation. Frass in whorls.', affectedParts: 'Leaves, whorls, ears', control: ['Early detection through scouting', 'Release Trichogramma egg parasitoids', 'Spray Spinosad or Chlorantraniliprole', 'Use pheromone traps for monitoring'] },
-            { name: 'Stem Borer', sinhalaName: 'කඳ මැදියා', symptoms: 'Dead hearts in young plants. Exit holes in stems. Stem breakage.', affectedParts: 'Stems', control: ['Destroy crop residues after harvest', 'Apply Carbofuran granules to whorls at 3 weeks', 'Release Trichogramma wasps'] },
+            { name: 'සේනා පණුවා', sinhalaName: 'සේනා පණුවා', symptoms: 'අක්‍රමවත් පත්‍ර ආහාරයට ගැනීම. දළඹුවන් ගොබයට සිදුරු කරයි. දැඩි පත්‍ර විනාශය. ගොබවල අපද්‍රව්‍ය.', affectedParts: 'පත්‍ර, ගොබ, කරල්', control: ['ක්ෂේත්‍ර පරීක්ෂාවෙන් කල්තියා හඳුනා ගැනීම', 'ට්‍රයිකොග්‍රැමා බිත්තර පරපෝෂිතයන් මුදා හරින්න', 'ස්පයිනොසාඩ් හෝ ක්ලෝරන්ත්‍රනිලිප්‍රෝල් ඉසින්න', 'අධීක්ෂණය සඳහා ෆෙරමෝන් උගුල් භාවිතා කරන්න'] },
+            { name: 'කඳ මැදියා', sinhalaName: 'කඳ මැදියා', symptoms: 'ළපටි ශාකවල මැරුණු ගොබ. කඳන්වල පිටවීමේ සිදුරු. කඳ කැඩී යාම.', affectedParts: 'කඳන්', control: ['අස්වැන්න නෙලීමෙන් පසු බෝග අවශේෂ විනාශ කරන්න', 'සති 3 දී ගොබවලට කාබෝෆියුරන් කැට යොදන්න', 'ට්‍රයිකොග්‍රැමා බඹරුන් මුදා හරින්න'] },
         ],
         diseases: [
-            { name: 'Downy Mildew', sinhalaName: 'පහළ පිටි පුස්', cause: 'Peronosclerospora sorghi', symptoms: 'White downy growth on leaf undersides. Narrow stripped leaves. No ear formation.', conditions: 'Cool mornings, high humidity', control: ['Use resistant varieties', 'Metalaxyl seed treatment', 'Remove infected plants early'] },
+            { name: 'පහළ පිටි පුස් (Downy Mildew)', sinhalaName: 'පහළ පිටි පුස්', cause: 'Peronosclerospora sorghi', symptoms: 'පත්‍ර යටි පැත්තේ සුදු පුස් වර්ධනය. පටු ඉරි සහිත පත්‍ර. කරල් හට නොගනී.', conditions: 'සිසිල් උදෑසන, ඉහළ ආර්ද්‍රතාවය', control: ['ප්‍රතිරෝධී ප්‍රභේද භාවිතා කරන්න', 'මෙටලැක්සිල් බීජ ප්‍රතිකාරය', 'ආසාදිත ශාක කල්තියා ඉවත් කරන්න'] },
         ],
-        prevention: ['Use DOA-recommended varieties', 'Timely planting at start of rains', 'Scout fields twice weekly for fall armyworm', 'Destroy crop residues after harvest'],
+        prevention: ['DOA-නිර්දේශිත ප්‍රභේද භාවිතා කරන්න', 'වර්ෂාව ආරම්භයත් සමඟ නියමිත වේලාවට සිටුවීම', 'සේනා පණුවා සඳහා සතියකට දෙවරක් ක්ෂේත්‍ර පරීක්ෂා කරන්න', 'අස්වැන්න නෙලීමෙන් පසු බෝග අවශේෂ විනාශ කරන්න'],
     },
     pepper: {
         pests: [
-            { name: 'Pepper Berry Borer', sinhalaName: 'ගම්මිරිස් ගෙඩි මැදියා', symptoms: 'Small holes in berries. Premature berry dropping. Hollow berries.', affectedParts: 'Developing and mature berries', control: ['Collect and destroy fallen berries', 'Spray Quinalphos during berry development', 'Maintain field hygiene'] },
+            { name: 'ගම්මිරිස් ගෙඩි මැදියා', sinhalaName: 'ගම්මිරිස් ගෙඩි මැදියා', symptoms: 'ඇටවල කුඩා සිදුරු. නොමේරූ ඇට වැටීම. හිස් ඇට.', affectedParts: 'වර්ධනය වන සහ මේරූ ඇට', control: ['වැටුණු ඇට එකතු කර විනාශ කරන්න', 'ඇට වර්ධනය වන විට ක්විනල්ෆොස් ඉසින්න', 'ක්ෂේත්‍රයේ පිරිසිදුකම පවත්වා ගන්න'] },
         ],
         diseases: [
-            { name: 'Quick Wilt (Phytophthora Foot Rot)', sinhalaName: 'ඉක්මන් මැළවීම', cause: 'Phytophthora capsici', symptoms: 'Sudden wilting and death. Black lesions at stem base. Root rot.', conditions: 'Waterlogged soils, poor drainage, monsoon season', control: ['Ensure excellent drainage around vines', 'Apply Metalaxyl + Mancozeb drench', 'Remove and destroy infected vines', 'Trichoderma application to soil'] },
-            { name: 'Slow Decline Pollu Disease', sinhalaName: 'සෙමින් මැළවීම', cause: 'Root-knot nematodes + fungi', symptoms: 'Gradual yellowing, leaf shedding, reduced fruiting over years.', conditions: 'Poor soil management, nematode infestation', control: ['Application of neem cake to soil', 'Apply Trichoderma bio-agent', 'Maintain proper nutrition and mulching'] },
+            { name: 'ඉක්මන් මැළවීම (Quick Wilt)', sinhalaName: 'ඉක්මන් මැළවීම', cause: 'Phytophthora capsici', symptoms: 'හදිසියේ මැලවී මිය යාම. කඳ පාමුල කලු ලප. මුල් කුණුවීම.', conditions: 'ජලයෙන් යටවූ පස්, දුර්වල ජලවහනය, මෝසම් සමය', control: ['වැල් වටා විශිෂ්ට ජලවහනයක් සහතික කරන්න', 'මෙටලැක්සිල් + මැන්කොසෙබ් යොදන්න', 'ආසාදිත වැල් ඉවත් කර විනාශ කරන්න', 'පසට ට්‍රයිකොඩර්මා යෙදීම'] },
+            { name: 'සෙමින් මැළවීම (Slow Decline)', sinhalaName: 'සෙමින් මැළවීම', cause: 'මුල් ගැට නෙමටෝඩාවන් + දිලීර', symptoms: 'වසර ගණනාවක් පුරා ක්‍රමයෙන් කහ වීම, පත්‍ර හැලීම, පලදාව අඩුවීම.', conditions: 'දුර්වල පාංශු කළමනාකරණය, නෙමටෝඩා ආසාදනය', control: ['පසට කොහොඹ කුඩු යෙදීම', 'ට්‍රයිකොඩර්මා ජීව-කාරකය යොදන්න', 'නිසි පෝෂණය සහ වසුන් පවත්වා ගන්න'] },
         ],
-        prevention: ['Plant on well-drained slopes', 'Avoid waterlogging at vine base', 'Apply Trichoderma + neem cake annually', 'Maintain organic mulch cover'],
+        prevention: ['හොඳින් ජලය බැස යන බෑවුම්වල සිටුවන්න', 'වැල පාමුල ජලය රැඳීමෙන් වළකින්න', 'වාර්ෂිකව ට්‍රයිකොඩර්මා + කොහොඹ කුඩු යොදන්න', 'කාබනික වසුන් ආවරණය පවත්වා ගන්න'],
     },
     rubber: {
         pests: [
-            { name: 'Bark-Feeding Caterpillar', sinhalaName: 'පොතු කන කීඩැල්ලා', symptoms: 'Bark damage on trunk below tapping panel. Reduced latex flow.', affectedParts: 'Trunk bark', control: ['Hand pick larvae', 'Apply Chlorpyrifos to affected areas', 'Clean up tree bases'] },
+            { name: 'පොතු කන කීඩැල්ලා', sinhalaName: 'පොතු කන කීඩැල්ලා', symptoms: 'කිරි කපන පැනලයට පහළින් කඳේ පොත්තට හානි වීම. කිරි ගලා යාම අඩුවීම.', affectedParts: 'කඳේ පොත්ත', control: ['දළඹුවන් අතින් අහුලා ගන්න', 'බලපෑමට ලක්වූ ප්‍රදේශවලට ක්ලෝරපයිරිෆොස් යොදන්න', 'ගස් පාද පිරිසිදු කරන්න'] },
         ],
         diseases: [
-            { name: 'Abnormal Leaf Fall', sinhalaName: 'අසාමාන්‍ය පත්‍ර වැටීම', cause: 'Phytophthora spp.', symptoms: 'Premature, massive leaf fall during rainy season. Reduces latex yield by 30-40%.', conditions: 'Heavy rain, cool temperatures', control: ['Aerial application of copper fungicides during outbreaks', 'Maintain tree nutrition', 'Report to Rubber Development Department'] },
-            { name: 'White Root Disease', sinhalaName: 'සුදු මුල් රෝගය', cause: 'Rigidoporus microporus', symptoms: 'Crown yellowing, leaf fall. White fungal threads on roots. Tree death.', conditions: 'Old rubber lands, infected root stumps', control: ['Remove and destroy infected stumps', 'Soil drenching with Tridemorph', 'Isolate infected trees with trenches'] },
+            { name: 'අසාමාන්‍ය පත්‍ර වැටීම', sinhalaName: 'අසාමාන්‍ය පත්‍ර වැටීම', cause: 'Phytophthora spp.', symptoms: 'වර්ෂා කාලයේදී නොමේරූ, දැවැන්ත පත්‍ර වැටීම. කිරි අස්වැන්න 30-40% කින් අඩු කරයි.', conditions: 'අධික වර්ෂාව, සිසිල් උෂ්ණත්වය', control: ['රෝග වසංගත වලදී තඹ දිලීර නාශක ගුවන් මගින් ඉසීම', 'ගසේ පෝෂණය පවත්වා ගන්න', 'රබර් සංවර්ධන දෙපාර්තමේන්තුවට වාර්තා කරන්න'] },
+            { name: 'සුදු මුල් රෝගය', sinhalaName: 'සුදු මුල් රෝගය', cause: 'Rigidoporus microporus', symptoms: 'අතු කහ වීම, පත්‍ර වැටීම. මුල් මත සුදු දිලීර නූල්. ගස මිය යාම.', conditions: 'පැරණි රබර් ඉඩම්, ආසාදිත මුල් කොට', control: ['ආසාදිත කොට ඉවත් කර විනාශ කරන්න', 'ට්‍රයිඩිමෝර්ෆ් පසට යෙදීම', 'ආසාදිත ගස් අගල් මගින් හුදෙකලා කරන්න'] },
         ],
-        prevention: ['Proper clone selection for area', 'Maintain tree vigor through nutrition', 'Remove old stumps when replanting', 'Regular inspection of tapping panels and roots'],
+        prevention: ['ප්‍රදේශයට සුදුසු ප්‍රභේද නිසි ලෙස තෝරා ගැනීම', 'පෝෂණය හරහා ගසේ ශක්තිය පවත්වා ගන්න', 'නැවත සිටුවීමේදී පැරණි කොට ඉවත් කරන්න', 'කිරි කපන පැනල් සහ මුල් නිතිපතා පරීක්ෂා කරන්න'],
     },
     onion: {
         pests: [
-            { name: 'Onion Thrips', sinhalaName: 'ළූණු තුරිප්ස්', symptoms: 'Silver-white streaks on leaves. Leaf curling and drying. Reduced bulb size.', affectedParts: 'Leaves', control: ['Apply Neem oil spray', 'Use blue sticky traps', 'Overhead irrigation to wash off thrips', 'Spray Fipronil if severe'] },
+            { name: 'ළූණු තුරිප්ස්', sinhalaName: 'ළූණු තුරිප්ස්', symptoms: 'පත්‍ර මත රිදී-සුදු ඉරි. පත්‍ර කැරලි ගැසීම සහ වියළීම. බල්බ ප්‍රමාණය අඩුවීම.', affectedParts: 'පත්‍ර', control: ['කොහොඹ තෙල් ඉසින්න', 'නිල් ඇලෙන සුළු උගුල් භාවිතා කරන්න', 'තුරිප්ස් සෝදා හැරීමට උඩින් ජලය ඉසීම', 'දරුණු නම් ෆිප්‍රොනිල් ඉසින්න'] },
         ],
         diseases: [
-            { name: 'Purple Blotch', sinhalaName: 'වම්බටු පැහැ රෝගය', cause: 'Alternaria porri', symptoms: 'Purple-brown elliptical lesions on leaves. Progressive leaf drying from tips.', conditions: 'Warm humid conditions, excessive overhead irrigation', control: ['Spray Mancozeb + Carbendazim at 7-day intervals', 'Avoid overhead watering', 'Ensure proper spacing', 'Crop rotation with non-allium crops'] },
+            { name: 'වම්බටු පැහැ රෝගය (Purple Blotch)', sinhalaName: 'වම්බටු පැහැ රෝගය', cause: 'Alternaria porri', symptoms: 'පත්‍ර මත දම්-දුඹුරු ඉලිප්සාකාර ලප. පත්‍ර අග සිට ක්‍රමයෙන් වියළීම.', conditions: 'උණුසුම් තෙතමන තත්වයන්, අධික ලෙස ජලය ඉසීම', control: ['දින 7ක කාල පරතරයකින් මැන්කොසෙබ් + කාබන්ඩසිම් ඉසින්න', 'උඩින් ජලය දැමීමෙන් වළකින්න', 'නිසි පරතරය සහතික කරන්න', 'ඇලියම් නොවන බෝග සමඟ බෝග මාරුව'] },
         ],
-        prevention: ['Use quality seed/sets from DOA', 'Crop rotation (avoid planting onion/garlic in same field for 3 years)', 'Proper spacing for air circulation', 'Balanced fertilizer application'],
+        prevention: ['DOA වෙතින් ගුණාත්මක බීජ/බල්බ භාවිතා කරන්න', 'බෝග මාරුව (වසර 3ක් සඳහා එකම කුඹුරේ ළූණු/සුදුළූණු සිටුවීමෙන් වළකින්න)', 'වාතය සංසරණය සඳහා නිසි පරතරය', 'සමබර පොහොර යෙදීම'],
     },
     groundnut: {
         pests: [
-            { name: 'Groundnut Leaf Miner', sinhalaName: 'රටකජු පත්‍ර මැදියා', symptoms: 'Whitish blotch mines on leaf surface. Heavy mines cause defoliation.', affectedParts: 'Leaves', control: ['Remove alternate host weeds', 'Apply Neem extract', 'Spray Monocrotophos if severe'] },
+            { name: 'රටකජු පත්‍ර මැදියා', sinhalaName: 'රටකජු පත්‍ර මැදියා', symptoms: 'පත්‍ර මතුපිට සුදු පැහැ ලප. අධික ලෙස මැදීම නිසා පත්‍ර විනාශ වේ.', affectedParts: 'පත්‍ර', control: ['විකල්ප ධාරක වල් පැලෑටි ඉවත් කරන්න', 'කොහොඹ නිස්සාරණය යොදන්න', 'දරුණු නම් මොනොක්‍රොටොෆොස් ඉසින්න'] },
         ],
         diseases: [
-            { name: 'Tikka Disease (Leaf Spot)', sinhalaName: 'ටික්කා රෝගය', cause: 'Cercospora spp.', symptoms: 'Circular dark brown spots on leaves. Premature defoliation.', conditions: 'Warm humid weather', control: ['Use resistant varieties', 'Spray Chlorothalonil or Mancozeb at 15-day intervals', 'Seed treatment with Carbendazim'] },
+            { name: 'ටික්කා රෝගය', sinhalaName: 'ටික්කා රෝගය', cause: 'Cercospora spp.', symptoms: 'පත්‍ර මත රවුම් තද දුඹුරු ලප. නොමේරූ පත්‍ර වැටීම.', conditions: 'උණුසුම් තෙතමන කාලගුණය', control: ['ප්‍රතිරෝධී ප්‍රභේද භාවිතා කරන්න', 'දින 15ක කාල පරතරයකින් ක්ලෝරොතලොනිල් හෝ මැන්කොසෙබ් ඉසින්න', 'කාබන්ඩසිම් සමඟ බීජ ප්‍රතිකාරය'] },
         ],
-        prevention: ['Seed treatment before planting', 'Crop rotation with cereals', 'Maintain field hygiene', 'Apply gypsum for calcium supply and disease reduction'],
+        prevention: ['සිටුවීමට පෙර බීජ ප්‍රතිකාරය', 'ධාන්‍ය සමඟ බෝග මාරුව', 'ක්ෂේත්‍රයේ පිරිසිදුකම පවත්වා ගන්න', 'කැල්සියම් සැපයීම සහ රෝග අවම කිරීම සඳහා ජිප්සම් යොදන්න'],
     },
     mungbean: {
         pests: [
-            { name: 'Bean Fly (Stem Fly)', sinhalaName: 'කඳ මැස්සා', symptoms: 'Stem swelling at base. Yellowing and wilting. Poor establishment.', affectedParts: 'Stem base', control: ['Seed treatment with Thiamethoxam', 'Plant at proper depth', 'Maintain good plant vigor'] },
-            { name: 'Pod Borer', sinhalaName: 'කරල් මැදියා', symptoms: 'Holes in pods. Partially eaten seeds. Frass in pods.', affectedParts: 'Pods, seeds', control: ['Spray Neem seed extract', 'Apply Bt spray', 'Harvest promptly when mature'] },
+            { name: 'කඳ මැස්සා', sinhalaName: 'කඳ මැස්සා', symptoms: 'කඳ පාමුල ඉදිමීම. කහ වීම සහ මැලවීම. දුර්වල පැලවීම.', affectedParts: 'කඳ පාදම', control: ['තයමෙතොක්සෑම් සමඟ බීජ ප්‍රතිකාරය', 'නිසි ගැඹුරට සිටුවන්න', 'හොඳ ශාක ශක්තියක් පවත්වා ගන්න'] },
+            { name: 'කරල් මැදියා', sinhalaName: 'කරල් මැදියා', symptoms: 'කරල්වල සිදුරු. අඩක් කා දැමූ බීජ. කරල්වල අපද්‍රව්‍ය.', affectedParts: 'කරල්, බීජ', control: ['කොහොඹ ඇට නිස්සාරණය ඉසින්න', 'Bt ඉසින්න', 'මේරූ වහාම අස්වැන්න නෙළන්න'] },
         ],
         diseases: [
-            { name: 'Yellow Mosaic Virus', sinhalaName: 'කහ මොසේක් වෛරසය', cause: 'Mungbean Yellow Mosaic Virus (transmitted by whitefly)', symptoms: 'Bright yellow patches on leaves. Stunted growth. Few or no pods.', conditions: 'Hot weather, high whitefly populations', control: ['Use resistant varieties', 'Control whitefly with Neem oil', 'Remove infected plants early', 'Use yellow sticky traps'] },
+            { name: 'කහ මොසේක් වෛරසය', sinhalaName: 'කහ මොසේක් වෛරසය', cause: 'මුං ඇට කහ මොසේක් වෛරසය (සුදු මැස්සන් මගින් සම්ප්‍රේෂණය වේ)', symptoms: 'පත්‍ර මත දීප්තිමත් කහ ලප. වර්ධනය බාල වීම. කරල් කිහිපයක් හෝ නොමැත.', conditions: 'උණුසුම් කාලගුණය, සුදු මැස්සන් ගහනය ඉහළ යාම', control: ['ප්‍රතිරෝධී ප්‍රභේද භාවිතා කරන්න', 'කොහොඹ තෙල් මගින් සුදු මැස්සන් පාලනය කරන්න', 'ආසාදිත ශාක කල්තියා ඉවත් කරන්න', 'කහ ඇලෙන සුළු උගුල් භාවිතා කරන්න'] },
         ],
-        prevention: ['Use DOA-recommended varieties', 'Timely sowing at start of rains', 'Seed treatment with insecticide + fungicide', 'Avoid continuous mung bean/cowpea cropping'],
+        prevention: ['DOA-නිර්දේශිත ප්‍රභේද භාවිතා කරන්න', 'වර්ෂාව ආරම්භයත් සමඟ නියමිත වේලාවට සිටුවීම', 'කෘමිනාශක + දිලීර නාශක සමඟ බීජ ප්‍රතිකාරය', 'නිරන්තරයෙන් මුං/කව්පි වගාවෙන් වළකින්න'],
     },
     cowpea: {
         pests: [
-            { name: 'Aphids', sinhalaName: 'මකුණන්', symptoms: 'Colonies on shoot tips and flower buds. Leaf curling. Honeydew and sooty mold.', affectedParts: 'Shoots, flowers, pods', control: ['Spray water at high pressure', 'Apply Neem oil', 'Encourage natural enemies (ladybirds, hoverflies)', 'Spray Dimethoate if severe'] },
-            { name: 'Pod Borer', sinhalaName: 'කරල් මැදියා', symptoms: 'Holes in pods. Damage to developing seeds.', affectedParts: 'Pods', control: ['Hand-pick larvae', 'Spray Bt (Bacillus thuringiensis)', 'Harvest promptly'] },
+            { name: 'මකුණන් / කුඩිත්තන්', sinhalaName: 'මකුණන්', symptoms: 'රිකිලි අග සහ මල් පොහොට්ටු මත ජනපද. පත්‍ර කැරලි ගැසීම. පැණිරස ශ්‍රාවය සහ කලු පුස්.', affectedParts: 'රිකිලි, මල්, කරල්', control: ['අධික පීඩනයෙන් ජලය ඉසින්න', 'කොහොඹ තෙල් යොදන්න', 'ස්වාභාවික සතුරන් දිරිමත් කරන්න', 'දරුණු නම් ඩයිමෙතොයේට් ඉසින්න'] },
+            { name: 'කරල් මැදියා', sinhalaName: 'කරල් මැදියා', symptoms: 'කරල්වල සිදුරු. වර්ධනය වන බීජ වලට හානි.', affectedParts: 'කරල්', control: ['දළඹුවන් අතින් අහුලා ගන්න', 'Bt ඉසින්න', 'වහාම අස්වැන්න නෙළන්න'] },
         ],
         diseases: [
-            { name: 'Cowpea Mosaic', sinhalaName: 'කව්පි මොසේක්', cause: 'Cowpea Aphid-borne Mosaic Virus', symptoms: 'Mosaic pattern on leaves. Leaf distortion. Stunted growth.', conditions: 'Aphid presence, warm conditions', control: ['Use virus-free seed', 'Control aphid vectors', 'Remove infected plants', 'Use tolerant varieties'] },
+            { name: 'කව්පි මොසේක්', sinhalaName: 'කව්පි මොසේක්', cause: 'කව්පි කුඩිත්තන් මගින් බෝවන මොසේක් වෛරසය', symptoms: 'පත්‍ර මත මොසේක් රටාව. පත්‍ර විකෘති වීම. වර්ධනය බාල වීම.', conditions: 'කුඩිත්තන් සිටීම, උණුසුම් තත්වයන්', control: ['වෛරස්-මුක්ත බීජ භාවිතා කරන්න', 'කුඩිත්තන් වාහකයන් පාලනය කරන්න', 'ආසාදිත ශාක ඉවත් කරන්න', 'ඔරොත්තු දෙන ප්‍රභේද භාවිතා කරන්න'] },
         ],
-        prevention: ['Use clean certified seed', 'Crop rotation', 'Control aphid vectors early', 'Maintain field sanitation'],
+        prevention: ['පිරිසිදු සහතික කළ බීජ භාවිතා කරන්න', 'බෝග මාරුව', 'කුඩිත්තන් වාහකයන් කල්තියා පාලනය කරන්න', 'ක්ෂේත්‍ර පිරිසිදුකම පවත්වා ගන්න'],
     },
     vegetables: {
         pests: [
-            { name: 'Diamondback Moth', sinhalaName: 'දියමන්ති පිට සලබයා', symptoms: 'Small holes and window-paning on leaves of cabbages and other brassicas.', affectedParts: 'Leaves (brassicas)', control: ['Use pheromone traps', 'Spray Bt (Bacillus thuringiensis)', 'Intercropping with tomato or onion', 'Net houses for high-value crops'] },
-            { name: 'Fruit Fly', sinhalaName: 'ගෙඩි මැස්සා', symptoms: 'Sting marks on fruits. Larvae inside fruits causing rot. Premature fruit drop.', affectedParts: 'Fruits (tomato, bitter gourd, cucurbits)', control: ['Use bait traps (Methyl Eugenol + insecticide)', 'Collect and destroy fallen fruits', 'Use bag covering for individual fruits', 'Spray Spinosad for severe cases'] },
+            { name: 'දියමන්ති පිට සලබයා', sinhalaName: 'දියමන්ති පිට සලබයා', symptoms: 'ගෝවා සහ අනෙකුත් බ්‍රැසිකා පත්‍රවල කුඩා සිදුරු සහ කවුළු සෑදීම.', affectedParts: 'පත්‍ර (බ්‍රැසිකා)', control: ['ෆෙරමෝන් උගුල් භාවිතා කරන්න', 'Bt ඉසින්න', 'තක්කාලි හෝ ළූණු සමඟ අතුරු බෝග වගාව', 'අධි වටිනාකම් බෝග සඳහා දැල් ගෙවල්'] },
+            { name: 'ගෙඩි මැස්සා', sinhalaName: 'ගෙඩි මැස්සා', symptoms: 'ගෙඩි මත දෂ්ට කිරීමේ ලකුණු. ගෙඩි ඇතුළත කීටයන් කුණුවීම ඇති කරයි. නොමේරූ ගෙඩි වැටීම.', affectedParts: 'ගෙඩි (තක්කාලි, කරවිල, කුකුර්බිට්)', control: ['ඇමක් උගුල් භාවිතා කරන්න (Methyl Eugenol + කෘමිනාශක)', 'වැටුණු ගෙඩි එකතු කර විනාශ කරන්න', 'තනි ගෙඩි සඳහා ආවරණ බෑග් භාවිතා කරන්න', 'දරුණු අවස්ථාවලදී ස්පයිනොසාඩ් ඉසින්න'] },
         ],
         diseases: [
-            { name: 'Bacterial Wilt', sinhalaName: 'බැක්ටීරියා මැළවීම', cause: 'Ralstonia solanacearum', symptoms: 'Sudden permanent wilting. Brown vascular discoloration in stem cross-section.', conditions: 'Warm wet soils, pH > 6.0', control: ['Use resistant varieties', 'Soil amendment with Trichoderma', 'Crop rotation with non-solanaceous crops', 'Lime soil to pH 6.5-7.0 can reduce incidence'] },
-            { name: 'Damping Off', sinhalaName: 'බිස් බසිනවා', cause: 'Pythium, Rhizoctonia spp.', symptoms: 'Seedlings collapse at soil line. Poor emergence. Thin, water-soaked stems.', conditions: 'Overwatering, poor drainage, dense sowing', control: ['Use sterilized nursery media', 'Avoid overwatering', 'Apply Trichoderma to soil', 'Treat seeds with Captan'] },
+            { name: 'බැක්ටීරියා මැළවීම', sinhalaName: 'බැක්ටීරියා මැළවීම', cause: 'Ralstonia solanacearum', symptoms: 'හදිසියේ ස්ථිරව මැලවීම. කඳේ හරස්කඩේ දුඹුරු සනාල වර්ණ විපර්යාසය.', conditions: 'උණුසුම් තෙත් පස්, pH > 6.0', control: ['ප්‍රතිරෝධී ප්‍රභේද භාවිතා කරන්න', 'ට්‍රයිකොඩර්මා සමඟ පස සකස් කිරීම', 'සොලනේසියේ නොවන බෝග සමඟ බෝග මාරුව', 'pH 6.5-7.0 දක්වා පසට හුණු යෙදීමෙන් රෝගය අඩු කළ හැක'] },
+            { name: 'බිස් බසිනවා (Damping Off)', sinhalaName: 'බිස් බසිනවා', cause: 'Pythium, Rhizoctonia spp.', symptoms: 'පැල පස් මට්ටමේදී කඩා වැටේ. දුර්වල පැලවීම. සිහින්, ජලයෙන් පෙඟුණු කඳන්.', conditions: 'අධික ලෙස ජලය දැමීම, දුර්වල ජලවහනය, ඝන ලෙස බීජ වැපිරීම', control: ['ජීවානුහරණය කළ තවාන් මාධ්‍ය භාවිතා කරන්න', 'අධික ලෙස ජලය දැමීමෙන් වළකින්න', 'පසට ට්‍රයිකොඩර්මා යොදන්න', 'කැප්ටාන් සමඟ බීජ ප්‍රතිකාර කරන්න'] },
         ],
-        prevention: ['Practice crop rotation (3-year cycle)', 'Use raised beds for good drainage', 'Maintain field hygiene', 'Balanced fertilizer to maintain plant vigor', 'Use IPM approach: cultural, biological, then chemical'],
+        prevention: ['බෝග මාරුව පුරුදු කරන්න (වසර 3ක චක්‍රය)', 'හොඳ ජලවහනයක් සඳහා උස් පාත්ති භාවිතා කරන්න', 'ක්ෂේත්‍රයේ පිරිසිදුකම පවත්වා ගන්න', 'ශාකයේ ශක්තිය පවත්වා ගැනීමට සමබර පොහොර', 'IPM ප්‍රවේශය භාවිතා කරන්න: සංස්කෘතික, ජීව විද්‍යාත්මක, ඉන්පසු රසායනික'],
     },
     cashew: {
         pests: [
-            { name: 'Tea Mosquito Bug', sinhalaName: 'තේ මදුරු කීටයා', symptoms: 'Brown necrotic spots on young shoots, leaves, and developing nuts. Sunken lesions on apples.', affectedParts: 'Shoots, leaves, nuts, apples', control: ['Spray Carbaryl or Lambda-Cyhalothrin during flushing and flowering', 'Maintain tree hygiene', 'Prune affected branches'] },
+            { name: 'තේ මදුරු කීටයා', sinhalaName: 'තේ මදුරු කීටයා', symptoms: 'ළපටි රිකිලි, පත්‍ර සහ වර්ධනය වන ඇට මත දුඹුරු මැරුණු ලප. පුහුලන් මත ගිලුණු ලප.', affectedParts: 'රිකිලි, පත්‍ර, කජු ඇට, පුහුලන්', control: ['දළු දමන සහ මල් පිපෙන කාලය තුළ කාබරිල් හෝ ලැම්ඩා-සයිහලොත්‍රින් ඉසින්න', 'ගසේ පිරිසිදුකම පවත්වා ගන්න', 'බලපෑමට ලක්වූ අතු කප්පාදු කරන්න'] },
         ],
         diseases: [
-            { name: 'Anthracnose', sinhalaName: 'ඇන්ත්‍රක්නෝස්', cause: 'Colletotrichum gloeosporioides', symptoms: 'Dark spots on leaves, inflorescence, and developing nuts. Blossom blight. Nut rot.', conditions: 'Wet weather during flowering period', control: ['Spray Mancozeb or Carbendazim during flowering', 'Prune dead branches to improve air flow', 'Avoid planting in waterlogged areas'] },
+            { name: 'ඇන්ත්‍රක්නෝස්', sinhalaName: 'ඇන්ත්‍රක්නෝස්', cause: 'Colletotrichum gloeosporioides', symptoms: 'පත්‍ර, මල් සහ වර්ධනය වන ඇට මත අඳුරු ලප. මල් කුණුවීම. ඇට කුණුවීම.', conditions: 'මල් පිපෙන කාලය තුළ තෙත් කාලගුණය', control: ['මල් පිපෙන කාලය තුළ මැන්කොසෙබ් හෝ කාබන්ඩසිම් ඉසින්න', 'වාතය ගලා යාම වැඩි දියුණු කිරීමට මැරුණු අතු කප්පාදු කරන්න', 'ජලය රැඳෙන ප්‍රදේශවල සිටුවීමෙන් වළකින්න'] },
         ],
-        prevention: ['Prune trees annually to open canopy', 'Maintain tree nutrition', 'Spray preventively during flushing and flowering periods', 'Remove and destroy infected plant material'],
+        prevention: ['වියන් විවෘත කිරීම සඳහා වාර්ෂිකව ගස් කප්පාදු කරන්න', 'ගසේ පෝෂණය පවත්වා ගන්න', 'දළු දමන සහ මල් පිපෙන කාලවලදී කල්තියා ඉසින්න', 'ආසාදිත ශාක කොටස් ඉවත් කර විනාශ කරන්න'],
     },
     banana: {
         pests: [
-            { name: 'Banana Weevil', sinhalaName: 'කෙසෙල් කුරුමිණියා', symptoms: 'Tunnels in corm causing weakening and toppling. Reduced bunch weight.', affectedParts: 'Corm, pseudostem base', control: ['Use clean planting material (paring and hot water treatment)', 'Apply Chlorpyrifos to planting pit', 'Use pseudostem traps to attract and kill weevils', 'Remove old corms after harvest'] },
-            { name: 'Nematodes', sinhalaName: 'නෙමටෝඩා', symptoms: 'Root lesions, poor root system, reduced vigor. Toppling of fruit-bearing plants.', affectedParts: 'Roots', control: ['Use tissue culture plants for clean start', 'Apply Carbofuran granules to planting pit', 'Incorporate neem cake into soil', 'Crop rotation if severe'] },
+            { name: 'කෙසෙල් කුරුමිණියා', sinhalaName: 'කෙසෙල් කුරුමිණියා', symptoms: 'අලයේ උමං සෑදීම නිසා දුර්වල වී පෙරළී යාම. කෙසෙල් කැණේ බර අඩුවීම.', affectedParts: 'අලය, බොරු කඳේ පාදම', control: ['පිරිසිදු රෝපණ ද්‍රව්‍ය භාවිතා කරන්න (පිරිසිදු කිරීම සහ උණු වතුර ප්‍රතිකාරය)', 'සිටුවන වලට ක්ලෝරපයිරිෆොස් යොදන්න', 'කුරුමිණියන් ආකර්ෂණය කර විනාශ කිරීමට බොරු කඳේ උගුල් භාවිතා කරන්න', 'අස්වැන්න නෙලීමෙන් පසු පැරණි අල ඉවත් කරන්න'] },
+            { name: 'නෙමටෝඩා', sinhalaName: 'නෙමටෝඩා', symptoms: 'මුල් වල ලප, දුර්වල මූල පද්ධතිය, ශක්තිය අඩුවීම. පල දරන ගස් පෙරළී යාම.', affectedParts: 'මුල්', control: ['පිරිසිදු ආරම්භයක් සඳහා පටක රෝපණ පැල භාවිතා කරන්න', 'සිටුවන වලට කාබෝෆියුරන් කැට යොදන්න', 'පසට කොහොඹ කුඩු කලවම් කරන්න', 'දරුණු නම් බෝග මාරුව'] },
         ],
         diseases: [
-            { name: 'Panama Disease (Fusarium Wilt)', sinhalaName: 'පැනමා රෝගය', cause: 'Fusarium oxysporum f.sp. cubense', symptoms: 'Yellowing and wilting of older leaves first. Pseudostem splitting. Brown vascular discoloration.', conditions: 'Infested soil, waterlogging, acidic pH', control: ['Use resistant varieties', 'Avoid planting in infested land', 'Apply lime to raise soil pH', 'There is NO chemical cure - prevention is key'] },
-            { name: 'Sigatoka Leaf Spot', sinhalaName: 'සිගටෝකා පත්‍ර ලප', cause: 'Mycosphaerella spp.', symptoms: 'Yellow streaks that develop into brown-black spots. Premature leaf death reduces fruit quality.', conditions: 'Warm humid weather, dense planting', control: ['Remove affected leaves', 'Spray Propiconazole or Mancozeb', 'Maintain proper spacing', 'Improve air circulation by desuckering'] },
+            { name: 'පැනමා රෝගය', sinhalaName: 'පැනමා රෝගය', cause: 'Fusarium oxysporum f.sp. cubense', symptoms: 'මුලින්ම පැරණි පත්‍ර කහ වී මැලවීම. බොරු කඳ පැලීම. දුඹුරු සනාල වර්ණ විපර්යාසය.', conditions: 'ආසාදිත පස්, ජලය රැඳීම, ආම්ලික pH', control: ['ප්‍රතිරෝධී ප්‍රභේද භාවිතා කරන්න', 'ආසාදිත ඉඩම්වල සිටුවීමෙන් වළකින්න', 'පසේ pH අගය ඉහළ නැංවීමට හුණු යොදන්න', 'රසායනික සුවයක් නොමැත - වළක්වා ගැනීම ප්‍රධාන වේ'] },
+            { name: 'සිගටෝකා පත්‍ර ලප', sinhalaName: 'සිගටෝකා පත්‍ර ලප', cause: 'Mycosphaerella spp.', symptoms: 'දුඹුරු-කලු ලප බවට පත්වන කහ ඉරි. නොමේරූ පත්‍ර මිය යාමෙන් පලතුරු ගුණාත්මකභාවය අඩු වේ.', conditions: 'උණුසුම් තෙතමන කාලගුණය, ඝන සිටුවීම', control: ['බලපෑමට ලක්වූ පත්‍ර ඉවත් කරන්න', 'ප්‍රොපිකොනසෝල් හෝ මැන්කොසෙබ් ඉසින්න', 'නිසි පරතරය පවත්වා ගන්න', 'අමතර මොරෙයියන් ඉවත් කිරීමෙන් වාතය සංසරණය වැඩි දියුණු කරන්න'] },
         ],
-        prevention: ['Use disease-free planting material (tissue culture preferred)', 'Practice good field sanitation', 'Remove old pseudostems after harvest', 'Maintain proper spacing', 'Avoid waterlogged areas for planting'],
+        prevention: ['රෝග-මුක්ත රෝපණ ද්‍රව්‍ය භාවිතා කරන්න (පටක රෝපණය වඩාත් සුදුසුය)', 'හොඳ ක්ෂේත්‍ර පිරිසිදුකමක් පුරුදු කරන්න', 'අස්වැන්න නෙලීමෙන් පසු පැරණි බොරු කඳන් ඉවත් කරන්න', 'නිසි පරතරය පවත්වා ගන්න', 'සිටුවීම සඳහා ජලය රැඳෙන ප්‍රදේශවලින් වළකින්න'],
     },
 };
 
