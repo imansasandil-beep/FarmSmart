@@ -218,6 +218,78 @@ export default function ProfileScreen() {
             </View>
           </View>
         </View>
+
+        {/* Farm Details Section (only for farmers) */}
+        {profile?.role === 'farmer' && (
+          <>
+            <Text style={styles.sectionTitle}>Farm Details</Text>
+            <View style={styles.infoCard}>
+              <View style={styles.infoRow}>
+                <View style={styles.infoIconWrap}>
+                  <Ionicons name="location-outline" size={18} color="#2ecc71" />
+                </View>
+                <View style={styles.infoContent}>
+                  <Text style={styles.infoLabel}>District</Text>
+                  <Text style={styles.infoValue}>{profile?.district || 'Not set'}</Text>
+                </View>
+              </View>
+
+              <View style={styles.infoDivider} />
+
+              <View style={styles.infoRow}>
+                <View style={styles.infoIconWrap}>
+                  <Ionicons name="map-outline" size={18} color="#2ecc71" />
+                </View>
+                <View style={styles.infoContent}>
+                  <Text style={styles.infoLabel}>Farm Location</Text>
+                  <Text style={styles.infoValue}>{profile?.farmLocation || 'Not set'}</Text>
+                </View>
+              </View>
+
+              <View style={styles.infoDivider} />
+
+              <View style={styles.infoRow}>
+                <View style={styles.infoIconWrap}>
+                  <Ionicons name="resize-outline" size={18} color="#2ecc71" />
+                </View>
+                <View style={styles.infoContent}>
+                  <Text style={styles.infoLabel}>Farm Size</Text>
+                  <Text style={styles.infoValue}>
+                    {profile?.farmSize ? `${profile.farmSize} acres` : 'Not set'}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.infoDivider} />
+
+              <View style={styles.infoRow}>
+                <View style={styles.infoIconWrap}>
+                  <Ionicons name="leaf-outline" size={18} color="#2ecc71" />
+                </View>
+                <View style={styles.infoContent}>
+                  <Text style={styles.infoLabel}>Primary Crops</Text>
+                  <Text style={styles.infoValue}>
+                    {profile?.primaryCrops && profile.primaryCrops.length > 0
+                      ? profile.primaryCrops.join(', ')
+                      : 'Not set'}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.infoDivider} />
+
+              <View style={styles.infoRow}>
+                <View style={styles.infoIconWrap}>
+                  <Ionicons name="water-outline" size={18} color="#2ecc71" />
+                </View>
+                <View style={styles.infoContent}>
+                  <Text style={styles.infoLabel}>Farming Zone</Text>
+                  <Text style={styles.infoValue}>{profile?.farmingZone || 'Not set'}</Text>
+                </View>
+              </View>
+            </View>
+          </>
+        )}
       </ScrollView>
 
       {/* Edit Profile Modal */}
