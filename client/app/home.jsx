@@ -165,6 +165,8 @@ export default function HomeScreen() {
       router.push('/agrisup');
     } else if (item.route === 'posts') {
       router.push('/posts');
+    } else if (item.route === 'profile') {
+      router.push('/profile');
     } else {
       Alert.alert(item.title, 'This feature is coming soon!');
     }
