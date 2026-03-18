@@ -68,7 +68,7 @@ export default function LoginScreen() {
   const handleGoogleLogin = async () => {
     try {
       const { createdSessionId, signIn, signUp, setActive } = await startOAuthFlow({
-        redirectUrl: Linking.createURL('/home', { scheme: 'myapp' }),
+        redirectUrl: Linking.createURL('/home'),
       });
 
       if (createdSessionId) {
