@@ -17,7 +17,7 @@ router.get('/search', async (req, res) => {
         const query = req.query.q;
 
         if (!query) {
-            return res.status(400).json({ message: 'Please provide a search query (?q=...)' });
+            return res.status(400).json({ message: 'කරුණාකර සෙවුම් පදයක් ලබා දෙන්න (?q=...)' });
         }
 
         // Case-insensitive regex search on name and affectedCrops

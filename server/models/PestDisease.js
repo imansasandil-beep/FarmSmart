@@ -7,7 +7,7 @@ const PestDiseaseSchema = new mongoose.Schema({
     },
     type: {
         type: String,
-        enum: ['Pest', 'Disease'],
+        enum: ['පළිබෝධ', 'රෝග'],
         required: true,
     },
     affectedCrops: {
