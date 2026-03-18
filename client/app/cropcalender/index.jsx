@@ -32,6 +32,7 @@ export default function CropCalendarScreen() {
     const [taskTitle, setTaskTitle] = useState('');
     const [date, setDate] = useState(new Date());
     const [showPicker, setShowPicker] = useState(false);
+    const [pickerMode, setPickerMode] = useState('date');
     const [reminders, setReminders] = useState([]);
     const [zone, setZone] = useState(null);
     const [district, setDistrict] = useState(null);
@@ -127,11 +128,31 @@ export default function CropCalendarScreen() {
     };
 
     const onDateChange = (event, selectedDate) => {
+        if (event.type === 'dismissed') {
+            setShowPicker(false);
+            setPickerMode('date');
+            return;
+        }
+
         const currentDate = selectedDate || date;
         setDate(currentDate);
+
         if (Platform.OS === 'android') {
-            setShowPicker(false);
+            if (pickerMode === 'date') {
+                // Date selected on Android, now show time picker
+                setPickerMode('time');
+                setShowPicker(true);
+            } else {
+                // Time selected on Android, close picker
+                setShowPicker(false);
+                setPickerMode('date');
+            }
         }
+    };
+
+    const openPicker = () => {
+        setPickerMode('date');
+        setShowPicker(true);
     };
 
     const monthlyTip = zone ? getMonthlyTips(zone.id) : null;
@@ -225,7 +246,7 @@ export default function CropCalendarScreen() {
                     />
 
                     <Text style={styles.label}>When?</Text>
-                    <TouchableOpacity style={styles.dateButton} onPress={() => setShowPicker(true)}>
+                    <TouchableOpacity style={styles.dateButton} onPress={openPicker}>
                         <Ionicons name="calendar" size={20} color="white" />
                         <Text style={styles.dateText}>{date.toLocaleString()}</Text>
                     </TouchableOpacity>
@@ -233,7 +254,7 @@ export default function CropCalendarScreen() {
                     {showPicker && (
                         <DateTimePicker
                             value={date}
-                            mode="datetime"
+                            mode={Platform.OS === 'android' ? pickerMode : 'datetime'}
                             display="default"
                             onChange={onDateChange}
                             minimumDate={new Date()}
