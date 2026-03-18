@@ -27,6 +27,14 @@ export default function ProfileScreen() {
   const [editRole, setEditRole] = useState('farmer');
   const [saving, setSaving] = useState(false);
 
+  // Edit farm details state
+  const [farmModalVisible, setFarmModalVisible] = useState(false);
+  const [editDistrict, setEditDistrict] = useState('');
+  const [editFarmLocation, setEditFarmLocation] = useState('');
+  const [editFarmSize, setEditFarmSize] = useState('');
+  const [editCrops, setEditCrops] = useState('');
+  const [editFarmingZone, setEditFarmingZone] = useState('');
+
   const loadProfile = useCallback(async () => {
     try {
       setLoading(true);
@@ -116,6 +124,50 @@ export default function ProfileScreen() {
     } catch (error) {
       console.log('Save profile error:', error);
       Alert.alert('Error', 'Failed to update profile');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const openFarmEditModal = () => {
+    setEditDistrict(profile?.district || '');
+    setEditFarmLocation(profile?.farmLocation || '');
+    setEditFarmSize(profile?.farmSize ? String(profile.farmSize) : '');
+    setEditCrops(profile?.primaryCrops ? profile.primaryCrops.join(', ') : '');
+    setEditFarmingZone(profile?.farmingZone || '');
+    setFarmModalVisible(true);
+  };
+
+  const handleSaveFarmDetails = async () => {
+    Keyboard.dismiss();
+    setSaving(true);
+    try {
+      const token = await getToken();
+      const cropsArray = editCrops
+        .split(',')
+        .map(c => c.trim())
+        .filter(c => c.length > 0);
+
+      const response = await axios.put(
+        `${API_BASE_URL}/api/user/update-farm-details`,
+        {
+          district: editDistrict,
+          farmLocation: editFarmLocation,
+          farmSize: editFarmSize,
+          primaryCrops: cropsArray,
+          farmingZone: editFarmingZone,
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (response.data.user) {
+        setProfile(response.data.user);
+        await AsyncStorage.setItem('user', JSON.stringify(response.data.user));
+        Alert.alert('Success', 'Farm details updated successfully');
+        setFarmModalVisible(false);
+      }
+    } catch (error) {
+      console.log('Save farm details error:', error);
+      Alert.alert('Error', 'Failed to update farm details');
     } finally {
       setSaving(false);
     }
@@ -288,6 +340,12 @@ export default function ProfileScreen() {
                 </View>
               </View>
             </View>
+
+            {/* Edit Farm Button */}
+            <TouchableOpacity style={styles.editFarmButton} onPress={openFarmEditModal}>
+              <Ionicons name="create-outline" size={16} color="#2ecc71" />
+              <Text style={[styles.editButtonText, { color: '#2ecc71' }]}>Edit Farm Details</Text>
+            </TouchableOpacity>
           </>
         )}
       </ScrollView>
@@ -370,6 +428,117 @@ export default function ProfileScreen() {
                   <Text style={styles.saveButtonText}>Save Changes</Text>
                 )}
               </TouchableOpacity>
+            </View>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
+
+      {/* Edit Farm Details Modal */}
+      <Modal
+        visible={farmModalVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setFarmModalVisible(false)}
+      >
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <View style={styles.modalHeader}>
+                <Text style={styles.modalTitle}>Edit Farm Details</Text>
+                <TouchableOpacity onPress={() => setFarmModalVisible(false)}>
+                  <Ionicons name="close" size={24} color="#8aa6a3" />
+                </TouchableOpacity>
+              </View>
+
+              <ScrollView showsVerticalScrollIndicator={false}>
+                {/* District Input */}
+                <Text style={styles.inputLabel}>District</Text>
+                <View style={styles.inputContainer}>
+                  <Ionicons name="location-outline" size={18} color="#2ecc71" style={{ marginLeft: 12 }} />
+                  <TextInput
+                    style={styles.textInput}
+                    value={editDistrict}
+                    onChangeText={setEditDistrict}
+                    placeholder="e.g. Colombo, Kandy, Galle"
+                    placeholderTextColor="#4a7a70"
+                  />
+                </View>
+
+                {/* Farm Location */}
+                <Text style={styles.inputLabel}>Farm Location</Text>
+                <View style={styles.inputContainer}>
+                  <Ionicons name="map-outline" size={18} color="#2ecc71" style={{ marginLeft: 12 }} />
+                  <TextInput
+                    style={styles.textInput}
+                    value={editFarmLocation}
+                    onChangeText={setEditFarmLocation}
+                    placeholder="Enter farm address"
+                    placeholderTextColor="#4a7a70"
+                  />
+                </View>
+
+                {/* Farm Size */}
+                <Text style={styles.inputLabel}>Farm Size (acres)</Text>
+                <View style={styles.inputContainer}>
+                  <Ionicons name="resize-outline" size={18} color="#2ecc71" style={{ marginLeft: 12 }} />
+                  <TextInput
+                    style={styles.textInput}
+                    value={editFarmSize}
+                    onChangeText={setEditFarmSize}
+                    placeholder="e.g. 5"
+                    placeholderTextColor="#4a7a70"
+                    keyboardType="numeric"
+                  />
+                </View>
+
+                {/* Primary Crops */}
+                <Text style={styles.inputLabel}>Primary Crops (comma separated)</Text>
+                <View style={styles.inputContainer}>
+                  <Ionicons name="leaf-outline" size={18} color="#2ecc71" style={{ marginLeft: 12 }} />
+                  <TextInput
+                    style={styles.textInput}
+                    value={editCrops}
+                    onChangeText={setEditCrops}
+                    placeholder="e.g. Rice, Tea, Coconut"
+                    placeholderTextColor="#4a7a70"
+                  />
+                </View>
+
+                {/* Farming Zone Selector */}
+                <Text style={styles.inputLabel}>Farming Zone</Text>
+                <View style={styles.roleRow}>
+                  {['Wet Zone', 'Dry Zone', 'Intermediate Zone'].map((zone) => (
+                    <TouchableOpacity
+                      key={zone}
+                      style={[
+                        styles.roleOption,
+                        editFarmingZone === zone && styles.farmZoneActive
+                      ]}
+                      onPress={() => setEditFarmingZone(zone)}
+                    >
+                      <Text style={[
+                        styles.roleOptionText,
+                        editFarmingZone === zone && styles.roleOptionTextActive
+                      ]}>
+                        {zone.replace(' Zone', '')}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+
+                {/* Save Button */}
+                <TouchableOpacity
+                  style={[styles.saveButton, { backgroundColor: '#2ecc71' }, saving && { opacity: 0.6 }]}
+                  onPress={handleSaveFarmDetails}
+                  disabled={saving}
+                >
+                  {saving ? (
+                    <ActivityIndicator color="#0a1f1c" />
+                  ) : (
+                    <Text style={styles.saveButtonText}>Save Farm Details</Text>
+                  )}
+                </TouchableOpacity>
+              </ScrollView>
             </View>
           </View>
         </TouchableWithoutFeedback>
@@ -617,5 +786,22 @@ const styles = StyleSheet.create({
     color: '#0a1f1c',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  editFarmButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'center',
+    marginTop: 14,
+    marginBottom: 8,
+    paddingHorizontal: 18,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#2ecc71',
+    gap: 6,
+  },
+  farmZoneActive: {
+    backgroundColor: '#2ecc71',
+    borderColor: '#2ecc71',
   },
 });
