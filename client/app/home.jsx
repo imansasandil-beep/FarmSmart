@@ -141,7 +141,7 @@ export default function HomeScreen() {
     },
     {
       title: 'Profile',
-      subtitle: 'Manage your account',
+      subtitle: 'View and edit your profile & farm',
       icon: 'person-circle',
       iconColor: '#8e44ad',
       route: 'profile',
