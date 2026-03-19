@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity, ScrollView,
   ActivityIndicator, StatusBar, Dimensions, Modal,
@@ -35,7 +35,7 @@ export default function ProfileScreen() {
   const [editCrops, setEditCrops] = useState('');
   const [editFarmingZone, setEditFarmingZone] = useState('');
 
-  const loadProfile = useCallback(async () => {
+  const loadProfile = async () => {
     try {
       setLoading(true);
       const token = await getToken();
@@ -56,11 +56,11 @@ export default function ProfileScreen() {
     } finally {
       setLoading(false);
     }
-  }, [getToken]);
+  };
 
   useEffect(() => {
     loadProfile();
-  }, [loadProfile]);
+  }, []);
 
   const getRoleBadgeColor = (role) => {
     switch (role) {
