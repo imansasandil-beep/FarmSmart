@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const Order = require('../models/Order');
 const Listing = require('../models/Listing');
+const { createNotification } = require('./notifications');
 
 /**
  * Order Routes
@@ -57,6 +58,17 @@ router.post('/', async (req, res) => {
             listing.isActive = false; // Auto-deactivate if sold out
         }
         await listing.save();
+
+        // Notify the seller about the new order
+        if (createNotification) {
+            await createNotification(
+                sellerId.toString(),
+                'order',
+                'New Order Received 🛒',
+                `You have a new order for ${listing.title}`,
+                { orderId: savedOrder._id, listingId }
+            );
+        }
 
         res.status(201).json({
             message: 'Order created successfully',
@@ -141,6 +153,25 @@ router.put('/:id/status', async (req, res) => {
         }
 
         await order.save();
+
+        // Notify buyer about order status change
+        if (createNotification) {
+            const statusMessages = {
+                'confirmed': 'Your order has been confirmed by the seller ✅',
+                'processing': 'Your order is being processed 📦',
+                'shipped': 'Your order has been shipped 🚚',
+                'delivered': 'Your order has been delivered 🎉',
+                'cancelled': 'Your order has been cancelled ❌',
+            };
+            await createNotification(
+                order.buyerId.toString(),
+                'order',
+                `Order ${status.charAt(0).toUpperCase() + status.slice(1)}`,
+                statusMessages[status] || `Your order status changed to ${status}`,
+                { orderId: order._id }
+            );
+        }
+
         res.status(200).json({ message: 'Order status updated', order });
     } catch (error) {
         res.status(500).json({ message: error.message });
