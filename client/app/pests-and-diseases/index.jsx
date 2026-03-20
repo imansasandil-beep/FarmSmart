@@ -20,11 +20,11 @@ export default function PestsAndDiseasesScreen() {
     const [records, setRecords] = useState([]);
     const [filteredRecords, setFilteredRecords] = useState([]);
     const [searchText, setSearchText] = useState('');
-    const [activeFilter, setActiveFilter] = useState('All');
+    const [activeFilter, setActiveFilter] = useState('සියල්ල');
     const [loading, setLoading] = useState(true);
     const [expandedId, setExpandedId] = useState(null);
 
-    const filters = ['All', 'Pest', 'Disease'];
+    const filters = ['සියල්ල', 'පළිබෝධ', 'රෝග'];
 
     // ─── Fetch all records on mount ───
     useEffect(() => {
@@ -38,7 +38,7 @@ export default function PestsAndDiseasesScreen() {
             setRecords(response.data);
             setFilteredRecords(response.data);
         } catch (err) {
-            Alert.alert('Error', 'Could not load pest & disease data.');
+            Alert.alert('දෝෂය', 'පළිබෝධ සහ රෝග දත්ත පැටවීම අසාර්ථක විය.');
             console.log('Fetch error:', err);
         } finally {
             setLoading(false);
@@ -67,7 +67,7 @@ export default function PestsAndDiseasesScreen() {
                 }
 
                 // Apply the type filter client-side
-                if (typeFilter !== 'All') {
+                if (typeFilter !== 'සියල්ල') {
                     data = data.filter((item) => item.type === typeFilter);
                 }
 
@@ -87,7 +87,7 @@ export default function PestsAndDiseasesScreen() {
     // ─── Render a single card ───
     const renderCard = ({ item }) => {
         const isExpanded = expandedId === item._id;
-        const isPest = item.type === 'Pest';
+        const isPest = item.type === 'පළිබෝධ';
 
         return (
             <TouchableOpacity
@@ -124,7 +124,7 @@ export default function PestsAndDiseasesScreen() {
                         <View style={styles.detailSection}>
                             <View style={styles.detailLabelRow}>
                                 <Ionicons name="alert-circle-outline" size={16} color="#f9a825" />
-                                <Text style={styles.detailLabel}>Symptoms</Text>
+                                <Text style={styles.detailLabel}>රෝග ලක්ෂණ</Text>
                             </View>
                             <Text style={styles.detailText}>{item.symptoms}</Text>
                         </View>
@@ -134,7 +134,7 @@ export default function PestsAndDiseasesScreen() {
                         <View style={styles.detailSection}>
                             <View style={styles.detailLabelRow}>
                                 <Ionicons name="medkit-outline" size={16} color="#6fdfc4" />
-                                <Text style={[styles.detailLabel, { color: '#6fdfc4' }]}>Treatment</Text>
+                                <Text style={[styles.detailLabel, { color: '#6fdfc4' }]}>ප්‍රතිකාර</Text>
                             </View>
                             <Text style={styles.detailText}>{item.treatment}</Text>
                         </View>
@@ -158,7 +158,7 @@ export default function PestsAndDiseasesScreen() {
         return (
             <View style={[styles.container, styles.centered]}>
                 <ActivityIndicator size="large" color="#6fdfc4" />
-                <Text style={styles.loadingText}>Loading data…</Text>
+                <Text style={styles.loadingText}>දත්ත පූරණය වෙමින් පවතී…</Text>
             </View>
         );
     }
@@ -170,7 +170,7 @@ export default function PestsAndDiseasesScreen() {
                 <TouchableOpacity onPress={() => router.back()}>
                     <Ionicons name="arrow-back" size={28} color="white" />
                 </TouchableOpacity>
-                <Text style={styles.title}>Pests & Diseases</Text>
+                <Text style={styles.title}>පළිබෝධ සහ රෝග</Text>
                 <Ionicons name="bug" size={24} color="#6fdfc4" />
             </View>
 
@@ -179,7 +179,7 @@ export default function PestsAndDiseasesScreen() {
                 <Ionicons name="search" size={20} color="#8aa6a3" style={{ marginRight: 8 }} />
                 <TextInput
                     style={styles.searchInput}
-                    placeholder="Search by name or crop…"
+                    placeholder="නම හෝ බෝගය අනුව සොයන්න…"
                     placeholderTextColor="#8aa6a3"
                     value={searchText}
                     onChangeText={setSearchText}
@@ -211,7 +211,7 @@ export default function PestsAndDiseasesScreen() {
                 ))}
                 <View style={styles.resultCount}>
                     <Text style={styles.resultCountText}>
-                        {filteredRecords.length} result{filteredRecords.length !== 1 ? 's' : ''}
+                        ප්‍රතිඵල {filteredRecords.length} යි
                     </Text>
                 </View>
             </View>
@@ -226,8 +226,8 @@ export default function PestsAndDiseasesScreen() {
                 ListEmptyComponent={
                     <View style={styles.emptyContainer}>
                         <Ionicons name="leaf-outline" size={60} color="#2a5d55" />
-                        <Text style={styles.emptyText}>No results found</Text>
-                        <Text style={styles.emptySubText}>Try a different search or filter</Text>
+                        <Text style={styles.emptyText}>ප්‍රතිඵල හමු නොවීය</Text>
+                        <Text style={styles.emptySubText}>වෙනත් සෙවුමක් හෝ පෙරහනක් උත්සාහ කරන්න</Text>
                     </View>
                 }
             />
