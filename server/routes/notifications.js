@@ -157,6 +157,5 @@ router.delete('/cleanup/:userId', async (req, res) => {
     }
 });
 
-// Export router and helper function separately to avoid export conflicts
-router.createNotification = createNotification;
-module.exports = router;
+// Export router and helper function as named exports
+module.exports = { router, createNotification };
