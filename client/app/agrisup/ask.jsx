@@ -9,7 +9,7 @@ import { useAuth } from '@clerk/expo';
 import axios from 'axios';
 import { API_BASE_URL } from '../../config';
 
-const CATEGORIES = ['Crops', 'Livestock', 'Soil', 'Pest Control', 'Irrigation', 'General'];
+const CATEGORIES = ['Crops', 'Livestock', 'Soil', 'Pest Control', 'Irrigation', 'Export Support', 'General'];
 
 export default function AskQuestion() {
   const router = useRouter();

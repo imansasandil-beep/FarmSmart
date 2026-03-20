@@ -19,6 +19,7 @@ export default function HomeScreen() {
   const [userName, setUserName] = useState('');
   const [loading, setLoading] = useState(true);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [notifCount, setNotifCount] = useState(0);
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -172,6 +173,50 @@ export default function HomeScreen() {
     }
   };
 
+  const handleNotifications = async () => {
+    try {
+      const token = await getToken();
+      const response = await axios.get(`${API_BASE_URL}/api/notifications/my`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const { notifications, unreadCount } = response.data;
+      setNotifCount(unreadCount || 0);
+
+      if (notifications && notifications.length > 0) {
+        const latest = notifications.slice(0, 5);
+        const notifText = latest.map(n => `${n.read ? '○' : '●'} ${n.title}\n   ${n.message}`).join('\n\n');
+        Alert.alert(
+          `Notifications (${unreadCount} unread)`,
+          notifText,
+          [
+            {
+              text: 'Mark All Read',
+              onPress: async () => {
+                try {
+                  await axios.patch(
+                    `${API_BASE_URL}/api/notifications/read-all/me`,
+                    {},
+                    { headers: { Authorization: `Bearer ${token}` } }
+                  );
+                  setNotifCount(0);
+                } catch (e) {
+                  console.log('Mark read error:', e);
+                }
+              },
+            },
+            { text: 'Close', style: 'cancel' },
+          ]
+        );
+      } else {
+        Alert.alert('Notifications', 'No notifications yet. You\'re all caught up! 🎉');
+      }
+    } catch (error) {
+      console.log('Notification fetch error:', error);
+      Alert.alert('Notifications', 'No notifications yet. You\'re all caught up! 🎉');
+    }
+  };
+
   const handleLogout = () => {
     Alert.alert(
       'Log Out',
@@ -216,9 +261,9 @@ export default function HomeScreen() {
             </Text>
           </View>
           <View style={styles.headerRight}>
-            <TouchableOpacity style={styles.notifButton}>
+            <TouchableOpacity style={styles.notifButton} onPress={handleNotifications}>
               <Ionicons name="notifications-outline" size={22} color="white" />
-              <View style={styles.notifDot} />
+              {notifCount > 0 && <View style={styles.notifDot} />}
             </TouchableOpacity>
             <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
               <Ionicons name="log-out-outline" size={22} color="#ff6b6b" />

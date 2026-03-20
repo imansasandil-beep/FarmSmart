@@ -10,7 +10,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { API_BASE_URL } from '../../config';
 
-const CATEGORIES = ['All', 'Crops', 'Livestock', 'Soil', 'Pest Control', 'Irrigation', 'General'];
+const CATEGORIES = ['All', 'Crops', 'Livestock', 'Soil', 'Pest Control', 'Irrigation', 'Export Support', 'General'];
 
 export default function AgriSupHome() {
   const router = useRouter();

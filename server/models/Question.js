@@ -31,7 +31,7 @@ const QuestionSchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    enum: ['Crops', 'Livestock', 'Soil', 'Pest Control', 'Irrigation', 'General'],
+    enum: ['Crops', 'Livestock', 'Soil', 'Pest Control', 'Irrigation', 'Export Support', 'General'],
     default: 'General',
   },
   authorId: {

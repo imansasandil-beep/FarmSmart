@@ -2,6 +2,7 @@ const router = require('express').Router();
 const Question = require('../models/Question');
 const User = require('../models/User');
 const { requireClerkAuth } = require('../middleware/clerkAuth');
+const { createNotification } = require('./notifications');
 
 // ============================================
 // GET ALL QUESTIONS - Accessible by all authenticated users
@@ -83,6 +84,18 @@ router.post('/', requireClerkAuth, async (req, res) => {
     });
 
     const savedQuestion = await newQuestion.save();
+
+    // Send notification for the new question
+    if (createNotification) {
+      await createNotification(
+        clerkId,
+        'agrisup',
+        'Question Posted ✅',
+        `Your question "${title.trim().substring(0, 50)}" has been posted successfully`,
+        { questionId: savedQuestion._id }
+      );
+    }
+
     res.status(201).json({ question: savedQuestion });
   } catch (err) {
     console.error('Create question error:', err);
@@ -125,6 +138,17 @@ router.post('/:id/answer', requireClerkAuth, async (req, res) => {
     // Mark question as answered
     question.status = 'answered';
     const updatedQuestion = await question.save();
+
+    // Notify the question author about the new answer
+    if (createNotification) {
+      await createNotification(
+        question.authorId,
+        'agrisup',
+        'New Expert Answer 🎓',
+        `${user.fullName} answered your question: "${question.title.substring(0, 50)}"`,
+        { questionId: question._id }
+      );
+    }
 
     res.status(201).json({ question: updatedQuestion });
   } catch (err) {
