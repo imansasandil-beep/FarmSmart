@@ -58,9 +58,8 @@ const QuestionSchema = new mongoose.Schema({
   },
 });
 
-QuestionSchema.pre('save', function (next) {
+QuestionSchema.pre('save', function () {
   this.updatedAt = Date.now();
-  next();
 });
 
 module.exports = mongoose.model('Question', QuestionSchema);
