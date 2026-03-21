@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet,
   Alert, ActivityIndicator, StatusBar, KeyboardAvoidingView, Platform
@@ -13,6 +13,17 @@ export default function MFAScreen() {
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    const prepareVerification = async () => {
+      try {
+        await signIn.prepareSecondFactor({ strategy: 'email_code' });
+      } catch (err) {
+        console.error('Failed to send email verification code:', err);
+      }
+    };
+    prepareVerification();
+  }, []);
+
   const handleVerify = async () => {
     if (!code.trim()) {
       Alert.alert('Error', 'Please enter the verification code');
@@ -22,7 +33,7 @@ export default function MFAScreen() {
     setLoading(true);
     try {
       const result = await signIn.attemptSecondFactor({
-        strategy: 'phone_code',
+        strategy: 'email_code',
         code: code.trim(),
       });
 
@@ -63,7 +74,7 @@ export default function MFAScreen() {
 
         <Text style={styles.title}>Two-Step Verification</Text>
         <Text style={styles.subtitle}>
-          Enter the verification code sent to your phone to continue signing in.
+          Enter the verification code sent to your email to continue signing in.
         </Text>
 
         {/* Code Input */}
@@ -100,7 +111,7 @@ export default function MFAScreen() {
         <View style={styles.infoCard}>
           <Ionicons name="information-circle-outline" size={20} color="#6fdfc4" />
           <Text style={styles.infoText}>
-            Check your phone for a text message with your verification code. If you didn't receive it, go back and try again.
+            Check your email inbox for a message with your verification code. If you didn't receive it, go back and try again.
           </Text>
         </View>
       </KeyboardAvoidingView>
