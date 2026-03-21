@@ -22,7 +22,8 @@ function AuthGate({ children }) {
     const onAuthScreen = segments[0] === undefined || // index (login)
       segments[0] === 'index' ||
       segments[0] === 'register' ||
-      segments[0] === 'success';
+      segments[0] === 'success' ||
+      segments[0] === 'mfa';
 
     // Allow signed-in users to access onboarding without being redirected to /home
     const onOnboardingScreen = segments[0] === 'onboarding';
@@ -45,6 +46,7 @@ export default function RootLayout() {
           <Stack.Screen name="index" />
           <Stack.Screen name="register" />
           <Stack.Screen name="success" />
+          <Stack.Screen name="mfa" />
           <Stack.Screen name="onboarding" />
           <Stack.Screen name="home" />
           <Stack.Screen name="tasks" />

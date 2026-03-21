@@ -54,6 +54,9 @@ export default function LoginScreen() {
             router.replace('/home');
           },
         });
+      } else if (signIn.status === 'needs_second_factor') {
+        // User has 2FA enabled, navigate to the MFA verification screen
+        router.push('/mfa');
       } else {
         console.log('Sign-in status:', signIn.status);
         Alert.alert("Info", "Sign-in status: " + signIn.status);
