@@ -58,8 +58,8 @@ const uploadToCloudinary = (buffer, options = {}) => {
     });
 };
 
-// POST /api/upload - Upload an image
-router.post('/', upload.single('image'), async (req, res) => {
+// Handler for single image upload
+const uploadImageHandler = async (req, res) => {
     try {
         if (!req.file) {
             return res.status(400).json({ message: 'No image file provided' });
@@ -97,7 +97,13 @@ router.post('/', upload.single('image'), async (req, res) => {
         console.error('Upload error:', error);
         res.status(500).json({ message: 'Failed to upload image' });
     }
-});
+};
+
+// POST /api/upload - Upload an image (used by community posts)
+router.post('/', upload.single('image'), uploadImageHandler);
+
+// POST /api/upload/image - Upload an image (used by marketplace)
+router.post('/image', upload.single('image'), uploadImageHandler);
 
 // DELETE /api/upload/:publicId - Delete an image from Cloudinary
 router.delete('/:publicId', async (req, res) => {
