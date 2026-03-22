@@ -312,66 +312,66 @@ const seedData = [
     //  CINNAMON  (Sources: dea.gov.lk, cinnamon.gov.lk)
     // ═══════════════════════════════════════════════════════════════
     {
-        name: 'Cinnamon Rough Bark Disease',
+        name: 'Cinnamon Rough Bark Disease / කුරුඳු රළු පොත්ත රෝගය',
         type: 'Disease',
         affectedCrops: ['Cinnamon'],
         symptoms:
-            'Brown spots appear on young shoots that gradually spread, causing the immature bark to become coarse and rough-textured. Peeling becomes difficult, reducing the quality of processed cinnamon quills. Caused by Phomopsis spp. and other fungi (Pestalotiopsis, Colletotrichum). Common in nearly all cinnamon-growing areas of Sri Lanka.',
+            'Brown spots appear on young shoots that gradually spread, causing the immature bark to become coarse and rough-textured. Peeling becomes difficult, reducing the quality of processed cinnamon quills. Caused by Phomopsis spp. and other fungi (Pestalotiopsis, Colletotrichum). Common in nearly all cinnamon-growing areas of Sri Lanka. / තරුණ දළු මත දුඹුරු ලප ඇතිවී ඒවා ක්‍රමයෙන් පැතිරී ළපටි පොත්ත රළු වේ. මේ නිසා පොත්ත ගැලවීමට අපහසු වන අතර කුරුඳු කූරුවල ගුණාත්මකභාවය අඩුවේ. දිලීර මගින් මෙය ඇතිවේ.',
         treatment:
-            'Prune and destroy infected shoots before the disease spreads. Apply Mancozeb 80% WP or Copper Oxychloride as a foliar spray during rainy periods. Maintain good spacing and air circulation in plantations. Avoid wounding stems during harvesting. Follow DEA guidelines on disease-free planting material.',
+            'Prune and destroy infected shoots before the disease spreads. Apply Mancozeb 80% WP or Copper Oxychloride as a foliar spray during rainy periods. Maintain good spacing and air circulation in plantations. Avoid wounding stems during harvesting. Follow DEA guidelines on disease-free planting material. / රෝගය පැතිරීමට පෙර ආසාදිත දළු කපා විනාශ කරන්න. වැසි කාලයේදී දිලීර නාශකයක් ඉසින්න. අස්වනු නෙළීමේදී කඳ තුවාල වීමෙන් වළකින්න.',
     },
     {
-        name: 'Cinnamon Pink Stem Borer',
+        name: 'Cinnamon Pink Stem Borer / කුරුඳු රෝස කඳ විදින දළඹුවා',
         type: 'Pest',
         affectedCrops: ['Cinnamon'],
         symptoms:
-            'Larvae of Ichneumoniptera cinnamomumi burrow into the base of cinnamon stems, causing shoots to wilt and eventually fall off. Entry holes visible near the base with frass. The base decays over time, killing the entire shoot. Considered the most destructive pest of cinnamon in Sri Lanka.',
+            'Larvae of Ichneumoniptera cinnamomumi burrow into the base of cinnamon stems, causing shoots to wilt and eventually fall off. Entry holes visible near the base with frass. The base decays over time, killing the entire shoot. Considered the most destructive pest of cinnamon in Sri Lanka. / දළඹුවන් කුරුඳු කඳේ පාදමට විදීම නිසා දළු මැලවී කඩා වැටේ. පාදම අසල සිදුරු හා මළපහ දැකිය හැක. කඳේ පාදම දිරාපත් වී මුළු ශාකයම මිය යාමට පුළුවන.',
         treatment:
-            'Remove and destroy infested stems below the bore hole. Apply contact insecticides to the base of plants during peak adult emergence (rainy season). Keep the plantation floor clean to reduce pupation sites. Use trap crops or light traps for monitoring adult moths. Follow DEA and National Cinnamon Research Centre recommendations.',
+            'Remove and destroy infested stems below the bore hole. Apply contact insecticides to the base of plants during peak adult emergence (rainy season). Keep the plantation floor clean to reduce pupation sites. Use trap crops or light traps for monitoring adult moths. Follow DEA and National Cinnamon Research Centre recommendations. / කඳ විද ඇති ස්ථානයට පහළින් කඳ කපා විනාශ කරන්න. වැසි කාලයේදී කෘමිනාශකයක් කඳේ පාදමට යොදන්න. වගා භූමිය පිරිසිදුව තබා ගන්න.',
     },
 
     // ═══════════════════════════════════════════════════════════════
     //  PEPPER  (Sources: dea.gov.lk, Department of Export Agriculture)
     // ═══════════════════════════════════════════════════════════════
     {
-        name: 'Pepper Quick Wilt',
+        name: 'Pepper Quick Wilt / ගම්මිරිස් ඉක්මන් මැලවීමේ රෝගය',
         type: 'Disease',
         affectedCrops: ['Black Pepper', 'Pepper'],
         symptoms:
-            'Rapid wilting and drying of pepper vines within 2–3 weeks. Leaves turn yellow, droop, and fall. Roots and root collar show dark brown to black rot when examined. Caused by Phytophthora capsici, which attacks the root system. Particularly severe during hot, dry spells followed by sudden rainfall in the mid-country.',
+            'Rapid wilting and drying of pepper vines within 2–3 weeks. Leaves turn yellow, droop, and fall. Roots and root collar show dark brown to black rot when examined. Caused by Phytophthora capsici, which attacks the root system. Particularly severe during hot, dry spells followed by sudden rainfall in the mid-country. / සති 2-3 ක් ඇතුළත ගම්මිරිස් වැල වේගයෙන් මැලවී වියළී යයි. කොළ කහ පැහැ වී කඩා හැලේ. මුල් සහ කඳේ පාදම දුඹුරු හෝ කළු පැහැ වී කුණුවීමක් දැකිය හැක.',
         treatment:
-            'Improve drainage around vine bases. Apply Metalaxyl + Mancozeb (Ridomil Gold) as a soil drench at the onset of monsoon. Apply Trichoderma-based bioagents to the root zone. Avoid injuring roots during weeding. Use pepper varieties with field tolerance (e.g. Panniyur selections). Follow DEA alert circulars on Quick Wilt management.',
+            'Improve drainage around vine bases. Apply Metalaxyl + Mancozeb (Ridomil Gold) as a soil drench at the onset of monsoon. Apply Trichoderma-based bioagents to the root zone. Avoid injuring roots during weeding. Use pepper varieties with field tolerance (e.g. Panniyur selections). Follow DEA alert circulars on Quick Wilt management. / ශාකය අවට ජලය බැසයාම ක්‍රමවත් කරන්න. වැසි කාලය ආරම්භයේදී නිර්දේශිත දිලීර නාශක පසට යොදන්න. වල් නෙළීමේදී මුල් වලට හානි වීමෙන් වළකින්න.',
     },
     {
-        name: 'Pepper Pollu Beetle',
+        name: 'Pepper Pollu Beetle / ගම්මිරිස් පොල්ලු කුරුමිණියා',
         type: 'Pest',
         affectedCrops: ['Black Pepper', 'Pepper'],
         symptoms:
-            'Small black beetles (Longitarsus nigripennis) feed on developing pepper spikes, causing flowers and immature berries to drop. Spike damage leads to "hollow" or "pinhead" berries with no pungency. Severe during flowering season; losses can reach 30–40% in neglected plantations.',
+            'Small black beetles (Longitarsus nigripennis) feed on developing pepper spikes, causing flowers and immature berries to drop. Spike damage leads to "hollow" or "pinhead" berries with no pungency. Severe during flowering season; losses can reach 30–40% in neglected plantations. / කුඩා කළු පැහැති කුරුමිණියන් වර්ධනය වන ගම්මිරිස් කරල් විදීම නිසා මල් සහ ගැට හැලී යයි. මෙහිදී හිස් හෝ කුඩා බෙරි හටගන්නා අතර ඒවායේ සැර ගතියක් නොමැත.',
         treatment:
-            'Spray Quinalphos 25% EC or neem-based insecticides during early spike emergence. Apply two rounds of spray — first at spike initiation and second at berry formation. Maintain clean plantation floor to reduce pupation habitat. Follow DEA recommended spray schedule for the specific agro-ecological zone.',
+            'Spray Quinalphos 25% EC or neem-based insecticides during early spike emergence. Apply two rounds of spray — first at spike initiation and second at berry formation. Maintain clean plantation floor to reduce pupation habitat. Follow DEA recommended spray schedule for the specific agro-ecological zone. / කරල් හටගන්නා මුල් අවධියේදී ක්විනල්ෆොස් හෝ කොහොඹ ආශ්‍රිත කෘමිනාශක ඉසින්න. කෘමිනාශක වට දෙකක් පමණ යෙදිය යුතුය.',
     },
 
     // ═══════════════════════════════════════════════════════════════
     //  CARDAMOM  (Sources: dea.gov.lk, vikaspedia.in)
     // ═══════════════════════════════════════════════════════════════
     {
-        name: 'Cardamom Thrips',
+        name: 'Cardamom Thrips / එනසාල් පැළ මැක්කා',
         type: 'Pest',
         affectedCrops: ['Cardamom'],
         symptoms:
-            'Feeding damage by Sciothrips cardamomi on panicles, flowers, and young capsules. Capsules develop a scabby, rough, and discoloured surface. Severe damage causes premature flower drop, stunted capsules, and empty pods with no market value. Most destructive pest of cardamom in Sri Lanka.',
+            'Feeding damage by Sciothrips cardamomi on panicles, flowers, and young capsules. Capsules develop a scabby, rough, and discoloured surface. Severe damage causes premature flower drop, stunted capsules, and empty pods with no market value. Most destructive pest of cardamom in Sri Lanka. / පැළ මැක්කන් විසින් මල් සහ ළපටි කරල් වලට හානි කිරීම නිසා කරල් මතුපිට රළු, කොරපොතු සහිත වී විකෘති වේ. මල් අකාලයේ හැලී යාම සහ හිස් කරල් හටගැනීම සිදුවේ.',
         treatment:
-            'Remove dried leaves and debris from the base of plants to reduce thrips refugia. Apply Dimethoate 30% EC or neem oil at early flowering stage. Use overhead micro-sprinklers during dry periods to create unfavourable conditions for thrips. Follow DEA integrated management guidelines for cardamom.',
+            'Remove dried leaves and debris from the base of plants to reduce thrips refugia. Apply Dimethoate 30% EC or neem oil at early flowering stage. Use overhead micro-sprinklers during dry periods to create unfavourable conditions for thrips. Follow DEA integrated management guidelines for cardamom. / ශාක පාමුල ඇති වියළි කොළ සහ කුණු ඉවත් කරන්න. මල් පිපෙන මුල් අවධියේදී නිර්දේශිත කෘමිනාශක හෝ කොහොඹ තෙල් යොදන්න. වියළි කාලයේදී ජලය ඉසින්න.',
     },
     {
-        name: 'Cardamom Capsule Rot (Azhukal)',
+        name: 'Cardamom Capsule Rot (Azhukal) / එනසාල් කරල් කුණුවීමේ රෝගය',
         type: 'Disease',
         affectedCrops: ['Cardamom'],
         symptoms:
-            'Water-soaked lesions on young capsules that enlarge and turn dark brown to black. Infected capsules rot and emit a foul smell. The disease caused by Phytophthora spp. thrives during the southwest monsoon in poorly drained, shaded plantations. Can lead to total loss of the harvest in severely affected fields.',
+            'Water-soaked lesions on young capsules that enlarge and turn dark brown to black. Infected capsules rot and emit a foul smell. The disease caused by Phytophthora spp. thrives during the southwest monsoon in poorly drained, shaded plantations. Can lead to total loss of the harvest in severely affected fields. / තරුණ කරල් මත ජලකාමී ලප ඇතිවී ඒවා විශාල වී තද දුඹුරු හෝ කළු පැහැයට හැරේ. ආසාදිත කරල් කුණු වී දුගඳක් හමයි. තෙත් සහ අධික සෙවන සහිත ස්ථානවල මෙය බහුලව දක්නට ලැබේ.',
         treatment:
-            'Improve drainage in the plantation. Apply 1% Bordeaux mixture or Potassium Phosphonate as a preventive spray before the monsoon. Remove and destroy all infected capsules and debris. Maintain proper shade levels (not too dense). Follow DEA advisory on Phytophthora management in spice crops.',
+            'Improve drainage in the plantation. Apply 1% Bordeaux mixture or Potassium Phosphonate as a preventive spray before the monsoon. Remove and destroy all infected capsules and debris. Maintain proper shade levels (not too dense). Follow DEA advisory on Phytophthora management in spice crops. / වගාවේ ජලවහනය දියුණු කරන්න. මෝසම් වැසි වලට පෙර 1% බෝඩෝ මිශ්‍රණයක් වැනි දිලීර නාශකයක් ඉසින්න. ආසාදිත කරල් ඉවත් කර විනාශ කරන්න.',
     },
 ];
 
