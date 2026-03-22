@@ -223,89 +223,89 @@ const seedData = [
     //  CHILI / VEGETABLES  (Sources: DOA doa.gov.lk, dea.gov.lk)
     // ═══════════════════════════════════════════════════════════════
     {
-        name: 'Chili Anthracnose',
+        name: 'Chili Anthracnose / මිරිස් ඇන්ත්‍රැක්නෝස් රෝගය',
         type: 'Disease',
         affectedCrops: ['Chili', 'Capsicum', 'Bell Pepper'],
         symptoms:
-            'Sunken, circular, dark lesions on ripe and mature green fruits, often with concentric rings. Lesions may coalesce causing extensive fruit rot. Under humid conditions, salmon-pink spore masses appear in the centre of lesions. Caused by Colletotrichum capsici and C. gloeosporioides.',
+            'Sunken, circular, dark lesions on ripe and mature green fruits, often with concentric rings. Lesions may coalesce causing extensive fruit rot. Under humid conditions, salmon-pink spore masses appear in the centre of lesions. Caused by Colletotrichum capsici and C. gloeosporioides. / ඉදුණු සහ මේරූ අමු කරල් මත රවුම්, ගිලුණු, තද දුඹුරු පැහැති ලප ඇතිවේ. ලප විශාල වී කරල් කුණුවීම සිදුවේ. තෙත් කාලගුණයේදී ලප මධ්‍යයේ රෝස පැහැති බීජාණු ගොනු දැකිය හැක.',
         treatment:
-            'Use certified disease-free seed. Treat seeds with Thiram or Captan before sowing. Apply Mancozeb 80% WP or Carbendazim 50% WP at flowering and fruiting stages. Practise crop rotation (minimum 2 years). Remove and destroy infected fruit debris. Avoid overhead irrigation.',
+            'Use certified disease-free seed. Treat seeds with Thiram or Captan before sowing. Apply Mancozeb 80% WP or Carbendazim 50% WP at flowering and fruiting stages. Practise crop rotation (minimum 2 years). Remove and destroy infected fruit debris. Avoid overhead irrigation. / සහතික කළ නිරෝගී බීජ භාවිතා කරන්න. මල් හටගන්නා සහ කරල් සෑදෙන අවධියේදී නිර්දේශිත දිලීර නාශක යොදන්න. ආසාදිත කරල් අස්කර විනාශ කරන්න.',
     },
     {
-        name: 'Chili Leaf Curl Complex',
+        name: 'Chili Leaf Curl Complex / මිරිස් කොළ කොඩවීමේ රෝගය',
         type: 'Disease',
         affectedCrops: ['Chili', 'Capsicum'],
         symptoms:
-            'Upward curling and puckering of leaves with thickened, leathery texture. Stunted plant growth with shortened internodes giving a bushy appearance. Caused by a begomovirus transmitted by the whitefly Bemisia tabaci. Yield losses can be 50–70% in severe outbreaks in the dry zone of Sri Lanka.',
+            'Upward curling and puckering of leaves with thickened, leathery texture. Stunted plant growth with shortened internodes giving a bushy appearance. Caused by a begomovirus transmitted by the whitefly Bemisia tabaci. Yield losses can be 50–70% in severe outbreaks in the dry zone of Sri Lanka. / පත්‍ර ඉහළට හැරී ඇකිලී ගොස් ඝන වේ. ශාකයේ වර්ධනය බාල වී පඳුරක් මෙන් දිස්වේ. සුදු මැස්සා මගින් බෝවන වෛරසයක් නිසා මෙය ඇතිවේ.',
         treatment:
-            'Control the whitefly vector with yellow sticky traps and neem-based insecticides. Apply systemic insecticides (Imidacloprid) to seedlings before transplanting. Use reflective mulch to repel whiteflies. Remove and destroy infected plants immediately. Grow tolerant varieties where available (DOA recommendations).',
+            'Control the whitefly vector with yellow sticky traps and neem-based insecticides. Apply systemic insecticides (Imidacloprid) to seedlings before transplanting. Use reflective mulch to repel whiteflies. Remove and destroy infected plants immediately. Grow tolerant varieties where available (DOA recommendations). / කහ පැහැති ඇලෙන සුළු උගුල් සහ කොහොඹ ආශ්‍රිත කෘමිනාශක මගින් සුදු මැස්සන් පාලනය කරන්න. ආසාදිත ශාක වහාම ගලවා විනාශ කරන්න.',
     },
     {
-        name: 'Tomato Bacterial Wilt',
+        name: 'Tomato Bacterial Wilt / තක්කාලි බැක්ටීරියා මැලවීමේ රෝගය',
         type: 'Disease',
         affectedCrops: ['Tomato', 'Brinjal', 'Chili', 'Potato'],
         symptoms:
-            'Sudden wilting of the entire plant without yellowing of leaves. Lower leaves may droop first. When the stem is cut and placed in water, milky-white bacterial ooze streams out — a diagnostic test. Caused by Ralstonia solanacearum, a soil-borne bacterium highly persistent in wet zone soils of Sri Lanka.',
+            'Sudden wilting of the entire plant without yellowing of leaves. Lower leaves may droop first. When the stem is cut and placed in water, milky-white bacterial ooze streams out — a diagnostic test. Caused by Ralstonia solanacearum, a soil-borne bacterium highly persistent in wet zone soils of Sri Lanka. / කොළ කහ පැහැ ගැන්වීමකින් තොරව හදිසියේම මුළු ශාකයම මැලවී යාම සිදුවේ. කඳ කපා ජලයේ දැමූ විට සුදු පැහැති බැක්ටීරියා ශ්‍රාවයක් පිටවේ. පසෙහි ජීවත්වන බැක්ටීරියාවක් මගින් මෙය ඇතිවේ.',
         treatment:
-            'Use resistant varieties recommended by DOA. Practise crop rotation with non-solanaceous crops (rice, maize) for at least 3 years. Soil solarisation before planting. Apply Trichoderma viride to the planting hole. Avoid waterlogging; ensure good drainage. Remove and destroy infected plants immediately — do not compost them.',
+            'Use resistant varieties recommended by DOA. Practise crop rotation with non-solanaceous crops (rice, maize) for at least 3 years. Soil solarisation before planting. Apply Trichoderma viride to the planting hole. Avoid waterlogging; ensure good drainage. Remove and destroy infected plants immediately — do not compost them. / රෝගයට ඔරොත්තු දෙන ප්‍රභේද වගා කරන්න. අවම වශයෙන් වසර 3 ක බෝග මාරුවක් කරන්න. ජලය බැසයාම ක්‍රමවත් කරන්න. ආසාදිත ශාක විනාශ කරන්න.',
     },
     {
-        name: 'Tomato Late Blight',
+        name: 'Tomato Late Blight / තක්කාලි ප්‍රමාද අංගමාරය',
         type: 'Disease',
         affectedCrops: ['Tomato', 'Potato'],
         symptoms:
-            'Large, irregular, water-soaked, dark brown lesions on leaves, often with a pale green halo. White, cottony fungal growth visible on the underside of leaves during humid mornings. Fruits develop firm, dark, greasy-looking patches. Caused by Phytophthora infestans. Severe in upcountry wet zone areas during the Maha season.',
+            'Large, irregular, water-soaked, dark brown lesions on leaves, often with a pale green halo. White, cottony fungal growth visible on the underside of leaves during humid mornings. Fruits develop firm, dark, greasy-looking patches. Caused by Phytophthora infestans. Severe in upcountry wet zone areas during the Maha season. / කොළ මත විශාල, අක්‍රමවත්, තද දුඹුරු පැහැති ජලකාමී ලප ඇතිවේ. තෙතමනය සහිත උදෑසනක කොළ යට සුදු පුස් දැකිය හැක. ගෙඩි මත අඳුරු පෙනුමක් ඇති ලප සෑදේ.',
         treatment:
-            'Apply Mancozeb 80% WP or Metalaxyl + Mancozeb (Ridomil Gold) preventively before rainy periods. Use raised beds and proper spacing for air circulation. Remove and destroy affected plant parts. Grow DOA-recommended tolerant varieties. Avoid overhead irrigation; use drip irrigation.',
+            'Apply Mancozeb 80% WP or Metalaxyl + Mancozeb (Ridomil Gold) preventively before rainy periods. Use raised beds and proper spacing for air circulation. Remove and destroy affected plant parts. Grow DOA-recommended tolerant varieties. Avoid overhead irrigation; use drip irrigation. / වැසි කාලයට පෙර මාන්කොසෙබ් වැනි දිලීර නාශකයක් යොදන්න. හොඳ වාතාශ්‍රයක් සඳහා නිසි පරතරය තබන්න. ඉහළින් ජලය යෙදීමෙන් වළකින්න.',
     },
     {
-        name: 'Brinjal Fruit and Shoot Borer',
+        name: 'Brinjal Fruit and Shoot Borer / වම්බටු කරල් සහ දළු විදින දළඹුවා',
         type: 'Pest',
         affectedCrops: ['Brinjal', 'Eggplant'],
         symptoms:
-            'Larvae of Leucinodes orbonalis bore into tender shoots causing wilting and drooping of growing tips. In fruits, larvae bore inside, leaving entry holes sealed with frass. Infested fruits show internal tunnelling and become unmarketable. Yield losses can exceed 60% in the wet zone of Sri Lanka.',
+            'Larvae of Leucinodes orbonalis bore into tender shoots causing wilting and drooping of growing tips. In fruits, larvae bore inside, leaving entry holes sealed with frass. Infested fruits show internal tunnelling and become unmarketable. Yield losses can exceed 60% in the wet zone of Sri Lanka. / දළඹුවන් ළපටි දළු තුළට විදීම නිසා දළු මැලවී කඩා වැටේ. කරල් ඇතුළට විද අනුභව කිරීම නිසා කරල් පරිභෝජනයට නුසුදුසු වේ. සිදුරු අසල මළපහ දැකිය හැක.',
         treatment:
-            'Remove and destroy all wilted shoots and infested fruits weekly. Use pheromone traps for monitoring and mass trapping of adult males. Apply neem-based insecticides (Azadirachtin). Avoid broad-spectrum pesticides to preserve natural enemies (parasitoid wasps). As a last resort, apply Emamectin benzoate 5% SG (DOA-approved).',
+            'Remove and destroy all wilted shoots and infested fruits weekly. Use pheromone traps for monitoring and mass trapping of adult males. Apply neem-based insecticides (Azadirachtin). Avoid broad-spectrum pesticides to preserve natural enemies (parasitoid wasps). As a last resort, apply Emamectin benzoate 5% SG (DOA-approved). / මැලවී ගිය දළු සහ හානි වූ කරල් සතිපතා ඉවත් කර විනාශ කරන්න. පෙරමෝන උගුල් සහ කොහොඹ ආශ්‍රිත කෘමිනාශක භාවිතා කරන්න.',
     },
     {
-        name: 'Okra Yellow Vein Mosaic',
+        name: 'Okra Yellow Vein Mosaic / බණ්ඩක්කා කහ නහර මොසෙයික් රෝගය',
         type: 'Disease',
         affectedCrops: ['Okra', 'Ladies Finger'],
         symptoms:
-            'Bright yellow vein clearing and interveinal yellowing of leaves, creating a net-like mosaic pattern. Severely infected plants are stunted with small, malformed, and tough fruits. Caused by a begomovirus transmitted by the whitefly Bemisia tabaci. Can cause total crop loss in susceptible varieties.',
+            'Bright yellow vein clearing and interveinal yellowing of leaves, creating a net-like mosaic pattern. Severely infected plants are stunted with small, malformed, and tough fruits. Caused by a begomovirus transmitted by the whitefly Bemisia tabaci. Can cause total crop loss in susceptible varieties. / කොළ වල නහර කහ පැහැ වී දැල් වැනි රටාවක් ඇතිවේ. ශාකයේ වර්ධනය බාල වී කරල් කුඩා, විකෘති සහ දෘඩ වේ. මෙය සුදු මැස්සා මගින් බෝවන රෝගයකි.',
         treatment:
-            'Grow resistant/tolerant varieties (e.g. MI-5, MI-7 recommended by DOA Sri Lanka). Control whitefly vectors using yellow sticky traps and neem oil. Apply Imidacloprid as a seed treatment or soil drench at transplanting. Use silver-coloured reflective mulch to repel whiteflies. Uproot and destroy infected plants immediately.',
+            'Grow resistant/tolerant varieties (e.g. MI-5, MI-7 recommended by DOA Sri Lanka). Control whitefly vectors using yellow sticky traps and neem oil. Apply Imidacloprid as a seed treatment or soil drench at transplanting. Use silver-coloured reflective mulch to repel whiteflies. Uproot and destroy infected plants immediately. / රෝගයට ඔරොත්තු දෙන ප්‍රභේද වගා කරන්න. කහ පැහැති උගුල් සහ කොහොඹ තෙල් මගින් සුදු මැස්සන් පාලනය කරන්න. ආසාදිත ශාක ගලවා විනාශ කරන්න.',
     },
 
     // ═══════════════════════════════════════════════════════════════
     //  BANANA  (Sources: DOA doa.gov.lk, harti.gov.lk)
     // ═══════════════════════════════════════════════════════════════
     {
-        name: 'Banana Bunchy Top Virus',
+        name: 'Banana Bunchy Top Virus / කෙසෙල් පරඬැල් රෝගය',
         type: 'Disease',
         affectedCrops: ['Banana'],
         symptoms:
-            'Dark green "dot-dash" streaks along the leaf midrib and petiole veins (Morse-code pattern). Leaves become progressively narrower, shorter, and erect with wavy, chlorotic margins, giving a "bunchy top" rosette appearance. Infected plants rarely produce fruit. Spread by the banana aphid (Pentalonia nigronervosa).',
+            'Dark green "dot-dash" streaks along the leaf midrib and petiole veins (Morse-code pattern). Leaves become progressively narrower, shorter, and erect with wavy, chlorotic margins, giving a "bunchy top" rosette appearance. Infected plants rarely produce fruit. Spread by the banana aphid (Pentalonia nigronervosa). / කොළ නාරටි වල තද කොළ පැහැති තිත් සහ ඉරි දැකිය හැක. කොළ කුඩා වී, එකට එක් වී කොඩවී ඉහළට විහිදී "මිටියක්" මෙන් දිස්වේ. කුඩිත්තන් මගින් රෝගය පැතිරේ.',
         treatment:
-            'Use only virus-free planting material from certified tissue culture labs. Rogue and destroy infected plants immediately by injecting with herbicide (Glyphosate) before uprooting to kill the aphid vector. Control banana aphids with Imidacloprid. Maintain a 10 m quarantine zone around affected areas.',
+            'Use only virus-free planting material from certified tissue culture labs. Rogue and destroy infected plants immediately by injecting with herbicide (Glyphosate) before uprooting to kill the aphid vector. Control banana aphids with Imidacloprid. Maintain a 10 m quarantine zone around affected areas. / පටක රෝපිත නිරෝගී පැළ භාවිතා කරන්න. ආසාදිත ගස් වහාම ගලවා විනාශ කරන්න. කුඩිත්තන් මර්ධනයට කෘමිනාශක යොදන්න.',
     },
     {
-        name: 'Banana Weevil Borer',
+        name: 'Banana Weevil Borer / කෙසෙල් කඳ විදින කුරුමිණියා',
         type: 'Pest',
         affectedCrops: ['Banana', 'Plantain'],
         symptoms:
-            'Tunnelling in the corm by larvae (Cosmopolites sordidus) causing weakened root anchorage — plants topple easily in wind ("snapping"). Reduced bunch weight and delayed maturity. Entry holes visible at the base of the pseudostem with dark frass. Infested corms show extensive brownish tunnels when cut open.',
+            'Tunnelling in the corm by larvae (Cosmopolites sordidus) causing weakened root anchorage — plants topple easily in wind ("snapping"). Reduced bunch weight and delayed maturity. Entry holes visible at the base of the pseudostem with dark frass. Infested corms show extensive brownish tunnels when cut open. / දළඹුවන් විසින් කෙසෙල් අලයේ සිදුරු සාදා අනුභව කිරීම නිසා ගස දුර්වල වී සුළඟට පහසුවෙන් කඩා වැටේ. කඳේ පාදමේ සිදුරු සහ මළපහ දැකිය හැක. අස්වැන්න අඩුවේ.',
         treatment:
-            'Use clean, pest-free planting material; pare corms and dip in Chlorpyrifos solution before planting. Place pseudostem disc traps (split-trap method) in the field to attract and collect adult weevils. Apply Beauveria bassiana (biological control) to the soil around the base. Practise crop rotation and field sanitation.',
+            'Use clean, pest-free planting material; pare corms and dip in Chlorpyrifos solution before planting. Place pseudostem disc traps (split-trap method) in the field to attract and collect adult weevils. Apply Beauveria bassiana (biological control) to the soil around the base. Practise crop rotation and field sanitation. / පිරිසිදු නිරෝගී මොරෙයියන් භාවිතා කරන්න. කෙසෙල් කඳන් කපා උගුල් ලෙස තබා කුරුමිණියන් අල්ලා විනාශ කරන්න. වගා භූමිය පිරිසිදුව තබා ගන්න.',
     },
     {
-        name: 'Panama Disease (Fusarium Wilt of Banana)',
+        name: 'Panama Disease (Fusarium Wilt of Banana) / පැනමා රෝගය (කෙසෙල් මැලවීමේ රෝගය)',
         type: 'Disease',
         affectedCrops: ['Banana'],
         symptoms:
-            'Yellowing and wilting of older leaves, starting from the margins and progressing inward. Leaves collapse and hang around the pseudostem like a skirt. Splitting of the pseudostem base reveals dark brown to reddish vascular discolouration. Caused by Fusarium oxysporum f.sp. cubense, a persistent soil-borne fungus.',
+            'Yellowing and wilting of older leaves, starting from the margins and progressing inward. Leaves collapse and hang around the pseudostem like a skirt. Splitting of the pseudostem base reveals dark brown to reddish vascular discolouration. Caused by Fusarium oxysporum f.sp. cubense, a persistent soil-borne fungus. / පරණ කොළ සහ වාටිය කහ පැහැ වී මැලවී යයි. කොළ පහළට කඩා හැලී කඳ වටා සායක් මෙන් එල්ලී පවතී. කඳ මැද දුඹුරු හෝ රතු පැහැති පැල්ලම් දැකිය හැක. පසෙන් බෝවන දිලීරයකි.',
         treatment:
-            'Use disease-free tissue culture planting material. Avoid planting in previously infested soil. Practise crop rotation with non-host crops for at least 5 years. Apply Trichoderma-based biofungicides to planting holes. There is no effective chemical cure — prevention and resistant varieties (e.g. FHIA hybrids) are the primary strategy.',
+            'Use disease-free tissue culture planting material. Avoid planting in previously infested soil. Practise crop rotation with non-host crops for at least 5 years. Apply Trichoderma-based biofungicides to planting holes. There is no effective chemical cure — prevention and resistant varieties (e.g. FHIA hybrids) are the primary strategy. / පටක රෝපිත නිරෝගී පැළ භාවිතා කරන්න. රෝගය පැවති පසෙහි නැවත වගා කිරීමෙන් වළකින්න. ට්‍රයිකොඩර්මා (Trichoderma) ජෛව දිලීර නාශක යොදන්න.',
     },
 
     // ═══════════════════════════════════════════════════════════════
