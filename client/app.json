@@ -20,7 +20,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.imansasandil.farmsmart"
+      "package": "com.imansasandil.farmsmartconnect"
     },
     "web": {
       "output": "static",

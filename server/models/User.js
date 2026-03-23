@@ -57,6 +57,16 @@ const UserSchema = new mongoose.Schema({
     enum: ['none', 'pending', 'approved', 'rejected'],
     default: 'none',
   },
+  // Stripe Connect (for sellers receiving payouts)
+  stripeAccountId: {
+    type: String,
+    default: null,
+  },
+  stripeOnboardingStatus: {
+    type: String,
+    enum: ['none', 'pending', 'complete'],
+    default: 'none',
+  },
   // Ratings (for sellers)
   averageRating: {
     type: Number,

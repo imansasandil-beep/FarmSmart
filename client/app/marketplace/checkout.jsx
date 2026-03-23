@@ -193,6 +193,7 @@ export default function CheckoutScreen() {
                     orderId,
                     amount: total,
                     productName: title,
+                    sellerId,
                 }),
             });
 

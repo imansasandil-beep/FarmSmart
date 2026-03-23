@@ -173,6 +173,30 @@ export default function AddListingScreen() {
             }
             const user = JSON.parse(userStr);
 
+            // Check if seller has completed Stripe Connect onboarding
+            try {
+                const connectRes = await fetch(`${API_BASE_URL}/api/payments/connect-status/${user._id}`);
+                const connectData = await connectRes.json();
+                if (!connectData.chargesEnabled) {
+                    Alert.alert(
+                        'Payment Setup Required',
+                        'You need to set up your Stripe payment account before posting a listing. This ensures you can receive payments from buyers.',
+                        [
+                            { text: 'Cancel', style: 'cancel' },
+                            {
+                                text: 'Set Up Now',
+                                onPress: () => router.push('/marketplace/seller-setup'),
+                            },
+                        ]
+                    );
+                    setLoading(false);
+                    return;
+                }
+            } catch (connectError) {
+                console.error('Connect check error:', connectError);
+                // Allow listing creation if we can't check — backend will catch it at checkout
+            }
+
             const response = await fetch(`${API_BASE_URL}/api/marketplace/add`, {
                 method: 'POST',
                 headers: {

@@ -50,6 +50,25 @@ app.get('/api/payments/checkout-cancel', (req, res) => {
     `);
 });
 
+// Stripe Connect onboarding: seller returns after completing onboarding
+app.get('/api/payments/connect-onboarding-return', (req, res) => {
+    res.send(`
+        <html><head><meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>body{font-family:-apple-system,sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh;margin:0;background:#0a1f1c;color:white}.c{text-align:center;padding:40px}.i{font-size:64px;margin-bottom:20px}h1{color:#6fdfc4}p{color:rgba(255,255,255,0.7);font-size:16px}</style>
+        </head><body><div class="c"><div class="i">✅</div><h1>Stripe Setup Complete!</h1><p>Your payment account is being verified.</p><p>You can close this window and return to the FarmSmart app.</p></div></body></html>
+    `);
+});
+
+// Stripe Connect onboarding: link expired or needs refresh
+app.get('/api/payments/connect-onboarding-refresh', async (req, res) => {
+    const { sellerId } = req.query;
+    res.send(`
+        <html><head><meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>body{font-family:-apple-system,sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh;margin:0;background:#0a1f1c;color:white}.c{text-align:center;padding:40px}.i{font-size:64px;margin-bottom:20px}h1{color:#f59e0b}p{color:rgba(255,255,255,0.7);font-size:16px}</style>
+        </head><body><div class="c"><div class="i">🔄</div><h1>Link Expired</h1><p>This onboarding link has expired.</p><p>Please close this window and tap "Set Up Payments" again in the app.</p></div></body></html>
+    `);
+});
+
 // Middleware
 app.use(express.json()); // Allows us to parse JSON data
 app.use(cors()); // Allows frontend to communicate with backend
