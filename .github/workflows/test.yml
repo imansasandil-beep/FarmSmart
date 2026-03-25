@@ -1,0 +1,38 @@
+name: FarmSmart Server Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install server dependencies
+        working-directory: ./server
+        run: npm ci
+
+      - name: Run tests
+        working-directory: ./server
+        run: npm test
+        env:
+          # Dummy env vars so dotenv doesn't crash (tests use mocks, not real services)
+          MONGO_URI: mongodb://localhost:27017/farmsmart_test
+          CLERK_SECRET_KEY: sk_test_dummy
+          STRIPE_SECRET_KEY: sk_test_dummy
+          WEATHER_API_KEY: dummy_weather_key
